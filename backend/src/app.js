@@ -3,8 +3,16 @@ const cors = require('cors');
 
 const env = require('./config/env');
 const { pool } = require('./config/db');
-const notFoundMiddleware = require('./middleware/notFoundMiddleware');
-const errorMiddleware = require('./middleware/errorMiddleware');
+
+const authRoutes = require('./routes/authRoutes');
+
+const notFoundMiddleware = require(
+  './middleware/notFoundMiddleware'
+);
+
+const errorMiddleware = require(
+  './middleware/errorMiddleware'
+);
 
 const app = express();
 
@@ -46,6 +54,8 @@ app.get('/api/health', async (req, res, next) => {
     next(error);
   }
 });
+
+app.use('/api/auth', authRoutes);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
