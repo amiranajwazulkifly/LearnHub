@@ -1,12 +1,17 @@
 import axiosInstance from '../api/axiosInstance';
 
 import type { ApiResponse } from '../types/api';
+
 import type {
   AuthData,
+  ChangePasswordRequest,
   CurrentUserData,
   LoginRequest,
   RegisterRequest,
+  UpdateProfileRequest,
 } from '../types/auth';
+
+import type { User } from '../types/user';
 
 export const authService = {
   async register(
@@ -53,6 +58,31 @@ export const authService = {
     }
 
     return response.data.data;
+  },
+
+  async updateProfile(
+    payload: UpdateProfileRequest
+  ): Promise<User> {
+    const response = await axiosInstance.patch<
+      ApiResponse<CurrentUserData>
+    >('/auth/me', payload);
+
+    if (!response.data.data?.user) {
+      throw new Error(
+        'Profile response did not contain user data'
+      );
+    }
+
+    return response.data.data.user;
+  },
+
+  async changePassword(
+    payload: ChangePasswordRequest
+  ): Promise<void> {
+    await axiosInstance.patch(
+      '/auth/password',
+      payload
+    );
   },
 
   async logout(): Promise<void> {

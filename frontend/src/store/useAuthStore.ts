@@ -3,8 +3,10 @@ import { create } from 'zustand';
 import { authService } from '../services/authService';
 
 import type {
+  ChangePasswordRequest,
   LoginRequest,
   RegisterRequest,
+  UpdateProfileRequest,
 } from '../types/auth';
 
 import type { User } from '../types/user';
@@ -29,6 +31,14 @@ interface AuthState {
   ) => Promise<User>;
 
   initializeAuth: () => Promise<void>;
+
+  updateProfile: (
+    payload: UpdateProfileRequest
+  ) => Promise<User>;
+
+  changePassword: (
+    payload: ChangePasswordRequest
+  ) => Promise<void>;
 
   logout: () => Promise<void>;
 
@@ -67,14 +77,14 @@ export const useAuthStore = create<AuthState>(
 
         return data.user;
       } catch (error) {
-        const message = getErrorMessage(error);
+        authStorage.removeToken();
 
         set({
           user: null,
           token: null,
           isAuthenticated: false,
           isLoading: false,
-          error: message,
+          error: getErrorMessage(error),
         });
 
         throw error;
@@ -102,8 +112,6 @@ export const useAuthStore = create<AuthState>(
 
         return data.user;
       } catch (error) {
-        const message = getErrorMessage(error);
-
         authStorage.removeToken();
 
         set({
@@ -111,7 +119,7 @@ export const useAuthStore = create<AuthState>(
           token: null,
           isAuthenticated: false,
           isLoading: false,
-          error: message,
+          error: getErrorMessage(error),
         });
 
         throw error;
@@ -126,6 +134,7 @@ export const useAuthStore = create<AuthState>(
           user: null,
           token: null,
           isAuthenticated: false,
+          isLoading: false,
           isInitialized: true,
         });
 
@@ -159,6 +168,54 @@ export const useAuthStore = create<AuthState>(
           isInitialized: true,
           error: getErrorMessage(error),
         });
+      }
+    },
+
+    updateProfile: async (payload) => {
+      set({
+        isLoading: true,
+        error: null,
+      });
+
+      try {
+        const user =
+          await authService.updateProfile(payload);
+
+        set({
+          user,
+          isLoading: false,
+        });
+
+        return user;
+      } catch (error) {
+        set({
+          isLoading: false,
+          error: getErrorMessage(error),
+        });
+
+        throw error;
+      }
+    },
+
+    changePassword: async (payload) => {
+      set({
+        isLoading: true,
+        error: null,
+      });
+
+      try {
+        await authService.changePassword(payload);
+
+        set({
+          isLoading: false,
+        });
+      } catch (error) {
+        set({
+          isLoading: false,
+          error: getErrorMessage(error),
+        });
+
+        throw error;
       }
     },
 

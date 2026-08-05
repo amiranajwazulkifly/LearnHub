@@ -11,6 +11,16 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface UpdateProfileRequest {
+  fullName: string;
+  email: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
 export interface AuthData {
   user: User;
   token: string;
