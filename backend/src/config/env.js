@@ -1,0 +1,25 @@
+const path = require('path');
+const dotenv = require('dotenv');
+
+dotenv.config({
+  path: path.resolve(__dirname, '../../.env'),
+});
+
+const requiredVariables = ['DATABASE_URL'];
+
+for (const variable of requiredVariables) {
+  if (!process.env[variable]) {
+    throw new Error(`${variable} is missing from the .env file`);
+  }
+}
+
+const env = {
+  nodeEnv: process.env.NODE_ENV || 'development',
+  port: Number(process.env.PORT) || 5000,
+  databaseUrl: process.env.DATABASE_URL,
+  clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
+  jwtSecret: process.env.JWT_SECRET,
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1d',
+};
+
+module.exports = env;
