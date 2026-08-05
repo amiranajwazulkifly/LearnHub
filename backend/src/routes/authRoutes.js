@@ -20,6 +20,10 @@ const authMiddleware = require(
   '../middleware/authMiddleware'
 );
 
+const roleMiddleware = require(
+  '../middleware/roleMiddleware'
+);
+
 const asyncHandler = require('../utils/asyncHandler');
 
 const router = express.Router();
@@ -39,12 +43,14 @@ router.post(
 router.get(
   '/me',
   authMiddleware,
+  roleMiddleware('admin', 'student'),
   asyncHandler(getCurrentUser)
 );
 
 router.post(
   '/logout',
   authMiddleware,
+  roleMiddleware('admin', 'student'),
   asyncHandler(logout)
 );
 
