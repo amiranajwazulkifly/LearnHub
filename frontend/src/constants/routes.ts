@@ -1,3 +1,8 @@
+import {
+  ROLES,
+  type UserRole,
+} from './roles';
+
 export const ROUTES = {
   HOME: '/',
 
@@ -16,3 +21,17 @@ export const ROUTES = {
     TIMETABLE: '/student/timetable',
   },
 } as const;
+
+export function getDefaultRouteForRole(
+  role: UserRole
+): string {
+  if (role === ROLES.ADMIN) {
+    return ROUTES.ADMIN.DASHBOARD;
+  }
+
+  if (role === ROLES.STUDENT) {
+    return ROUTES.STUDENT.DASHBOARD;
+  }
+
+  return ROUTES.LOGIN;
+}

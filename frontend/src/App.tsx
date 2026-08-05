@@ -1,9 +1,12 @@
+import { BrowserRouter } from 'react-router-dom';
+
+import AppRoutes from './routes/AppRoutes';
+
 function App() {
   return (
-    <main>
-      <h1>LearnHub</h1>
-      <p>Course Management System</p>
-    </main>
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
   );
 }
 
