@@ -5,7 +5,10 @@ dotenv.config({
   path: path.resolve(__dirname, '../../.env'),
 });
 
-const requiredVariables = ['DATABASE_URL'];
+const requiredVariables = [
+  'DATABASE_URL',
+  'JWT_SECRET',
+];
 
 for (const variable of requiredVariables) {
   if (!process.env[variable]) {
@@ -15,7 +18,7 @@ for (const variable of requiredVariables) {
 
 const env = {
   nodeEnv: process.env.NODE_ENV || 'development',
-  port: Number(process.env.PORT) || 5000,
+  port: Number(process.env.PORT) || 5001,
   databaseUrl: process.env.DATABASE_URL,
   clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
   jwtSecret: process.env.JWT_SECRET,
