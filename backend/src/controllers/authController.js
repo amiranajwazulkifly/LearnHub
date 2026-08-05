@@ -30,7 +30,17 @@ async function login(req, res) {
   });
 }
 
-async function logout(req, res) {
+function getCurrentUser(req, res) {
+  res.status(200).json({
+    success: true,
+    message: 'Authenticated user retrieved successfully',
+    data: {
+      user: req.user,
+    },
+  });
+}
+
+function logout(req, res) {
   res.status(200).json({
     success: true,
     message: 'Logout successful',
@@ -40,5 +50,6 @@ async function logout(req, res) {
 module.exports = {
   register,
   login,
+  getCurrentUser,
   logout,
 };

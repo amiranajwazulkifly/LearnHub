@@ -44,6 +44,29 @@ async function findUserByEmail(email) {
   return result.rows[0] || null;
 }
 
+async function findUserById(userId) {
+  const result = await pool.query(
+    `
+      SELECT
+        id,
+        full_name,
+        email,
+        role,
+        status,
+        created_at,
+        updated_at
+      FROM public.users
+      WHERE id = $1
+      LIMIT 1
+    `,
+    [userId]
+  );
+
+  const user = result.rows[0];
+
+  return user ? formatUser(user) : null;
+}
+
 async function registerStudent({
   fullName,
   email,
@@ -90,11 +113,10 @@ async function registerStudent({
     );
 
     const user = result.rows[0];
-    const token = generateToken(user);
 
     return {
       user: formatUser(user),
-      token,
+      token: generateToken(user),
     };
   } catch (error) {
     if (error.code === '23505') {
@@ -142,15 +164,14 @@ async function loginUser({
     );
   }
 
-  const token = generateToken(user);
-
   return {
     user: formatUser(user),
-    token,
+    token: generateToken(user),
   };
 }
 
 module.exports = {
   registerStudent,
   loginUser,
+  findUserById,
 };

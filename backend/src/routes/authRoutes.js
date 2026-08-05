@@ -3,6 +3,7 @@ const express = require('express');
 const {
   register,
   login,
+  getCurrentUser,
   logout,
 } = require('../controllers/authController');
 
@@ -13,6 +14,10 @@ const {
 
 const validationMiddleware = require(
   '../middleware/validationMiddleware'
+);
+
+const authMiddleware = require(
+  '../middleware/authMiddleware'
 );
 
 const asyncHandler = require('../utils/asyncHandler');
@@ -31,8 +36,15 @@ router.post(
   asyncHandler(login)
 );
 
+router.get(
+  '/me',
+  authMiddleware,
+  asyncHandler(getCurrentUser)
+);
+
 router.post(
   '/logout',
+  authMiddleware,
   asyncHandler(logout)
 );
 
