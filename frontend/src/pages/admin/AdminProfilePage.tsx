@@ -1,17 +1,13 @@
+import PageHeader from '../../components/layout/PageHeader';
 import ProfileForm from '../../components/forms/ProfileForm';
 
 function AdminProfilePage() {
   return (
     <div className="mx-auto max-w-3xl">
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold">
-          Admin Profile
-        </h1>
-
-        <p className="mt-1 text-gray-600">
-          Manage your administrator account.
-        </p>
-      </div>
+      <PageHeader
+        title="Admin Profile"
+        description="Manage your administrator account information and password."
+      />
 
       <ProfileForm />
     </div>

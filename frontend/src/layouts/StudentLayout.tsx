@@ -1,56 +1,41 @@
-import {
-  Link,
-  Outlet,
-  useNavigate,
-} from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
+import Navbar from '../components/layout/Navbar';
+import Sidebar from '../components/layout/Sidebar';
 import { ROUTES } from '../constants/routes';
-import { useAuthStore } from '../store/useAuthStore';
+
+const studentNavigation = [
+  {
+    label: 'Dashboard',
+    path: ROUTES.STUDENT.DASHBOARD,
+    end: true,
+  },
+  {
+    label: 'Profile',
+    path: ROUTES.STUDENT.PROFILE,
+  },
+  {
+    label: 'Browse Courses',
+    path: ROUTES.STUDENT.COURSES,
+  },
+  {
+    label: 'Timetable',
+    path: ROUTES.STUDENT.TIMETABLE,
+  },
+] as const;
 
 function StudentLayout() {
-  const navigate = useNavigate();
-
-  const user = useAuthStore(
-    (state) => state.user
-  );
-
-  const logout = useAuthStore(
-    (state) => state.logout
-  );
-
-  async function handleLogout() {
-    await logout();
-    navigate(ROUTES.LOGIN, { replace: true });
-  }
-
   return (
     <div className="min-h-screen bg-gray-100">
-      <header className="flex items-center justify-between bg-white px-6 py-4 shadow-sm">
-        <div>
-          <strong>LearnHub Student</strong>
-          <p className="text-sm text-gray-600">
-            {user?.fullName}
-          </p>
-        </div>
+      <Navbar portalName="Student Portal" />
 
-        <nav className="flex items-center gap-4">
-          <Link to={ROUTES.STUDENT.PROFILE}>
-            Profile
-          </Link>
+      <div className="flex flex-col md:flex-row">
+        <Sidebar items={studentNavigation} />
 
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="rounded-lg border px-3 py-2"
-          >
-            Logout
-          </button>
-        </nav>
-      </header>
-
-      <main className="p-6">
-        <Outlet />
-      </main>
+        <main className="min-w-0 flex-1 p-4 sm:p-6">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }

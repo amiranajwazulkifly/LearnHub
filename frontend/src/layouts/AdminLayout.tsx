@@ -1,56 +1,33 @@
-import {
-  Link,
-  Outlet,
-  useNavigate,
-} from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
+import Navbar from '../components/layout/Navbar';
+import Sidebar from '../components/layout/Sidebar';
 import { ROUTES } from '../constants/routes';
-import { useAuthStore } from '../store/useAuthStore';
+
+const adminNavigation = [
+  {
+    label: 'Dashboard',
+    path: ROUTES.ADMIN.DASHBOARD,
+    end: true,
+  },
+  {
+    label: 'Profile',
+    path: ROUTES.ADMIN.PROFILE,
+  },
+] as const;
 
 function AdminLayout() {
-  const navigate = useNavigate();
-
-  const user = useAuthStore(
-    (state) => state.user
-  );
-
-  const logout = useAuthStore(
-    (state) => state.logout
-  );
-
-  async function handleLogout() {
-    await logout();
-    navigate(ROUTES.LOGIN, { replace: true });
-  }
-
   return (
     <div className="min-h-screen bg-gray-100">
-      <header className="flex items-center justify-between bg-white px-6 py-4 shadow-sm">
-        <div>
-          <strong>LearnHub Admin</strong>
-          <p className="text-sm text-gray-600">
-            {user?.fullName}
-          </p>
-        </div>
+      <Navbar portalName="Admin Portal" />
 
-        <nav className="flex items-center gap-4">
-          <Link to={ROUTES.ADMIN.PROFILE}>
-            Profile
-          </Link>
+      <div className="flex flex-col md:flex-row">
+        <Sidebar items={adminNavigation} />
 
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="rounded-lg border px-3 py-2"
-          >
-            Logout
-          </button>
-        </nav>
-      </header>
-
-      <main className="p-6">
-        <Outlet />
-      </main>
+        <main className="min-w-0 flex-1 p-4 sm:p-6">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }

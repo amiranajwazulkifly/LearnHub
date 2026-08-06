@@ -1,17 +1,13 @@
 import ProfileForm from '../../components/forms/ProfileForm';
+import PageHeader from '../../components/layout/PageHeader';
 
 function ProfilePage() {
   return (
     <div className="mx-auto max-w-3xl">
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold">
-          Student Profile
-        </h1>
-
-        <p className="mt-1 text-gray-600">
-          Manage your LearnHub account.
-        </p>
-      </div>
+      <PageHeader
+        title="Student Profile"
+        description="Manage your LearnHub account information and password."
+      />
 
       <ProfileForm />
     </div>
