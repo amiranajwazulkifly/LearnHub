@@ -63,6 +63,47 @@ async function getAllCourses(req, res) {
   }
 }
 
+async function getCourseById(req, res) {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(
+      `
+      SELECT
+        courses.*,
+        categories.name AS category_name,
+        instructors.full_name AS instructor_name
+      FROM courses
+      JOIN categories
+        ON categories.id = courses.category_id
+      JOIN instructors
+        ON instructors.id = courses.instructor_id
+      WHERE courses.id = $1;
+      `,
+      [id],
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Course not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to retrieve course",
+    });
+  }
+}
+
 async function createCourse(req, res) {
   try {
     const {
@@ -209,6 +250,7 @@ async function deleteCourse(req, res) {
 
 module.exports = {
   getAllCourses,
+  getCourseById,
   createCourse,
   updateCourse,
   deleteCourse,

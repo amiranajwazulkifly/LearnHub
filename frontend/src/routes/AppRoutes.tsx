@@ -16,7 +16,12 @@ import SchedulesPage from "../pages/admin/SchedulesPage";
 
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
+
+import BrowseCoursesPage from "../pages/student/BrowseCoursesPage";
+import CourseDetailsPage from "../pages/student/CourseDetailsPage";
+import MyCoursesPage from "../pages/student/MyCoursesPage";
 import ProfilePage from "../pages/student/ProfilePage";
+import TimetablePage from "../pages/student/TimetablePage";
 
 import { useAuthStore } from "../store/useAuthStore";
 
@@ -31,7 +36,7 @@ function RootRedirect() {
   const isInitialized = useAuthStore((state) => state.isInitialized);
 
   if (!isInitialized) {
-    return <main className="p-6">Loading LearnHub...</main>;
+    return <div>Loading LearnHub...</div>;
   }
 
   if (!isAuthenticated || !user) {
@@ -94,6 +99,26 @@ function AppRoutes() {
             <Route path={ROUTES.STUDENT.DASHBOARD} element={<ProfilePage />} />
 
             <Route path={ROUTES.STUDENT.PROFILE} element={<ProfilePage />} />
+
+            <Route
+              path={ROUTES.STUDENT.COURSES}
+              element={<BrowseCoursesPage />}
+            />
+
+            <Route
+              path={`${ROUTES.STUDENT.COURSES}/:id`}
+              element={<CourseDetailsPage />}
+            />
+
+            <Route
+              path={ROUTES.STUDENT.MY_COURSES}
+              element={<MyCoursesPage />}
+            />
+
+            <Route
+              path={ROUTES.STUDENT.TIMETABLE}
+              element={<TimetablePage />}
+            />
           </Route>
         </Route>
       </Route>
