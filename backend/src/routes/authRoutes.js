@@ -28,24 +28,33 @@ const roleMiddleware = require(
   '../middleware/roleMiddleware'
 );
 
+const {
+  authRateLimiter,
+} = require('../middleware/rateLimitMiddleware');
+
 const asyncHandler = require(
   '../utils/asyncHandler'
 );
 
 const router = express.Router();
 
+// Public registration
 router.post(
   '/register',
+  authRateLimiter,
   validationMiddleware(validateRegister),
   asyncHandler(register)
 );
 
+// Public login
 router.post(
   '/login',
+  authRateLimiter,
   validationMiddleware(validateLogin),
   asyncHandler(login)
 );
 
+// Get authenticated user
 router.get(
   '/me',
   authMiddleware,
@@ -53,6 +62,7 @@ router.get(
   asyncHandler(getCurrentUser)
 );
 
+// Update authenticated user's profile
 router.patch(
   '/me',
   authMiddleware,
@@ -61,6 +71,7 @@ router.patch(
   asyncHandler(updateProfile)
 );
 
+// Change password
 router.patch(
   '/password',
   authMiddleware,
@@ -69,6 +80,7 @@ router.patch(
   asyncHandler(changePassword)
 );
 
+// Logout
 router.post(
   '/logout',
   authMiddleware,
