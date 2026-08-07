@@ -1,29 +1,66 @@
-// backend/src/validators/announcementValidator.js
-//
-// Lightweight manual validation (no extra dependency). If Nabil's shared
-// validationMiddleware.js wraps a library like express-validator or Joi,
-// swap this for that pattern to stay consistent — check with him first.
+// dzul
+const ALLOWED_AUDIENCES = ['all', 'students', 'instructors'];
 
-const ApiError = require('../utils/apiError');
-
-function validateAnnouncementPayload(req, res, next) {
-  const { title, content } = req.body;
+function validateCreateAnnouncement(req) {
   const errors = [];
 
-  if (!title || typeof title !== 'string' || title.trim().length === 0) {
-    errors.push('title is required');
-  } else if (title.length > 200) {
-    errors.push('title must be 200 characters or fewer');
+  const title = typeof req.body.title === 'string' ? req.body.title.trim() : '';
+  const content = typeof req.body.content === 'string' ? req.body.content.trim() : '';
+  const audience = req.body.audience;
+
+  if (!title) {
+    errors.push({ field: 'title', message: 'Title is required' });
+  } else if (title.length < 2) {
+    errors.push({ field: 'title', message: 'Title must contain at least 2 characters' });
+  } else if (title.length > 180) {
+    errors.push({ field: 'title', message: 'Title cannot exceed 180 characters' });
   }
 
-  if (!content || typeof content !== 'string' || content.trim().length === 0) {
-    errors.push('content is required');
+  if (!content) {
+    errors.push({ field: 'content', message: 'Content is required' });
   }
 
-  if (errors.length > 0) {
-    return next(new ApiError(400, 'VALIDATION_ERROR', errors.join('; ')));
+  if (audience !== undefined && !ALLOWED_AUDIENCES.includes(audience)) {
+    errors.push({
+      field: 'audience',
+      message: `audience must be one of: ${ALLOWED_AUDIENCES.join(', ')}`,
+    });
   }
-  next();
+
+  return errors;
 }
 
-module.exports = { validateAnnouncementPayload };
+function validateUpdateAnnouncement(req) {
+  const errors = [];
+
+  const hasTitle = Object.prototype.hasOwnProperty.call(req.body, 'title');
+  const hasContent = Object.prototype.hasOwnProperty.call(req.body, 'content');
+  const hasAudience = Object.prototype.hasOwnProperty.call(req.body, 'audience');
+
+  if (hasTitle) {
+    const title = typeof req.body.title === 'string' ? req.body.title.trim() : '';
+    if (!title) {
+      errors.push({ field: 'title', message: 'Title cannot be empty' });
+    } else if (title.length > 180) {
+      errors.push({ field: 'title', message: 'Title cannot exceed 180 characters' });
+    }
+  }
+
+  if (hasContent) {
+    const content = typeof req.body.content === 'string' ? req.body.content.trim() : '';
+    if (!content) {
+      errors.push({ field: 'content', message: 'Content cannot be empty' });
+    }
+  }
+
+  if (hasAudience && !ALLOWED_AUDIENCES.includes(req.body.audience)) {
+    errors.push({
+      field: 'audience',
+      message: `audience must be one of: ${ALLOWED_AUDIENCES.join(', ')}`,
+    });
+  }
+
+  return errors;
+}
+
+module.exports = { validateCreateAnnouncement, validateUpdateAnnouncement };

@@ -5,6 +5,10 @@ const env = require('./config/env');
 const { pool } = require('./config/db');
 
 const authRoutes = require('./routes/authRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
+const studentRoutes = require('./routes/studentRoutes');
+const reportRoutes = require('./routes/reportRoutes');
+const announcementRoutes = require('./routes/announcementRoutes');
 
 const notFoundMiddleware = require(
   './middleware/notFoundMiddleware'
@@ -56,6 +60,10 @@ app.get('/api/health', async (req, res, next) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api', studentRoutes);
+app.use('/api/reports', reportRoutes);
+app.use('/api/announcements', announcementRoutes);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);

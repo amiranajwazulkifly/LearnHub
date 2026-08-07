@@ -1,11 +1,14 @@
-// backend/src/routes/dashboardRoutes.js
+//Dzul
 const express = require('express');
-const router = express.Router();
-const dashboardController = require('../controllers/dashboardController');
+
+const { getStats, getRecentActivity } = require('../controllers/dashboardController');
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
+const asyncHandler = require('../utils/asyncHandler');
 
-router.get('/stats', authMiddleware, roleMiddleware('admin'), dashboardController.getStats);
-router.get('/recent-activity', authMiddleware, roleMiddleware('admin'), dashboardController.getRecentActivity);
+const router = express.Router();
+
+router.get('/stats', authMiddleware, roleMiddleware('admin'), asyncHandler(getStats));
+router.get('/recent-activity', authMiddleware, roleMiddleware('admin'), asyncHandler(getRecentActivity));
 
 module.exports = router;

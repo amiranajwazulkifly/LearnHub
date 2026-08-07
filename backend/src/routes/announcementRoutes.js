@@ -1,22 +1,59 @@
-// backend/src/routes/announcementRoutes.js
+//Dzul
 const express = require('express');
-const router = express.Router();
-const announcementController = require('../controllers/announcementController');
-const { validateAnnouncementPayload } = require('../validators/announcementValidator');
+
+const {
+  listAll,
+  listPublished,
+  getOne,
+  create,
+  update,
+  publish,
+  archive,
+  backToDraft,
+  remove,
+} = require('../controllers/announcementController');
+
+const {
+  validateCreateAnnouncement,
+  validateUpdateAnnouncement,
+} = require('../validators/announcementValidator');
+
+const validationMiddleware = require('../middleware/validationMiddleware');
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
+const asyncHandler = require('../utils/asyncHandler');
 
-// Student-facing — any authenticated user can read published announcements.
-// Placed before /:id so it doesn't get swallowed by the param route.
-router.get('/published', authMiddleware, announcementController.listPublished);
+const router = express.Router();
+
+// Student-facing — any authenticated user reads published announcements
+// scoped to their audience. Declared before '/:id' so it isn't swallowed
+// by the param route.
+router.get('/published', authMiddleware, roleMiddleware('admin', 'student'), asyncHandler(listPublished));
 
 // Admin management
-router.get('/', authMiddleware, roleMiddleware('admin'), announcementController.listAll);
-router.get('/:id', authMiddleware, roleMiddleware('admin'), announcementController.getOne);
-router.post('/', authMiddleware, roleMiddleware('admin'), validateAnnouncementPayload, announcementController.create);
-router.patch('/:id', authMiddleware, roleMiddleware('admin'), announcementController.update);
-router.patch('/:id/publish', authMiddleware, roleMiddleware('admin'), announcementController.publish);
-router.patch('/:id/unpublish', authMiddleware, roleMiddleware('admin'), announcementController.unpublish);
-router.delete('/:id', authMiddleware, roleMiddleware('admin'), announcementController.remove);
+router.get('/', authMiddleware, roleMiddleware('admin'), asyncHandler(listAll));
+router.get('/:id', authMiddleware, roleMiddleware('admin'), asyncHandler(getOne));
+
+router.post(
+  '/',
+  authMiddleware,
+  roleMiddleware('admin'),
+  validationMiddleware(validateCreateAnnouncement),
+  asyncHandler(create)
+);
+
+router.patch(
+  '/:id',
+  authMiddleware,
+  roleMiddleware('admin'),
+  validationMiddleware(validateUpdateAnnouncement),
+  asyncHandler(update)
+);
+
+router.patch('/:id/publish', authMiddleware, roleMiddleware('admin'), asyncHandler(publish));
+router.patch('/:id/archive', authMiddleware, roleMiddleware('admin'), asyncHandler(archive));
+router.patch('/:id/draft', authMiddleware, roleMiddleware('admin'), asyncHandler(backToDraft));
+
+router.delete('/:id', authMiddleware, roleMiddleware('admin'), asyncHandler(remove));
 
 module.exports = router;

@@ -1,18 +1,28 @@
-// backend/src/routes/studentRoutes.js
+//Dzul
 const express = require('express');
-const router = express.Router();
-const studentController = require('../controllers/studentController');
+
+const {
+  listStudents,
+  getStudentDetail,
+  listAllEnrollments,
+  updateEnrollmentStatus,
+} = require('../controllers/studentController');
+
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
+const asyncHandler = require('../utils/asyncHandler');
 
-// Student management (StudentsPage, StudentDetailsPage)
-router.get('/students', authMiddleware, roleMiddleware('admin'), studentController.listStudents);
-router.get('/students/:id', authMiddleware, roleMiddleware('admin'), studentController.getStudentDetail);
+const router = express.Router();
 
-// Enrollment management (EnrollmentsPage) — same router file since both
-// are "admin oversight of students," but mounted under a separate prefix
-// in app.js: /api/students and /api/enrollments respectively.
-router.get('/enrollments', authMiddleware, roleMiddleware('admin'), studentController.listAllEnrollments);
-router.patch('/enrollments/:id', authMiddleware, roleMiddleware('admin'), studentController.updateEnrollmentStatus);
+router.get('/students', authMiddleware, roleMiddleware('admin'), asyncHandler(listStudents));
+router.get('/students/:id', authMiddleware, roleMiddleware('admin'), asyncHandler(getStudentDetail));
+
+router.get('/enrollments', authMiddleware, roleMiddleware('admin'), asyncHandler(listAllEnrollments));
+router.patch(
+  '/enrollments/:id',
+  authMiddleware,
+  roleMiddleware('admin'),
+  asyncHandler(updateEnrollmentStatus)
+);
 
 module.exports = router;

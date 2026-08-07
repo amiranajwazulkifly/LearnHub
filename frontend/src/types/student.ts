@@ -1,4 +1,4 @@
-// frontend/src/types/student.ts
+// Dzul
 
 export interface Student {
   id: number;
