@@ -1,34 +1,129 @@
-const { body, validationResult } = require("express-validator");
+function validateRegister(req) {
+  const errors = [];
 
-const validateCourse = [
-  body("title").trim().notEmpty().withMessage("Course title is required"),
+  const { fullName, email, password } = req.body;
 
-  body("description").optional().trim(),
+  if (!fullName || !fullName.trim()) {
+    errors.push({
+      field: "fullName",
+      message: "Full name is required",
+    });
+  }
 
-  body("price").isFloat({ min: 0 }).withMessage("Price must be 0 or greater"),
+  if (!email || !email.trim()) {
+    errors.push({
+      field: "email",
+      message: "Email is required",
+    });
+  } else {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  body("duration").isInt({ min: 1 }).withMessage("Duration must be at least 1"),
-
-  body("level")
-    .isIn(["Beginner", "Intermediate", "Advanced"])
-    .withMessage("Invalid course level"),
-
-  body("category_id").isUUID().withMessage("Valid category is required"),
-
-  body("instructor_id").isUUID().withMessage("Valid instructor is required"),
-
-  (req, res, next) => {
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        errors: errors.array(),
+    if (!emailPattern.test(email)) {
+      errors.push({
+        field: "email",
+        message: "Please enter a valid email address",
       });
     }
+  }
 
-    next();
-  },
-];
+  if (!password) {
+    errors.push({
+      field: "password",
+      message: "Password is required",
+    });
+  } else if (password.length < 8) {
+    errors.push({
+      field: "password",
+      message: "Password must be at least 8 characters",
+    });
+  }
 
-module.exports = validateCourse;
+  return errors;
+}
+
+function validateLogin(req) {
+  const errors = [];
+
+  const { email, password } = req.body;
+
+  if (!email || !email.trim()) {
+    errors.push({
+      field: "email",
+      message: "Email is required",
+    });
+  }
+
+  if (!password) {
+    errors.push({
+      field: "password",
+      message: "Password is required",
+    });
+  }
+
+  return errors;
+}
+
+function validateUpdateProfile(req) {
+  const errors = [];
+
+  const { fullName, email } = req.body;
+
+  if (!fullName || !fullName.trim()) {
+    errors.push({
+      field: "fullName",
+      message: "Full name is required",
+    });
+  }
+
+  if (!email || !email.trim()) {
+    errors.push({
+      field: "email",
+      message: "Email is required",
+    });
+  } else {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailPattern.test(email)) {
+      errors.push({
+        field: "email",
+        message: "Please enter a valid email address",
+      });
+    }
+  }
+
+  return errors;
+}
+
+function validateChangePassword(req) {
+  const errors = [];
+
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword) {
+    errors.push({
+      field: "currentPassword",
+      message: "Current password is required",
+    });
+  }
+
+  if (!newPassword) {
+    errors.push({
+      field: "newPassword",
+      message: "New password is required",
+    });
+  } else if (newPassword.length < 8) {
+    errors.push({
+      field: "newPassword",
+      message: "New password must be at least 8 characters",
+    });
+  }
+
+  return errors;
+}
+
+module.exports = {
+  validateRegister,
+  validateLogin,
+  validateUpdateProfile,
+  validateChangePassword,
+};

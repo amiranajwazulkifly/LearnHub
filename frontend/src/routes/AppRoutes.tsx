@@ -23,6 +23,7 @@ import CourseDetailsPage from "../pages/student/CourseDetailsPage";
 import MyCoursesPage from "../pages/student/MyCoursesPage";
 import ProfilePage from "../pages/student/ProfilePage";
 import TimetablePage from "../pages/student/TimetablePage";
+import StudentDashboardPage from "../pages/student/StudentDashboardPage";
 
 import { useAuthStore } from "../store/useAuthStore";
 
@@ -97,7 +98,10 @@ function AppRoutes() {
         {/* Student */}
         <Route element={<RoleRoute allowedRoles={[ROLES.STUDENT]} />}>
           <Route element={<StudentLayout />}>
-            <Route path={ROUTES.STUDENT.DASHBOARD} element={<ProfilePage />} />
+            <Route
+              path={ROUTES.STUDENT.DASHBOARD}
+              element={<StudentDashboardPage />}
+            />
 
             <Route path={ROUTES.STUDENT.PROFILE} element={<ProfilePage />} />
 
