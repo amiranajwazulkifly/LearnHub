@@ -1,13 +1,19 @@
 export interface Course {
-  id: number;
+  id: string;
+  code: string;
   title: string;
-  description: string;
-  price: number;
-  duration: number;
-  level: string;
-  category_id: number;
-  instructor_id: number;
+  description: string | null;
 
-  category_name: string;
-  instructor_name: string;
+  category_id: string | null;
+  instructor_id: string | null;
+
+  capacity: number;
+  status: string;
+
+  created_by?: string | null;
+  created_at?: string;
+  updated_at?: string;
+
+  category_name?: string;
+  instructor_name?: string;
 }

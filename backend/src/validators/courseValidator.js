@@ -1,23 +1,31 @@
 const { body, validationResult } = require("express-validator");
 
+const uuidPattern =
+  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+
 const validateCourse = [
+  body("code").trim().notEmpty().withMessage("Course code is required"),
+
   body("title").trim().notEmpty().withMessage("Course title is required"),
 
-  body("description").optional().trim(),
+  body("description").optional({ nullable: true }).trim(),
 
-  body("price").isFloat({ min: 0 }).withMessage("Price must be 0 or greater"),
+  body("category_id")
+    .optional({ nullable: true, checkFalsy: true })
+    .matches(uuidPattern)
+    .withMessage("Category must be a valid UUID"),
 
-  body("duration")
+  body("instructor_id")
+    .optional({ nullable: true, checkFalsy: true })
+    .matches(uuidPattern)
+    .withMessage("Instructor must be a valid UUID"),
+
+  body("capacity")
+    .optional()
     .isInt({ min: 1 })
-    .withMessage("Duration must be at least 1 hour"),
+    .withMessage("Capacity must be at least 1"),
 
-  body("level")
-    .isIn(["Beginner", "Intermediate", "Advanced"])
-    .withMessage("Invalid course level"),
-
-  body("category_id").isInt().withMessage("Category is required"),
-
-  body("instructor_id").isInt().withMessage("Instructor is required"),
+  body("status").optional().isString().withMessage("Status must be valid"),
 
   (req, res, next) => {
     const errors = validationResult(req);
