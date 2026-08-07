@@ -13,6 +13,7 @@ import CategoriesPage from "../pages/admin/CategoriesPage";
 import CoursesPage from "../pages/admin/CoursesPage";
 import InstructorsPage from "../pages/admin/InstructorsPage";
 import SchedulesPage from "../pages/admin/SchedulesPage";
+import CourseFormPage from "../pages/admin/CourseFormPage";
 
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
@@ -78,7 +79,7 @@ function AppRoutes() {
             <Route path={ROUTES.ADMIN.PROFILE} element={<AdminProfilePage />} />
 
             <Route path={ROUTES.ADMIN.COURSES} element={<CoursesPage />} />
-
+            <Route path="/admin/courses/create" element={<CourseFormPage />} />
             <Route
               path={ROUTES.ADMIN.CATEGORIES}
               element={<CategoriesPage />}

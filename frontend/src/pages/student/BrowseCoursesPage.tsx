@@ -37,8 +37,8 @@ export default function BrowseCoursesPage() {
     return (
       course.title.toLowerCase().includes(keyword) ||
       course.code.toLowerCase().includes(keyword) ||
-      course.category_name.toLowerCase().includes(keyword) ||
-      course.instructor_name.toLowerCase().includes(keyword)
+      (course.category_name ?? "").toLowerCase().includes(keyword) ||
+      (course.instructor_name ?? "").toLowerCase().includes(keyword)
     );
   });
 

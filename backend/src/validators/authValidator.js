@@ -1,265 +1,34 @@
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const { body, validationResult } = require("express-validator");
 
-function validatePasswordStrength(password, field = 'password') {
-  const errors = [];
+const validateCourse = [
+  body("title").trim().notEmpty().withMessage("Course title is required"),
 
-  if (password.length < 8) {
-    errors.push({
-      field,
-      message: 'Password must contain at least 8 characters',
-    });
-  }
+  body("description").optional().trim(),
 
-  if (!/[a-z]/.test(password)) {
-    errors.push({
-      field,
-      message: 'Password must contain a lowercase letter',
-    });
-  }
+  body("price").isFloat({ min: 0 }).withMessage("Price must be 0 or greater"),
 
-  if (!/[A-Z]/.test(password)) {
-    errors.push({
-      field,
-      message: 'Password must contain an uppercase letter',
-    });
-  }
+  body("duration").isInt({ min: 1 }).withMessage("Duration must be at least 1"),
 
-  if (!/[0-9]/.test(password)) {
-    errors.push({
-      field,
-      message: 'Password must contain a number',
-    });
-  }
+  body("level")
+    .isIn(["Beginner", "Intermediate", "Advanced"])
+    .withMessage("Invalid course level"),
 
-  return errors;
-}
+  body("category_id").isUUID().withMessage("Valid category is required"),
 
-function validateRegister(req) {
-  const errors = [];
+  body("instructor_id").isUUID().withMessage("Valid instructor is required"),
 
-  const fullName =
-    typeof req.body.fullName === 'string'
-      ? req.body.fullName.trim()
-      : '';
+  (req, res, next) => {
+    const errors = validationResult(req);
 
-  const email =
-    typeof req.body.email === 'string'
-      ? req.body.email.trim()
-      : '';
-
-  const password =
-    typeof req.body.password === 'string'
-      ? req.body.password
-      : '';
-
-  if (!fullName) {
-    errors.push({
-      field: 'fullName',
-      message: 'Full name is required',
-    });
-  } else if (fullName.length < 2) {
-    errors.push({
-      field: 'fullName',
-      message: 'Full name must contain at least 2 characters',
-    });
-  } else if (fullName.length > 120) {
-    errors.push({
-      field: 'fullName',
-      message: 'Full name cannot exceed 120 characters',
-    });
-  }
-
-  if (!email) {
-    errors.push({
-      field: 'email',
-      message: 'Email is required',
-    });
-  } else if (!EMAIL_PATTERN.test(email)) {
-    errors.push({
-      field: 'email',
-      message: 'Enter a valid email address',
-    });
-  } else if (email.length > 255) {
-    errors.push({
-      field: 'email',
-      message: 'Email cannot exceed 255 characters',
-    });
-  }
-
-  if (!password) {
-    errors.push({
-      field: 'password',
-      message: 'Password is required',
-    });
-  } else {
-    errors.push(...validatePasswordStrength(password));
-  }
-
-  return errors;
-}
-
-function validateLogin(req) {
-  const errors = [];
-
-  const email =
-    typeof req.body.email === 'string'
-      ? req.body.email.trim()
-      : '';
-
-  const password =
-    typeof req.body.password === 'string'
-      ? req.body.password
-      : '';
-
-  if (!email) {
-    errors.push({
-      field: 'email',
-      message: 'Email is required',
-    });
-  } else if (!EMAIL_PATTERN.test(email)) {
-    errors.push({
-      field: 'email',
-      message: 'Enter a valid email address',
-    });
-  }
-
-  if (!password) {
-    errors.push({
-      field: 'password',
-      message: 'Password is required',
-    });
-  }
-
-  return errors;
-}
-
-function validateUpdateProfile(req) {
-  const errors = [];
-
-  const hasFullName =
-    Object.prototype.hasOwnProperty.call(
-      req.body,
-      'fullName'
-    );
-
-  const hasEmail =
-    Object.prototype.hasOwnProperty.call(
-      req.body,
-      'email'
-    );
-
-  if (!hasFullName && !hasEmail) {
-    errors.push({
-      field: 'profile',
-      message: 'Provide a full name or email to update',
-    });
-
-    return errors;
-  }
-
-  if (hasFullName) {
-    const fullName =
-      typeof req.body.fullName === 'string'
-        ? req.body.fullName.trim()
-        : '';
-
-    if (!fullName) {
-      errors.push({
-        field: 'fullName',
-        message: 'Full name is required',
-      });
-    } else if (fullName.length < 2) {
-      errors.push({
-        field: 'fullName',
-        message: 'Full name must contain at least 2 characters',
-      });
-    } else if (fullName.length > 120) {
-      errors.push({
-        field: 'fullName',
-        message: 'Full name cannot exceed 120 characters',
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array(),
       });
     }
-  }
 
-  if (hasEmail) {
-    const email =
-      typeof req.body.email === 'string'
-        ? req.body.email.trim()
-        : '';
+    next();
+  },
+];
 
-    if (!email) {
-      errors.push({
-        field: 'email',
-        message: 'Email is required',
-      });
-    } else if (!EMAIL_PATTERN.test(email)) {
-      errors.push({
-        field: 'email',
-        message: 'Enter a valid email address',
-      });
-    } else if (email.length > 255) {
-      errors.push({
-        field: 'email',
-        message: 'Email cannot exceed 255 characters',
-      });
-    }
-  }
-
-  return errors;
-}
-
-function validateChangePassword(req) {
-  const errors = [];
-
-  const currentPassword =
-    typeof req.body.currentPassword === 'string'
-      ? req.body.currentPassword
-      : '';
-
-  const newPassword =
-    typeof req.body.newPassword === 'string'
-      ? req.body.newPassword
-      : '';
-
-  if (!currentPassword) {
-    errors.push({
-      field: 'currentPassword',
-      message: 'Current password is required',
-    });
-  }
-
-  if (!newPassword) {
-    errors.push({
-      field: 'newPassword',
-      message: 'New password is required',
-    });
-  } else {
-    errors.push(
-      ...validatePasswordStrength(
-        newPassword,
-        'newPassword'
-      )
-    );
-  }
-
-  if (
-    currentPassword &&
-    newPassword &&
-    currentPassword === newPassword
-  ) {
-    errors.push({
-      field: 'newPassword',
-      message:
-        'New password must be different from the current password',
-    });
-  }
-
-  return errors;
-}
-
-module.exports = {
-  validateRegister,
-  validateLogin,
-  validateUpdateProfile,
-  validateChangePassword,
-};
+module.exports = validateCourse;

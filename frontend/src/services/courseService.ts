@@ -4,7 +4,7 @@ export const getCourses = async (params?: {
   search?: string;
   category?: string;
   instructor?: string;
-  level?: string;
+  status?: string;
 }) => {
   const response = await axiosInstance.get("/courses", {
     params,

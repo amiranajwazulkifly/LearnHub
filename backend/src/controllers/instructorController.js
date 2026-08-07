@@ -3,12 +3,12 @@ const { pool } = require("../config/db");
 async function getAllInstructors(req, res) {
   try {
     const result = await pool.query(
-      "SELECT * FROM instructors ORDER BY id ASC",
+      "SELECT * FROM instructors ORDER BY created_at DESC",
     );
 
     res.status(200).json(result.rows);
   } catch (error) {
-    console.error(error);
+    console.error("Get instructors error:", error);
 
     res.status(500).json({
       success: false,
@@ -19,16 +19,31 @@ async function getAllInstructors(req, res) {
 
 async function createInstructor(req, res) {
   try {
-    const { full_name, email, specialization, bio } = req.body;
+    const { full_name, email, phone, expertise, biography, is_active } =
+      req.body;
 
     const result = await pool.query(
       `
       INSERT INTO instructors
-      (full_name, email, specialization, bio)
-      VALUES ($1, $2, $3, $4)
+      (
+        full_name,
+        email,
+        phone,
+        expertise,
+        biography,
+        is_active
+      )
+      VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *;
       `,
-      [full_name, email, specialization, bio],
+      [
+        full_name,
+        email,
+        phone || null,
+        expertise || null,
+        biography || null,
+        is_active ?? true,
+      ],
     );
 
     res.status(201).json({
@@ -37,7 +52,7 @@ async function createInstructor(req, res) {
       data: result.rows[0],
     });
   } catch (error) {
-    console.error(error);
+    console.error("Create instructor error:", error);
 
     res.status(500).json({
       success: false,
@@ -49,7 +64,9 @@ async function createInstructor(req, res) {
 async function updateInstructor(req, res) {
   try {
     const { id } = req.params;
-    const { full_name, email, specialization, bio } = req.body;
+
+    const { full_name, email, phone, expertise, biography, is_active } =
+      req.body;
 
     const result = await pool.query(
       `
@@ -57,13 +74,23 @@ async function updateInstructor(req, res) {
       SET
         full_name = $1,
         email = $2,
-        specialization = $3,
-        bio = $4,
-        updated_at = CURRENT_TIMESTAMP
-      WHERE id = $5
+        phone = $3,
+        expertise = $4,
+        biography = $5,
+        is_active = $6,
+        updated_at = NOW()
+      WHERE id = $7
       RETURNING *;
       `,
-      [full_name, email, specialization, bio, id],
+      [
+        full_name,
+        email,
+        phone || null,
+        expertise || null,
+        biography || null,
+        is_active,
+        id,
+      ],
     );
 
     if (result.rowCount === 0) {
@@ -79,7 +106,7 @@ async function updateInstructor(req, res) {
       data: result.rows[0],
     });
   } catch (error) {
-    console.error(error);
+    console.error("Update instructor error:", error);
 
     res.status(500).json({
       success: false,
@@ -114,7 +141,7 @@ async function deleteInstructor(req, res) {
       data: result.rows[0],
     });
   } catch (error) {
-    console.error(error);
+    console.error("Delete instructor error:", error);
 
     res.status(500).json({
       success: false,
