@@ -1,3 +1,5 @@
+import api from "./api";
+
 export const getCourses = async (params?: {
   search?: string;
   category?: string;

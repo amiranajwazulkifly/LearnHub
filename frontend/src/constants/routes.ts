@@ -1,30 +1,29 @@
-import {
-  ROLES,
-  type UserRole,
-} from './roles';
+import { ROLES, type UserRole } from "./roles";
 
 export const ROUTES = {
-  HOME: '/',
+  HOME: "/",
 
-  LOGIN: '/login',
-  REGISTER: '/register',
+  LOGIN: "/login",
+  REGISTER: "/register",
 
   ADMIN: {
-    DASHBOARD: '/admin',
-    PROFILE: '/admin/profile',
+    DASHBOARD: "/admin",
+    PROFILE: "/admin/profile",
+    COURSES: "/admin/courses",
+    CATEGORIES: "/admin/categories",
+    INSTRUCTORS: "/admin/instructors",
+    SCHEDULES: "/admin/schedules",
   },
 
   STUDENT: {
-    DASHBOARD: '/student',
-    PROFILE: '/student/profile',
-    COURSES: '/student/courses',
-    TIMETABLE: '/student/timetable',
+    DASHBOARD: "/student",
+    PROFILE: "/student/profile",
+    COURSES: "/student/courses",
+    TIMETABLE: "/student/timetable",
   },
 } as const;
 
-export function getDefaultRouteForRole(
-  role: UserRole
-): string {
+export function getDefaultRouteForRole(role: UserRole): string {
   if (role === ROLES.ADMIN) {
     return ROUTES.ADMIN.DASHBOARD;
   }
