@@ -1,10 +1,15 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 
 const env = require('./config/env');
 const { pool } = require('./config/db');
 
 const authRoutes = require('./routes/authRoutes');
+
+const {
+  apiRateLimiter,
+} = require('./middleware/rateLimitMiddleware');
 
 const notFoundMiddleware = require(
   './middleware/notFoundMiddleware'
@@ -14,17 +19,66 @@ const errorMiddleware = require(
   './middleware/errorMiddleware'
 );
 
+const ApiError = require('./utils/apiError');
+
 const app = express();
+
+const allowedOrigins = env.clientUrl
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+app.disable('x-powered-by');
+
+app.use(helmet());
 
 app.use(
   cors({
-    origin: env.clientUrl,
+    origin(origin, callback) {
+      // Allow Postman, curl and other non-browser clients.
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(
+        new ApiError(
+          403,
+          'This origin is not allowed to access the API'
+        )
+      );
+    },
     credentials: true,
+    methods: [
+      'GET',
+      'POST',
+      'PUT',
+      'PATCH',
+      'DELETE',
+      'OPTIONS',
+    ],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+    ],
   })
 );
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(
+  express.json({
+    limit: '100kb',
+  })
+);
+
+app.use(
+  express.urlencoded({
+    extended: true,
+    limit: '100kb',
+  })
+);
 
 app.get('/', (req, res) => {
   res.status(200).json({
@@ -54,6 +108,8 @@ app.get('/api/health', async (req, res, next) => {
     next(error);
   }
 });
+
+app.use('/api', apiRateLimiter);
 
 app.use('/api/auth', authRoutes);
 
