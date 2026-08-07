@@ -9,6 +9,7 @@ const categoryRoutes = require("./routes/categoryRoutes");
 const instructorRoutes = require("./routes/instructorRoutes");
 const courseRoutes = require("./routes/courseRoutes");
 const scheduleRoutes = require("./routes/scheduleRoutes");
+const enrollmentRoutes = require("./routes/enrollmentRoutes");
 
 const notFoundMiddleware = require("./middleware/notFoundMiddleware");
 
@@ -60,6 +61,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/instructors", instructorRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/schedules", scheduleRoutes);
+app.use("/api/enrollments", enrollmentRoutes);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
