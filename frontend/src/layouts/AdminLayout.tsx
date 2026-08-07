@@ -1,18 +1,34 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet } from "react-router-dom";
 
-import Navbar from '../components/layout/Navbar';
-import Sidebar from '../components/layout/Sidebar';
-import { ROUTES } from '../constants/routes';
+import Navbar from "../components/layout/Navbar";
+import Sidebar from "../components/layout/Sidebar";
+import { ROUTES } from "../constants/routes";
 
 const adminNavigation = [
   {
-    label: 'Dashboard',
+    label: "Dashboard",
     path: ROUTES.ADMIN.DASHBOARD,
     end: true,
   },
   {
-    label: 'Profile',
+    label: "Profile",
     path: ROUTES.ADMIN.PROFILE,
+  },
+  {
+    label: "Courses",
+    path: ROUTES.ADMIN.COURSES,
+  },
+  {
+    label: "Categories",
+    path: ROUTES.ADMIN.CATEGORIES,
+  },
+  {
+    label: "Instructors",
+    path: ROUTES.ADMIN.INSTRUCTORS,
+  },
+  {
+    label: "Schedules",
+    path: ROUTES.ADMIN.SCHEDULES,
   },
 ] as const;
 
