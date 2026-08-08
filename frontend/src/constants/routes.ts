@@ -19,6 +19,7 @@ export const ROUTES = {
     DASHBOARD: "/student",
     PROFILE: "/student/profile",
     COURSES: "/student/courses",
+    MY_COURSES: "/student/my-courses",
     TIMETABLE: "/student/timetable",
   },
 } as const;

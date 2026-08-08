@@ -1,5 +1,4 @@
 import { BrowserRouter } from "react-router-dom";
-// import CoursesPage from "./pages/admin/CoursesPage";
 
 import AppRoutes from "./routes/AppRoutes";
 
