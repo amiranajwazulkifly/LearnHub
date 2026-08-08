@@ -11,7 +11,7 @@ export default function StudentDetailsPage() {
 
   useEffect(() => {
     if (!id) return;
-    getStudentDetail(Number(id))
+    getStudentDetail(id)
       .then(setData)
       .finally(() => setLoading(false));
   }, [id]);
@@ -25,10 +25,13 @@ export default function StudentDetailsPage() {
     <div className="p-6">
       <Link to="/admin/students" className="text-sm text-blue-600 hover:underline">← Back to Students</Link>
 
-      <h1 className="mt-2 text-2xl font-bold text-gray-900">{student.full_name}</h1>
+      <h1 className="mt-2 text-2xl font-bold text-gray-900">{student.fullName}</h1>
       <p className="text-gray-500">{student.email}</p>
+      {student.programme && (
+        <p className="text-sm text-gray-500">{student.programme} · Semester {student.semester}</p>
+      )}
       <p className="mt-1 text-xs text-gray-400">
-        Joined {new Date(student.created_at).toLocaleDateString()}
+        Joined {new Date(student.createdAt).toLocaleDateString()}
       </p>
 
       <h2 className="mb-3 mt-6 text-lg font-semibold text-gray-800">Enrollment History</h2>
@@ -45,13 +48,13 @@ export default function StudentDetailsPage() {
           <tbody className="divide-y divide-gray-100">
             {enrollments.map((e) => (
               <tr key={e.id}>
-                <td className="px-4 py-2 text-sm text-gray-800">{e.title}</td>
+                <td className="px-4 py-2 text-sm text-gray-800">{e.courseTitle}</td>
                 <td className="px-4 py-2 text-sm">
                   <span
                     className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                       e.status === 'completed'
                         ? 'bg-green-100 text-green-700'
-                        : e.status === 'dropped'
+                        : e.status === 'cancelled'
                           ? 'bg-gray-100 text-gray-600'
                           : 'bg-amber-100 text-amber-700'
                     }`}
@@ -60,10 +63,10 @@ export default function StudentDetailsPage() {
                   </span>
                 </td>
                 <td className="px-4 py-2 text-sm text-gray-500">
-                  {new Date(e.enrolled_at).toLocaleDateString()}
+                  {new Date(e.enrolledAt).toLocaleDateString()}
                 </td>
                 <td className="px-4 py-2 text-sm text-gray-500">
-                  {e.completed_at ? new Date(e.completed_at).toLocaleDateString() : '—'}
+                  {e.completedAt ? new Date(e.completedAt).toLocaleDateString() : '—'}
                 </td>
               </tr>
             ))}

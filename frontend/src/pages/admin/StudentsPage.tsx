@@ -10,7 +10,6 @@ export default function StudentsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simple debounce: wait 300ms after typing stops before hitting the API.
     const timeout = setTimeout(() => {
       setLoading(true);
       getStudents(search)
@@ -38,6 +37,7 @@ export default function StudentsPage() {
             <tr>
               <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">Name</th>
               <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">Email</th>
+              <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">Programme</th>
               <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">Enrollments</th>
               <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">Joined</th>
             </tr>
@@ -47,19 +47,20 @@ export default function StudentsPage() {
               <tr key={s.id} className="hover:bg-gray-50">
                 <td className="px-4 py-2 text-sm">
                   <Link to={`/admin/students/${s.id}`} className="font-medium text-blue-600 hover:underline">
-                    {s.full_name}
+                    {s.fullName}
                   </Link>
                 </td>
                 <td className="px-4 py-2 text-sm text-gray-600">{s.email}</td>
-                <td className="px-4 py-2 text-sm text-gray-600">{s.enrollment_count ?? 0}</td>
+                <td className="px-4 py-2 text-sm text-gray-600">{s.programme ?? '—'}</td>
+                <td className="px-4 py-2 text-sm text-gray-600">{s.enrollmentCount ?? 0}</td>
                 <td className="px-4 py-2 text-sm text-gray-500">
-                  {new Date(s.created_at).toLocaleDateString()}
+                  {new Date(s.createdAt).toLocaleDateString()}
                 </td>
               </tr>
             ))}
             {!loading && students.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-sm text-gray-400">
+                <td colSpan={5} className="px-4 py-6 text-center text-sm text-gray-400">
                   No students found.
                 </td>
               </tr>

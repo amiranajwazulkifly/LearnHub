@@ -1,7 +1,4 @@
 // Dzul
-//
-// Requires: npm install react-hook-form @hookform/resolvers zod
-
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -25,12 +22,13 @@ export default function AnnouncementFormPage() {
     formState: { errors, isSubmitting },
   } = useForm<AnnouncementFormValues>({
     resolver: zodResolver(announcementSchema),
+    defaultValues: { audience: 'all' },
   });
 
   useEffect(() => {
     if (!isEdit || !id) return;
-    getAnnouncement(Number(id))
-      .then((a) => reset({ title: a.title, content: a.content }))
+    getAnnouncement(id)
+      .then((a) => reset({ title: a.title, content: a.content, audience: a.audience }))
       .finally(() => setLoading(false));
   }, [id, isEdit, reset]);
 
@@ -38,7 +36,7 @@ export default function AnnouncementFormPage() {
     setSubmitError('');
     try {
       if (isEdit && id) {
-        await updateAnnouncement(Number(id), values);
+        await updateAnnouncement(id, values);
       } else {
         await createAnnouncement(values);
       }
@@ -65,6 +63,18 @@ export default function AnnouncementFormPage() {
             placeholder="e.g. Midterm schedule released"
           />
           {errors.title && <p className="mt-1 text-xs text-red-600">{errors.title.message}</p>}
+        </div>
+
+        <div>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Audience</label>
+          <select
+            {...register('audience')}
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+          >
+            <option value="all">Everyone</option>
+            <option value="students">Students only</option>
+            <option value="instructors">Instructors only</option>
+          </select>
         </div>
 
         <div>

@@ -14,9 +14,19 @@ import CoursesPage from "../pages/admin/CoursesPage";
 import InstructorsPage from "../pages/admin/InstructorsPage";
 import SchedulesPage from "../pages/admin/SchedulesPage";
 
+import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
+import StudentsPage from "../pages/admin/StudentsPage";
+import StudentDetailsPage from "../pages/admin/StudentDetailsPage";
+import EnrollmentsPage from "../pages/admin/EnrollmentsPage";
+import ReportsPage from "../pages/admin/ReportsPage";
+import AnnouncementsPage from "../pages/admin/AnnouncementsPage";
+import AnnouncementFormPage from "../pages/admin/AnnouncementFormPage";
+
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 import ProfilePage from "../pages/student/ProfilePage";
+
+import StudentAnnouncementsPage from "../pages/student/StudentAnnouncementsPage";
 
 import { useAuthStore } from "../store/useAuthStore";
 
@@ -67,7 +77,7 @@ function AppRoutes() {
           <Route element={<AdminLayout />}>
             <Route
               path={ROUTES.ADMIN.DASHBOARD}
-              element={<AdminProfilePage />}
+              element={<AdminDashboardPage />}
             />
 
             <Route path={ROUTES.ADMIN.PROFILE} element={<AdminProfilePage />} />
@@ -85,6 +95,14 @@ function AppRoutes() {
             />
 
             <Route path={ROUTES.ADMIN.SCHEDULES} element={<SchedulesPage />} />
+
+            <Route path={ROUTES.ADMIN.STUDENTS} element={<StudentsPage />} />
+            <Route path={`${ROUTES.ADMIN.STUDENTS}/:id`} element={<StudentDetailsPage />} />
+            <Route path={ROUTES.ADMIN.ENROLLMENTS} element={<EnrollmentsPage />} />
+            <Route path={ROUTES.ADMIN.REPORTS} element={<ReportsPage />} />
+            <Route path={ROUTES.ADMIN.ANNOUNCEMENTS} element={<AnnouncementsPage />} />
+            <Route path={`${ROUTES.ADMIN.ANNOUNCEMENTS}/new`} element={<AnnouncementFormPage />} />
+            <Route path={`${ROUTES.ADMIN.ANNOUNCEMENTS}/:id/edit`} element={<AnnouncementFormPage />} />
           </Route>
         </Route>
 
@@ -94,6 +112,8 @@ function AppRoutes() {
             <Route path={ROUTES.STUDENT.DASHBOARD} element={<ProfilePage />} />
 
             <Route path={ROUTES.STUDENT.PROFILE} element={<ProfilePage />} />
+
+            <Route path={ROUTES.STUDENT.ANNOUNCEMENTS} element={<StudentAnnouncementsPage />} />
           </Route>
         </Route>
       </Route>

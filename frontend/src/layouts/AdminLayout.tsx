@@ -30,6 +30,22 @@ const adminNavigation = [
     label: "Schedules",
     path: ROUTES.ADMIN.SCHEDULES,
   },
+  {
+    label: "Students",
+    path: ROUTES.ADMIN.STUDENTS,
+  },
+  {
+    label: "Enrollments",
+    path: ROUTES.ADMIN.ENROLLMENTS,
+  },
+  {
+    label: "Reports",
+    path: ROUTES.ADMIN.REPORTS,
+  },
+  {
+    label: "Announcements",
+    path: ROUTES.ADMIN.ANNOUNCEMENTS,
+  },
 ] as const;
 
 function AdminLayout() {

@@ -24,9 +24,9 @@ export default function StudentAnnouncementsPage() {
           <div key={a.id} className="rounded-lg border border-gray-200 bg-white p-4">
             <h3 className="font-semibold text-gray-900">{a.title}</h3>
             <p className="mt-1 whitespace-pre-wrap text-sm text-gray-600">{a.content}</p>
-            {a.published_at && (
+            {a.publishedAt && (
               <p className="mt-2 text-xs text-gray-400">
-                {new Date(a.published_at).toLocaleDateString()}
+                {new Date(a.publishedAt).toLocaleDateString()}
               </p>
             )}
           </div>

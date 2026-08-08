@@ -29,7 +29,7 @@ export default function AdminDashboardPage() {
         <StatCard label="Total Students" value={stats.totalStudents} />
         <StatCard label="Total Instructors" value={stats.totalInstructors} />
         <StatCard label="Total Courses" value={stats.totalCourses} />
-        <StatCard label="Total Enrollments" value={stats.totalEnrollments} />
+        <StatCard label="Active Enrollments" value={stats.totalActiveEnrollments} />
       </div>
 
       <h2 className="mb-3 text-lg font-semibold text-gray-800">Recent Enrollments</h2>
@@ -39,22 +39,24 @@ export default function AdminDashboardPage() {
             <tr>
               <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">Student</th>
               <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">Course</th>
+              <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">Status</th>
               <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">Enrolled</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {activity.map((item) => (
               <tr key={item.id}>
-                <td className="px-4 py-2 text-sm text-gray-800">{item.student_name}</td>
-                <td className="px-4 py-2 text-sm text-gray-800">{item.course_title}</td>
+                <td className="px-4 py-2 text-sm text-gray-800">{item.studentName}</td>
+                <td className="px-4 py-2 text-sm text-gray-800">{item.courseTitle}</td>
+                <td className="px-4 py-2 text-sm text-gray-600">{item.status}</td>
                 <td className="px-4 py-2 text-sm text-gray-500">
-                  {new Date(item.enrolled_at).toLocaleDateString()}
+                  {new Date(item.enrolledAt).toLocaleDateString()}
                 </td>
               </tr>
             ))}
             {activity.length === 0 && (
               <tr>
-                <td colSpan={3} className="px-4 py-6 text-center text-sm text-gray-400">
+                <td colSpan={4} className="px-4 py-6 text-center text-sm text-gray-400">
                   No enrollments yet.
                 </td>
               </tr>

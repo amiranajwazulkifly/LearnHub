@@ -1,8 +1,4 @@
 // Dzul
-//
-// Uses `recharts` for the charts — add it to frontend/package.json:
-//   npm install recharts
-
 import { useEffect, useState } from 'react';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -53,7 +49,7 @@ export default function ReportsPage() {
               <XAxis dataKey="title" tick={{ fontSize: 10 }} interval={0} angle={-20} textAnchor="end" height={60} />
               <YAxis allowDecimals={false} />
               <Tooltip />
-              <Bar dataKey="enrollmentCount" fill="#2563eb" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="totalEnrollments" fill="#2563eb" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>

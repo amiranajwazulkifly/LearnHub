@@ -18,10 +18,8 @@ export default function EnrollmentsPage() {
       .finally(() => setLoading(false));
   }
 
-  async function handleStatusChange(id: number, status: EnrollmentStatus) {
+  async function handleStatusChange(id: string, status: EnrollmentStatus) {
     await updateEnrollmentStatus(id, status);
-    // Local update instead of a full refetch — same instant-feeling
-    // pattern used in the useCourses hook.
     setRows((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
   }
 
@@ -44,10 +42,10 @@ export default function EnrollmentsPage() {
           <tbody className="divide-y divide-gray-100">
             {rows.map((r) => (
               <tr key={r.id}>
-                <td className="px-4 py-2 text-sm text-gray-800">{r.student_name}</td>
-                <td className="px-4 py-2 text-sm text-gray-800">{r.course_title}</td>
+                <td className="px-4 py-2 text-sm text-gray-800">{r.studentName}</td>
+                <td className="px-4 py-2 text-sm text-gray-800">{r.courseTitle}</td>
                 <td className="px-4 py-2 text-sm text-gray-500">
-                  {new Date(r.enrolled_at).toLocaleDateString()}
+                  {new Date(r.enrolledAt).toLocaleDateString()}
                 </td>
                 <td className="px-4 py-2 text-sm">
                   <select
@@ -55,9 +53,9 @@ export default function EnrollmentsPage() {
                     onChange={(e) => handleStatusChange(r.id, e.target.value as EnrollmentStatus)}
                     className="rounded-md border border-gray-300 px-2 py-1 text-sm"
                   >
-                    <option value="active">active</option>
+                    <option value="enrolled">enrolled</option>
                     <option value="completed">completed</option>
-                    <option value="dropped">dropped</option>
+                    <option value="cancelled">cancelled</option>
                   </select>
                 </td>
               </tr>

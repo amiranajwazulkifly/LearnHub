@@ -22,6 +22,10 @@ const studentNavigation = [
     label: 'Timetable',
     path: ROUTES.STUDENT.TIMETABLE,
   },
+  {
+    label: 'Announcements',
+    path: ROUTES.STUDENT.ANNOUNCEMENTS,
+  },
 ] as const;
 
 function StudentLayout() {

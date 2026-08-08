@@ -13,6 +13,10 @@ export const ROUTES = {
     CATEGORIES: "/admin/categories",
     INSTRUCTORS: "/admin/instructors",
     SCHEDULES: "/admin/schedules",
+    STUDENTS: "/admin/students",
+    ENROLLMENTS: "/admin/enrollments",
+    REPORTS: "/admin/reports",
+    ANNOUNCEMENTS: "/admin/announcements",
   },
 
   STUDENT: {
@@ -20,6 +24,7 @@ export const ROUTES = {
     PROFILE: "/student/profile",
     COURSES: "/student/courses",
     TIMETABLE: "/student/timetable",
+    ANNOUNCEMENTS: "/student/announcements",
   },
 } as const;
 
