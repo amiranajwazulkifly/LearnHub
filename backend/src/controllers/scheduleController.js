@@ -4,17 +4,18 @@ async function getAllSchedules(req, res) {
   try {
     const result = await pool.query(`
       SELECT
-        schedules.*,
-        courses.title AS course_title
-      FROM schedules
+        course_schedules.*,
+        courses.title AS course_title,
+        courses.code AS course_code
+      FROM course_schedules
       JOIN courses
-        ON courses.id = schedules.course_id
-      ORDER BY schedules.id ASC;
+        ON courses.id = course_schedules.course_id
+      ORDER BY course_schedules.created_at DESC;
     `);
 
     res.status(200).json(result.rows);
   } catch (error) {
-    console.error(error);
+    console.error("Get schedules error:", error);
 
     res.status(500).json({
       success: false,
@@ -25,23 +26,40 @@ async function getAllSchedules(req, res) {
 
 async function createSchedule(req, res) {
   try {
-    const { course_id, day_of_week, start_time, end_time, room } = req.body;
+    const {
+      course_id,
+      day_of_week,
+      start_time,
+      end_time,
+      location,
+      start_date,
+      end_date,
+    } = req.body;
 
     const result = await pool.query(
       `
-      INSERT INTO schedules
+      INSERT INTO course_schedules
       (
         course_id,
         day_of_week,
         start_time,
         end_time,
-        room
+        location,
+        start_date,
+        end_date
       )
-      VALUES
-      ($1,$2,$3,$4,$5)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *;
       `,
-      [course_id, day_of_week, start_time, end_time, room],
+      [
+        course_id,
+        day_of_week,
+        start_time,
+        end_time,
+        location,
+        start_date,
+        end_date,
+      ],
     );
 
     res.status(201).json({
@@ -50,7 +68,7 @@ async function createSchedule(req, res) {
       data: result.rows[0],
     });
   } catch (error) {
-    console.error(error);
+    console.error("Create schedule error:", error);
 
     res.status(500).json({
       success: false,
@@ -63,22 +81,41 @@ async function updateSchedule(req, res) {
   try {
     const { id } = req.params;
 
-    const { course_id, day_of_week, start_time, end_time, room } = req.body;
+    const {
+      course_id,
+      day_of_week,
+      start_time,
+      end_time,
+      location,
+      start_date,
+      end_date,
+    } = req.body;
 
     const result = await pool.query(
       `
-      UPDATE schedules
+      UPDATE course_schedules
       SET
         course_id = $1,
         day_of_week = $2,
         start_time = $3,
         end_time = $4,
-        room = $5,
-        updated_at = CURRENT_TIMESTAMP
-      WHERE id = $6
+        location = $5,
+        start_date = $6,
+        end_date = $7,
+        updated_at = NOW()
+      WHERE id = $8
       RETURNING *;
       `,
-      [course_id, day_of_week, start_time, end_time, room, id],
+      [
+        course_id,
+        day_of_week,
+        start_time,
+        end_time,
+        location,
+        start_date,
+        end_date,
+        id,
+      ],
     );
 
     if (result.rowCount === 0) {
@@ -94,7 +131,7 @@ async function updateSchedule(req, res) {
       data: result.rows[0],
     });
   } catch (error) {
-    console.error(error);
+    console.error("Update schedule error:", error);
 
     res.status(500).json({
       success: false,
@@ -109,7 +146,7 @@ async function deleteSchedule(req, res) {
 
     const result = await pool.query(
       `
-      DELETE FROM schedules
+      DELETE FROM course_schedules
       WHERE id = $1
       RETURNING *;
       `,
@@ -129,7 +166,7 @@ async function deleteSchedule(req, res) {
       data: result.rows[0],
     });
   } catch (error) {
-    console.error(error);
+    console.error("Delete schedule error:", error);
 
     res.status(500).json({
       success: false,
