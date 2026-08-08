@@ -8,30 +8,20 @@ interface CourseTableProps {
 
 function CourseTable({ courses, onEdit, onDelete }: CourseTableProps) {
   if (courses.length === 0) {
-    return (
-      <div className="rounded-lg bg-white p-6 shadow">
-        <p className="text-gray-500">No courses found.</p>
-      </div>
-    );
+    return <p>No courses found.</p>;
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg bg-white shadow">
-      <table className="w-full text-left">
-        <thead className="border-b bg-gray-50">
-          <tr>
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse bg-white">
+        <thead>
+          <tr className="border-b bg-gray-100 text-left">
             <th className="px-6 py-4">Code</th>
-
             <th className="px-6 py-4">Title</th>
-
             <th className="px-6 py-4">Category</th>
-
             <th className="px-6 py-4">Instructor</th>
-
             <th className="px-6 py-4">Capacity</th>
-
             <th className="px-6 py-4">Status</th>
-
             <th className="px-6 py-4">Actions</th>
           </tr>
         </thead>
