@@ -57,49 +57,66 @@ export default function MyCoursesPage() {
   }
 
   if (loading) {
-    return <p>Loading your courses...</p>;
+    return <p className="text-gray-500 dark:text-gray-400">Loading your courses...</p>;
   }
 
   return (
     <div>
-      <h1>My Courses</h1>
+      <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-gray-50">My Courses</h1>
 
-      {message && <p>{message}</p>}
+      {message && (
+        <p className="mb-4 rounded-lg border border-green-300 bg-green-50 p-3 text-sm text-green-700 dark:border-green-800 dark:bg-green-950/30 dark:text-green-400">
+          {message}
+        </p>
+      )}
 
-      {error && <p>{error}</p>}
+      {error && (
+        <p className="mb-4 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/30 dark:text-red-400">
+          {error}
+        </p>
+      )}
 
       {enrollments.length === 0 ? (
-        <p>You are not enrolled in any courses.</p>
+        <p className="text-gray-500 dark:text-gray-400">You are not enrolled in any courses.</p>
       ) : (
-        <div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {enrollments.map((enrollment) => (
-            <div key={enrollment.enrollment_id}>
-              <h2>
+            <div
+              key={enrollment.enrollment_id}
+              className="flex flex-col rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900"
+            >
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
                 {enrollment.code} - {enrollment.title}
               </h2>
 
-              <p>{enrollment.description}</p>
-
-              <p>
-                <strong>Category:</strong> {enrollment.category_name}
+              <p className="mt-2 flex-1 text-sm text-gray-600 dark:text-gray-400">
+                {enrollment.description}
               </p>
 
-              <p>
-                <strong>Instructor:</strong> {enrollment.instructor_name}
-              </p>
+              <div className="mt-3 space-y-1 text-sm text-gray-600 dark:text-gray-400">
+                <p>
+                  <span className="font-medium text-gray-800 dark:text-gray-200">Category:</span>{" "}
+                  {enrollment.category_name}
+                </p>
 
-              <p>
-                <strong>Status:</strong> {enrollment.enrollment_status}
-              </p>
+                <p>
+                  <span className="font-medium text-gray-800 dark:text-gray-200">Instructor:</span>{" "}
+                  {enrollment.instructor_name}
+                </p>
+
+                <p>
+                  <span className="font-medium text-gray-800 dark:text-gray-200">Status:</span>{" "}
+                  {enrollment.enrollment_status}
+                </p>
+              </div>
 
               <button
                 type="button"
                 onClick={() => handleCancel(enrollment.enrollment_id)}
+                className="mt-4 rounded-lg border border-red-300 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950/40"
               >
                 Cancel Enrollment
               </button>
-
-              <hr />
             </div>
           ))}
         </div>

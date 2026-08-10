@@ -1,111 +1,138 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+@import "tailwindcss";
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+/* Manual dark mode: toggled by a `dark` class on <html> (see useThemeStore). */
+@custom-variant dark (&:where(.dark, .dark *));
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@theme {
+  /*
+   * Inter for UI/headings, JetBrains Mono for technical/meta accents
+   * (labels, status tags, codes, timestamps) — loaded in index.html.
+   */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
+  /*
+   * Brand ramp anchored at #7F00FF (oklch(0.529 0.293 293.6) — exact at 600).
+   * Also aliased onto Tailwind's `blue-*` scale so every existing
+   * bg-blue-600 / text-blue-600 / hover:bg-blue-700 utility already in the
+   * app renders as brand violet with zero changes to component markup.
+   */
+  --color-brand-50: oklch(0.97 0.02 293.6);
+  --color-brand-100: oklch(0.94 0.045 293.6);
+  --color-brand-200: oklch(0.88 0.09 293.6);
+  --color-brand-300: oklch(0.8 0.15 293.6);
+  --color-brand-400: oklch(0.69 0.22 293.6);
+  --color-brand-500: oklch(0.6 0.27 293.6);
+  --color-brand-600: oklch(0.529 0.293 293.6);
+  --color-brand-700: oklch(0.45 0.27 293.6);
+  --color-brand-800: oklch(0.37 0.22 293.6);
+  --color-brand-900: oklch(0.3 0.17 293.6);
+  --color-brand-950: oklch(0.21 0.11 293.6);
+
+  --color-blue-50: var(--color-brand-50);
+  --color-blue-100: var(--color-brand-100);
+  --color-blue-200: var(--color-brand-200);
+  --color-blue-300: var(--color-brand-300);
+  --color-blue-400: var(--color-brand-400);
+  --color-blue-500: var(--color-brand-500);
+  --color-blue-600: var(--color-brand-600);
+  --color-blue-700: var(--color-brand-700);
+  --color-blue-800: var(--color-brand-800);
+  --color-blue-900: var(--color-brand-900);
+  --color-blue-950: var(--color-brand-950);
+}
+
+@layer base {
+  /*
+   * Safety net: several components rely on the browser-default black text
+   * color instead of an explicit text-gray-* class. Without this, dark mode
+   * would leave that text unreadable (black on a dark surface).
+   */
+  body {
+    @apply bg-gray-100 text-gray-900 antialiased dark:bg-gray-950 dark:text-gray-100;
+    font-family: var(--font-sans);
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+@layer utilities {
+  /* Faint technical dot-grid, used behind the auth screen. */
+  .bg-dot-grid {
+    background-image: radial-gradient(circle, oklch(0.55 0.25 293.6 / 25%) 1px, transparent 1px);
+    background-size: 28px 28px;
   }
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
+  .dark .bg-dot-grid {
+    background-image: radial-gradient(circle, oklch(0.75 0.2 293.6 / 18%) 1px, transparent 1px);
+  }
+
+  /* Neutral blueprint line-grid, used behind dashboard canvases. */
+  .bg-line-grid {
+    background-image:
+      linear-gradient(to right, oklch(0.55 0.01 293.6 / 6%) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(0.55 0.01 293.6 / 6%) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .dark .bg-line-grid {
+    background-image:
+      linear-gradient(to right, oklch(0.9 0.01 293.6 / 5%) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(0.9 0.01 293.6 / 5%) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  /* Diagonal light sweep on hover — used sparingly on hero CTAs. */
+  .btn-sheen {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-sheen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, transparent 35%, oklch(1 0 0 / 35%) 50%, transparent 65%);
+    transform: translateX(-120%);
+    transition: transform 0.7s ease;
+  }
+
+  .btn-sheen:hover::after {
+    transform: translateX(120%);
   }
 }
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-}
-
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(4%, -5%) scale(1.08);
   }
 }
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
+
+@keyframes drift-reverse {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-5%, 4%) scale(1.05);
   }
 }
-p {
-  margin: 0;
+
+.animate-drift {
+  animation: drift 22s ease-in-out infinite;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+.animate-drift-reverse {
+  animation: drift-reverse 26s ease-in-out infinite;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+@media (prefers-reduced-motion: reduce) {
+  .animate-drift,
+  .animate-drift-reverse,
+  .btn-sheen::after {
+    animation: none;
+    transition: none;
+  }
 }

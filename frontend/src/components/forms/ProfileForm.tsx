@@ -145,20 +145,20 @@ function ProfileForm() {
       {error && (
         <div
           role="alert"
-          className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700"
+          className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/30 dark:text-red-400"
         >
           {error}
         </div>
       )}
 
-      <section className="rounded-xl bg-white p-6 shadow-sm">
+      <section className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
         <h2 className="text-xl font-semibold">
           Account information
         </h2>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div>
-            <p className="text-sm font-medium text-gray-500">
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
               Role
             </p>
 
@@ -168,7 +168,7 @@ function ProfileForm() {
           </div>
 
           <div>
-            <p className="text-sm font-medium text-gray-500">
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
               Account status
             </p>
 
@@ -183,21 +183,21 @@ function ProfileForm() {
         onSubmit={handleProfileSubmit(
           onProfileSubmit
         )}
-        className="rounded-xl bg-white p-6 shadow-sm"
+        className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900"
         noValidate
       >
         <h2 className="text-xl font-semibold">
           Edit profile
         </h2>
 
-        <p className="mt-1 text-sm text-gray-600">
+        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
           Update your personal account details.
         </p>
 
         {profileSuccess && (
           <div
             role="status"
-            className="mt-4 rounded-lg border border-green-300 bg-green-50 p-3 text-sm text-green-700"
+            className="mt-4 rounded-lg border border-green-300 bg-green-50 p-3 text-sm text-green-700 dark:border-green-800 dark:bg-green-950/30 dark:text-green-400"
           >
             {profileSuccess}
           </div>
@@ -219,11 +219,11 @@ function ProfileForm() {
               {...registerProfileField(
                 'fullName'
               )}
-              className="w-full rounded-lg border px-3 py-2"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
             />
 
             {profileErrors.fullName && (
-              <p className="mt-1 text-sm text-red-600">
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
                 {
                   profileErrors.fullName
                     .message
@@ -247,11 +247,11 @@ function ProfileForm() {
               {...registerProfileField(
                 'email'
               )}
-              className="w-full rounded-lg border px-3 py-2"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
             />
 
             {profileErrors.email && (
-              <p className="mt-1 text-sm text-red-600">
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
                 {
                   profileErrors.email.message
                 }
@@ -262,7 +262,7 @@ function ProfileForm() {
           <button
             type="submit"
             disabled={isLoading}
-            className="rounded-lg bg-black px-4 py-2 text-white disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-lg bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-white transition hover:from-brand-700 hover:to-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isLoading
               ? 'Saving...'
@@ -275,14 +275,14 @@ function ProfileForm() {
         onSubmit={handlePasswordSubmit(
           onPasswordSubmit
         )}
-        className="rounded-xl bg-white p-6 shadow-sm"
+        className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900"
         noValidate
       >
         <h2 className="text-xl font-semibold">
           Change password
         </h2>
 
-        <p className="mt-1 text-sm text-gray-600">
+        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
           Enter your current password before
           choosing a new password.
         </p>
@@ -290,7 +290,7 @@ function ProfileForm() {
         {passwordSuccess && (
           <div
             role="status"
-            className="mt-4 rounded-lg border border-green-300 bg-green-50 p-3 text-sm text-green-700"
+            className="mt-4 rounded-lg border border-green-300 bg-green-50 p-3 text-sm text-green-700 dark:border-green-800 dark:bg-green-950/30 dark:text-green-400"
           >
             {passwordSuccess}
           </div>
@@ -312,11 +312,11 @@ function ProfileForm() {
               {...registerPasswordField(
                 'currentPassword'
               )}
-              className="w-full rounded-lg border px-3 py-2"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
             />
 
             {passwordErrors.currentPassword && (
-              <p className="mt-1 text-sm text-red-600">
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
                 {
                   passwordErrors
                     .currentPassword.message
@@ -340,11 +340,11 @@ function ProfileForm() {
               {...registerPasswordField(
                 'newPassword'
               )}
-              className="w-full rounded-lg border px-3 py-2"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
             />
 
             {passwordErrors.newPassword && (
-              <p className="mt-1 text-sm text-red-600">
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
                 {
                   passwordErrors.newPassword
                     .message
@@ -368,11 +368,11 @@ function ProfileForm() {
               {...registerPasswordField(
                 'confirmPassword'
               )}
-              className="w-full rounded-lg border px-3 py-2"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
             />
 
             {passwordErrors.confirmPassword && (
-              <p className="mt-1 text-sm text-red-600">
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
                 {
                   passwordErrors
                     .confirmPassword.message
@@ -384,7 +384,7 @@ function ProfileForm() {
           <button
             type="submit"
             disabled={isLoading}
-            className="rounded-lg border border-black px-4 py-2 disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
           >
             {isLoading
               ? 'Changing password...'

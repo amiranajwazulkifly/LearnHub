@@ -85,24 +85,24 @@ export default function BrowseCoursesPage() {
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Browse Courses</h1>
 
-        <p className="mt-2 text-gray-500">
+        <p className="mt-2 text-gray-500 dark:text-gray-400">
           Search and filter available LearnHub courses.
         </p>
       </div>
 
-      <div className="mb-6 grid gap-4 rounded-lg bg-white p-5 shadow md:grid-cols-4">
+      <div className="mb-6 grid gap-4 rounded-lg border border-gray-200 bg-white p-5 md:grid-cols-4 dark:border-gray-800 dark:bg-gray-900">
         <input
           type="text"
           placeholder="Search title, code, category..."
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          className="rounded border border-gray-300 px-3 py-2"
+          className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
         />
 
         <select
           value={category}
           onChange={(event) => setCategory(event.target.value)}
-          className="rounded border border-gray-300 px-3 py-2"
+          className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
         >
           <option value="">All Categories</option>
 
@@ -116,7 +116,7 @@ export default function BrowseCoursesPage() {
         <select
           value={instructor}
           onChange={(event) => setInstructor(event.target.value)}
-          className="rounded border border-gray-300 px-3 py-2"
+          className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
         >
           <option value="">All Instructors</option>
 
@@ -130,7 +130,7 @@ export default function BrowseCoursesPage() {
         <select
           value={status}
           onChange={(event) => setStatus(event.target.value)}
-          className="rounded border border-gray-300 px-3 py-2"
+          className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
         >
           <option value="">All Statuses</option>
           <option value="published">Published</option>
@@ -139,13 +139,13 @@ export default function BrowseCoursesPage() {
         </select>
       </div>
 
-      <p className="mb-4 text-sm text-gray-500">
+      <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
         {filteredCourses.length} course(s) found
       </p>
 
       {filteredCourses.length === 0 ? (
-        <div className="rounded-lg bg-white p-8 text-center shadow">
-          <p className="text-gray-500">No courses match your filters.</p>
+        <div className="rounded-lg border border-gray-200 bg-white p-8 text-center dark:border-gray-800 dark:bg-gray-900">
+          <p className="text-gray-500 dark:text-gray-400">No courses match your filters.</p>
         </div>
       ) : (
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">

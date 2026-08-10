@@ -5,6 +5,7 @@ function ProfilePage() {
   return (
     <div className="mx-auto max-w-3xl">
       <PageHeader
+        eyebrow="student / profile"
         title="Student Profile"
         description="Manage your LearnHub account information and password."
       />
