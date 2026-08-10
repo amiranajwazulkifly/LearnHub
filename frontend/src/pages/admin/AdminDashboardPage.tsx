@@ -34,7 +34,7 @@ export default function AdminDashboardPage() {
       </div>
 
       <h2 className="mb-3 text-lg font-semibold text-gray-800 dark:text-gray-200">Recent Enrollments</h2>
-      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+      <div className="table-scroll overflow-x-auto rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
           <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>

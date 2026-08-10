@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import {
   NavLink,
 } from 'react-router-dom';
@@ -5,6 +6,7 @@ import {
 interface SidebarItem {
   label: string;
   path: string;
+  icon: ReactNode;
   end?: boolean;
 }
 
@@ -25,13 +27,14 @@ function Sidebar({
             end={item.end}
             className={({ isActive }) =>
               [
-                'whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition',
+                'flex items-center gap-2.5 whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition',
                 isActive
                   ? 'bg-linear-to-r from-brand-600 to-brand-500 text-white shadow-sm'
                   : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800',
               ].join(' ')
             }
           >
+            {item.icon}
             {item.label}
           </NavLink>
         ))}

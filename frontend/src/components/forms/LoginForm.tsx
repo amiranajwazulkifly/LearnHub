@@ -17,6 +17,7 @@ import {
 } from '../../schemas/authSchema';
 
 import { useAuthStore } from '../../store/useAuthStore';
+import { fieldBorderClasses } from '../../utils/formStyles';
 
 function LoginForm() {
   const navigate = useNavigate();
@@ -111,7 +112,7 @@ function LoginForm() {
             type="email"
             autoComplete="email"
             {...registerField('email')}
-            className="w-full rounded-lg border border-gray-300 bg-white py-2 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
+            className={`w-full rounded-lg border bg-white py-2 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(!!errors.email)}`}
             placeholder="name@example.com"
           />
         </div>
@@ -151,7 +152,7 @@ function LoginForm() {
             type="password"
             autoComplete="current-password"
             {...registerField('password')}
-            className="w-full rounded-lg border border-gray-300 bg-white py-2 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
+            className={`w-full rounded-lg border bg-white py-2 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(!!errors.password)}`}
             placeholder="Enter your password"
           />
         </div>
