@@ -7,6 +7,7 @@ import { ROLES } from "../constants/roles";
 import AdminLayout from "../layouts/AdminLayout";
 import AuthLayout from "../layouts/AuthLayout";
 import StudentLayout from "../layouts/StudentLayout";
+import InstructorLayout from "../layouts/InstructorLayout";
 
 import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
 import AdminProfilePage from "../pages/admin/AdminProfilePage";
@@ -32,6 +33,11 @@ import ProfilePage from "../pages/student/ProfilePage";
 import TimetablePage from "../pages/student/TimetablePage";
 import StudentDashboardPage from "../pages/student/StudentDashboardPage";
 import StudentAnnouncementsPage from "../pages/student/StudentAnnouncementsPage";
+
+import InstructorDashboardPage from "../pages/instructor/InstructorDashboardPage";
+import InstructorCoursesPage from "../pages/instructor/InstructorCoursesPage";
+import InstructorCourseStudentsPage from "../pages/instructor/InstructorCourseStudentsPage";
+import InstructorProfilePage from "../pages/instructor/InstructorProfilePage";
 
 import { useAuthStore } from "../store/useAuthStore";
 
@@ -163,6 +169,31 @@ function AppRoutes() {
             <Route
               path={ROUTES.STUDENT.ANNOUNCEMENTS}
               element={<StudentAnnouncementsPage />}
+            />
+          </Route>
+        </Route>
+
+        {/* Instructor */}
+        <Route element={<RoleRoute allowedRoles={[ROLES.INSTRUCTOR]} />}>
+          <Route element={<InstructorLayout />}>
+            <Route
+              path={ROUTES.INSTRUCTOR.DASHBOARD}
+              element={<InstructorDashboardPage />}
+            />
+
+            <Route
+              path={ROUTES.INSTRUCTOR.PROFILE}
+              element={<InstructorProfilePage />}
+            />
+
+            <Route
+              path={ROUTES.INSTRUCTOR.COURSES}
+              element={<InstructorCoursesPage />}
+            />
+
+            <Route
+              path={`${ROUTES.INSTRUCTOR.COURSES}/:courseId/students`}
+              element={<InstructorCourseStudentsPage />}
             />
           </Route>
         </Route>

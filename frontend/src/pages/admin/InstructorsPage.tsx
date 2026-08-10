@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 import {
   createInstructor,
   deleteInstructor,
   getInstructors,
   updateInstructor,
+  setInstructorAccount,
 } from "../../services/instructorService";
 
 import type { Instructor } from "../../types/instructor";
@@ -26,6 +27,11 @@ function InstructorsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  const [loginTargetId, setLoginTargetId] = useState<string | null>(null);
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loginSaving, setLoginSaving] = useState(false);
+  const [loginError, setLoginError] = useState("");
 
   async function loadInstructors() {
     try {
@@ -183,6 +189,44 @@ function InstructorsPage() {
     }
   }
 
+  function handleOpenLoginForm(instructor: Instructor) {
+    setLoginTargetId(instructor.id);
+    setLoginPassword("");
+    setLoginError("");
+  }
+
+  function handleCloseLoginForm() {
+    setLoginTargetId(null);
+    setLoginPassword("");
+    setLoginError("");
+  }
+
+  async function handleSaveLogin() {
+    if (!loginTargetId) {
+      return;
+    }
+
+    if (loginPassword.trim().length < 8) {
+      setLoginError("Password must be at least 8 characters.");
+      return;
+    }
+
+    try {
+      setLoginSaving(true);
+      setLoginError("");
+
+      await setInstructorAccount(loginTargetId, loginPassword.trim());
+
+      handleCloseLoginForm();
+      await loadInstructors();
+    } catch (error) {
+      console.error("Failed to set instructor login:", error);
+      setLoginError(getErrorMessage(error));
+    } finally {
+      setLoginSaving(false);
+    }
+  }
+
   if (loading) {
     return <div>Loading instructors...</div>;
   }
@@ -317,53 +361,118 @@ function InstructorsPage() {
               <th className="px-6 py-4">Email</th>
               <th className="px-6 py-4">Expertise</th>
               <th className="px-6 py-4">Status</th>
+              <th className="px-6 py-4">Login</th>
               <th className="px-6 py-4">Actions</th>
             </tr>
           </thead>
 
           <tbody>
             {instructors.map((instructor) => (
-              <tr key={instructor.id} className="border-b border-gray-200 dark:border-gray-800">
-                <td className="px-6 py-4 font-medium">
-                  {instructor.full_name}
-                </td>
+              <Fragment key={instructor.id}>
+                <tr className="border-b border-gray-200 dark:border-gray-800">
+                  <td className="px-6 py-4 font-medium">
+                    {instructor.full_name}
+                  </td>
 
-                <td className="px-6 py-4">{instructor.email}</td>
+                  <td className="px-6 py-4">{instructor.email}</td>
 
-                <td className="px-6 py-4">{instructor.expertise}</td>
+                  <td className="px-6 py-4">{instructor.expertise}</td>
 
-                <td className="px-6 py-4">
-                  <StatusBadge
-                    label={instructor.is_active ? "Active" : "Inactive"}
-                    tone={instructor.is_active ? "green" : "gray"}
-                  />
-                </td>
+                  <td className="px-6 py-4">
+                    <StatusBadge
+                      label={instructor.is_active ? "Active" : "Inactive"}
+                      tone={instructor.is_active ? "green" : "gray"}
+                    />
+                  </td>
 
-                <td className="px-6 py-4">
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleEdit(instructor)}
-                      className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-3 py-2 text-sm text-white"
-                    >
-                      Edit
-                    </button>
+                  <td className="px-6 py-4">
+                    <StatusBadge
+                      label={instructor.has_login ? "Enabled" : "No Access"}
+                      tone={instructor.has_login ? "green" : "gray"}
+                    />
+                  </td>
 
-                    <button
-                      type="button"
-                      onClick={() => void handleDeleteInstructor(instructor.id)}
-                      className="rounded bg-red-600 px-3 py-2 text-sm text-white"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
+                  <td className="px-6 py-4">
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleEdit(instructor)}
+                        className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-3 py-2 text-sm text-white"
+                      >
+                        Edit
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleOpenLoginForm(instructor)}
+                        className="rounded border border-gray-300 px-3 py-2 text-sm font-medium hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                      >
+                        {instructor.has_login ? "Reset Password" : "Set Up Login"}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => void handleDeleteInstructor(instructor.id)}
+                        className="rounded bg-red-600 px-3 py-2 text-sm text-white"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                {loginTargetId === instructor.id && (
+                  <tr className="border-b border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-800">
+                    <td colSpan={6} className="px-6 py-4">
+                      <div className="flex flex-wrap items-end gap-3">
+                        <div>
+                          <label className="mb-1 block text-sm font-medium">
+                            {instructor.has_login ? "New password" : "Set a login password"}
+                          </label>
+                          <input
+                            type="password"
+                            value={loginPassword}
+                            onChange={(event) => setLoginPassword(event.target.value)}
+                            placeholder="At least 8 characters"
+                            className="w-64 rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500"
+                          />
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => void handleSaveLogin()}
+                          disabled={loginSaving}
+                          className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-sm text-white disabled:opacity-50"
+                        >
+                          {loginSaving ? "Saving..." : "Save"}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={handleCloseLoginForm}
+                          disabled={loginSaving}
+                          className="rounded border border-gray-300 px-4 py-2 text-sm font-medium hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+
+                      <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                        Login email will be this instructor&apos;s existing email address ({instructor.email}).
+                      </p>
+
+                      {loginError && (
+                        <p className="mt-2 text-sm text-red-600 dark:text-red-400">{loginError}</p>
+                      )}
+                    </td>
+                  </tr>
+                )}
+              </Fragment>
             ))}
 
             {instructors.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                <td colSpan={6} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
                   No instructors found.
                 </td>
               </tr>

@@ -113,6 +113,35 @@ ON CONFLICT (id) DO UPDATE SET
   biography = EXCLUDED.biography,
   is_active = EXCLUDED.is_active;
 
+-- Sample instructor login (Dr. Sarah Ahmad) — same seeded password as the
+-- admin/student accounts above.
+INSERT INTO public.users (
+  id,
+  full_name,
+  email,
+  password_hash,
+  role,
+  status
+)
+VALUES (
+  '00000000-0000-0000-0000-000000000003',
+  'Dr. Sarah Ahmad',
+  'sarah.ahmad@learnhub.local',
+  '$2b$10$toFZrNPYt4auF/VoQ0wf2.BIWgRtYRcBbN46b/jT0LEjeiATP52vy',
+  'instructor',
+  'active'
+)
+ON CONFLICT (id) DO UPDATE SET
+  full_name = EXCLUDED.full_name,
+  email = EXCLUDED.email,
+  password_hash = EXCLUDED.password_hash,
+  role = EXCLUDED.role,
+  status = EXCLUDED.status;
+
+UPDATE public.instructors
+SET user_id = '00000000-0000-0000-0000-000000000003'
+WHERE id = '20000000-0000-0000-0000-000000000001';
+
 -- Courses
 INSERT INTO public.courses (
   id,
