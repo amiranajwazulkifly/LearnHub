@@ -1,6 +1,7 @@
 // dzul
 const { pool } = require('../config/db');
 const ApiError = require('../utils/apiError');
+const { parsePagination, buildPaginationMeta } = require('../utils/pagination');
 
 function formatAnnouncement(row) {
   return {
@@ -17,19 +18,30 @@ function formatAnnouncement(row) {
   };
 }
 
-// GET /api/announcements  (admin — sees all statuses)
+// GET /api/announcements?page=&limit=  (admin — sees all statuses)
 async function listAll(req, res) {
-  const result = await pool.query(`
+  const { page, limit, offset } = parsePagination(req.query);
+
+  const result = await pool.query(
+    `
     SELECT a.*, u.full_name AS author_name
     FROM public.announcements a
     LEFT JOIN public.users u ON u.id = a.created_by
     ORDER BY a.created_at DESC
-  `);
+    LIMIT $1 OFFSET $2
+  `,
+    [limit, offset]
+  );
+
+  const countResult = await pool.query('SELECT COUNT(*) FROM public.announcements');
 
   res.status(200).json({
     success: true,
     message: 'Announcements retrieved successfully',
-    data: { announcements: result.rows.map(formatAnnouncement) },
+    data: {
+      announcements: result.rows.map(formatAnnouncement),
+      pagination: buildPaginationMeta({ page, limit, total: Number(countResult.rows[0].count) }),
+    },
   });
 }
 

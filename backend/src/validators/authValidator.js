@@ -121,9 +121,60 @@ function validateChangePassword(req) {
   return errors;
 }
 
+function validateForgotPassword(req) {
+  const errors = [];
+
+  const { email } = req.body;
+
+  if (!email || !email.trim()) {
+    errors.push({
+      field: "email",
+      message: "Email is required",
+    });
+  }
+
+  return errors;
+}
+
+function validateResetPassword(req) {
+  const errors = [];
+
+  const { email, token, newPassword } = req.body;
+
+  if (!email || !email.trim()) {
+    errors.push({
+      field: "email",
+      message: "Email is required",
+    });
+  }
+
+  if (!token || !token.trim()) {
+    errors.push({
+      field: "token",
+      message: "Reset token is required",
+    });
+  }
+
+  if (!newPassword) {
+    errors.push({
+      field: "newPassword",
+      message: "New password is required",
+    });
+  } else if (newPassword.length < 8) {
+    errors.push({
+      field: "newPassword",
+      message: "New password must be at least 8 characters",
+    });
+  }
+
+  return errors;
+}
+
 module.exports = {
   validateRegister,
   validateLogin,
   validateUpdateProfile,
   validateChangePassword,
+  validateForgotPassword,
+  validateResetPassword,
 };

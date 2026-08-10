@@ -2,19 +2,27 @@
 import { useEffect, useState } from 'react';
 import { getAllEnrollments, updateEnrollmentStatus } from '../../services/studentService';
 import type { AdminEnrollmentRow, EnrollmentStatus } from '../../types/student';
+import type { PaginationMeta } from '../../types/api';
+import Pagination from '../../components/common/Pagination';
+import { usePagination } from '../../hooks/usePagination';
 
 export default function EnrollmentsPage() {
   const [rows, setRows] = useState<AdminEnrollmentRow[]>([]);
+  const [pagination, setPagination] = useState<PaginationMeta | null>(null);
   const [loading, setLoading] = useState(true);
+  const { page, setPage } = usePagination();
 
   useEffect(() => {
     load();
-  }, []);
+  }, [page]);
 
   function load() {
     setLoading(true);
-    getAllEnrollments()
-      .then(setRows)
+    getAllEnrollments(page)
+      .then((res) => {
+        setRows(res.enrollments);
+        setPagination(res.pagination);
+      })
       .finally(() => setLoading(false));
   }
 
@@ -72,6 +80,8 @@ export default function EnrollmentsPage() {
           </tbody>
         </table>
       </div>
+
+      {pagination && <Pagination pagination={pagination} onPageChange={setPage} />}
     </div>
   );
 }

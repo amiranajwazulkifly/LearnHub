@@ -59,9 +59,7 @@ function SchedulesPage() {
       ]);
 
       setSchedules(scheduleData);
-
-      // getCourses() currently returns { success, count, data }
-      setCourses(courseData.data ?? []);
+      setCourses(courseData ?? []);
     } catch (error) {
       console.error("Failed to load schedule data:", error);
       setError("Failed to load schedules.");

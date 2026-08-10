@@ -6,23 +6,34 @@ const instructorController = require("../controllers/instructorController");
 const validateInstructor = require("../validators/instructorValidator");
 const authMiddleware = require("../middleware/authMiddleware");
 const roleMiddleware = require("../middleware/roleMiddleware");
+const asyncHandler = require("../utils/asyncHandler");
 
-router.get("/", instructorController.getAllInstructors);
+// Every instructor route requires a valid session; only admins can write.
+router.use(authMiddleware, roleMiddleware("admin", "student", "instructor"));
 
-router.post("/", validateInstructor, instructorController.createInstructor);
+router.get("/", asyncHandler(instructorController.getAllInstructors));
 
-router.put("/:id", validateInstructor, instructorController.updateInstructor);
+router.post(
+  "/",
+  roleMiddleware("admin"),
+  validateInstructor,
+  asyncHandler(instructorController.createInstructor),
+);
 
-router.delete("/:id", instructorController.deleteInstructor);
+router.put(
+  "/:id",
+  roleMiddleware("admin"),
+  validateInstructor,
+  asyncHandler(instructorController.updateInstructor),
+);
 
-// Creates/resets login credentials for an instructor — grants a real
-// account, so this one is auth-gated even though the rest of this
-// router currently isn't.
+router.delete("/:id", roleMiddleware("admin"), asyncHandler(instructorController.deleteInstructor));
+
+// Creates/resets login credentials for an instructor — grants a real account.
 router.post(
   "/:id/account",
-  authMiddleware,
   roleMiddleware("admin"),
-  instructorController.setInstructorAccount,
+  asyncHandler(instructorController.setInstructorAccount),
 );
 
 module.exports = router;

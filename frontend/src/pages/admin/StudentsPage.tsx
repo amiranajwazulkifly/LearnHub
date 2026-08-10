@@ -3,22 +3,30 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getStudents } from '../../services/studentService';
 import type { Student } from '../../types/student';
+import type { PaginationMeta } from '../../types/api';
+import Pagination from '../../components/common/Pagination';
+import { usePagination } from '../../hooks/usePagination';
 
 export default function StudentsPage() {
   const [students, setStudents] = useState<Student[]>([]);
+  const [pagination, setPagination] = useState<PaginationMeta | null>(null);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const { page, setPage } = usePagination([search]);
 
   useEffect(() => {
     // Simple debounce: wait 300ms after typing stops before hitting the API.
     const timeout = setTimeout(() => {
       setLoading(true);
-      getStudents(search)
-        .then((res) => setStudents(res.students))
+      getStudents(search, page)
+        .then((res) => {
+          setStudents(res.students);
+          setPagination(res.pagination);
+        })
         .finally(() => setLoading(false));
     }, 300);
     return () => clearTimeout(timeout);
-  }, [search]);
+  }, [search, page]);
 
   return (
     <div className="p-6">
@@ -67,6 +75,8 @@ export default function StudentsPage() {
           </tbody>
         </table>
       </div>
+
+      {pagination && <Pagination pagination={pagination} onPageChange={setPage} />}
     </div>
   );
 }

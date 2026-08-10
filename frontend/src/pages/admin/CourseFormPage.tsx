@@ -53,8 +53,7 @@ function CourseFormPage() {
         setInstructors(instructorData);
 
         if (isEditMode && id) {
-          const response = await getCourseById(id);
-          const course = response.data;
+          const course = await getCourseById(id);
 
           setFormData({
             code: course.code ?? "",

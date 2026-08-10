@@ -6,16 +6,24 @@ import { deleteCourse, getCourses } from "../../services/courseService";
 import CourseTable from "../../components/courses/CourseTable";
 
 import type { Course } from "../../types/course";
+import type { PaginationMeta } from "../../types/api";
+import Pagination from "../../components/common/Pagination";
+import { usePagination } from "../../hooks/usePagination";
 
 function CoursesPage() {
   const navigate = useNavigate();
 
   const [courses, setCourses] = useState<Course[]>([]);
+  const [pagination, setPagination] = useState<PaginationMeta | null>(null);
 
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [instructor, setInstructor] = useState("");
   const [status, setStatus] = useState("");
+  // No resetKeys here — this form only fetches on explicit Search/Reset
+  // clicks (not per keystroke), so page reset is handled manually in
+  // handleSearch/handleReset instead of reacting to every filter keystroke.
+  const { page, setPage } = usePagination();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -25,14 +33,16 @@ function CoursesPage() {
       setLoading(true);
       setError("");
 
-      const response = await getCourses({
+      const result = await getCourses({
         search: search || undefined,
         category: category || undefined,
         instructor: instructor || undefined,
         status: status || undefined,
+        page,
       });
 
-      setCourses(response.data ?? []);
+      setCourses(result.courses ?? []);
+      setPagination(result.pagination);
     } catch (error) {
       console.error("Failed to load courses:", error);
       setError("Failed to load courses.");
@@ -43,10 +53,14 @@ function CoursesPage() {
 
   useEffect(() => {
     void loadCourses();
-  }, []);
+  }, [page]);
 
   async function handleSearch(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (page !== 1) {
+      setPage(1);
+      return;
+    }
     await loadCourses();
   }
 
@@ -55,12 +69,7 @@ function CoursesPage() {
     setCategory("");
     setInstructor("");
     setStatus("");
-
-    setTimeout(() => {
-      void getCourses().then((response) => {
-        setCourses(response.data ?? []);
-      });
-    }, 0);
+    setPage(1);
   }
 
   function handleEdit(course: Course) {
@@ -169,11 +178,14 @@ function CoursesPage() {
       {loading ? (
         <div>Loading courses...</div>
       ) : (
-        <CourseTable
-          courses={courses}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+        <>
+          <CourseTable
+            courses={courses}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+          {pagination && <Pagination pagination={pagination} onPageChange={setPage} />}
+        </>
       )}
     </div>
   );

@@ -5,6 +5,7 @@ import Sidebar from "../components/layout/Sidebar";
 import { ROUTES } from "../constants/routes";
 import {
   AnnouncementsIcon,
+  AssignmentsIcon,
   BrowseCoursesIcon,
   DashboardIcon,
   MyCoursesIcon,
@@ -33,6 +34,11 @@ const studentNavigation = [
     label: "My Courses",
     path: ROUTES.STUDENT.MY_COURSES,
     icon: <MyCoursesIcon />,
+  },
+  {
+    label: "Tasks",
+    path: ROUTES.STUDENT.TASKS,
+    icon: <AssignmentsIcon />,
   },
   {
     label: "Timetable",

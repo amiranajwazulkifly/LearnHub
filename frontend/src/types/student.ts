@@ -1,4 +1,5 @@
 // Dzul
+import type { PaginationMeta } from './api';
 
 export interface Student {
   id: string;
@@ -10,9 +11,7 @@ export interface Student {
 
 export interface StudentListResponse {
   students: Student[];
-  total: number;
-  page: number;
-  limit: number;
+  pagination: PaginationMeta;
 }
 
 export type EnrollmentStatus = 'enrolled' | 'completed' | 'cancelled';
@@ -41,4 +40,9 @@ export interface AdminEnrollmentRow {
   studentName: string;
   courseId: number;
   courseTitle: string;
+}
+
+export interface AdminEnrollmentListResponse {
+  enrollments: AdminEnrollmentRow[];
+  pagination: PaginationMeta;
 }

@@ -131,3 +131,12 @@ export function MyCoursesIcon(props: IconProps) {
     </Icon>
   );
 }
+
+export function AssignmentsIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <rect x="4.5" y="2.5" width="15" height="19" rx="2" />
+      <path d="M8.5 8h7M8.5 12h7M8.5 16h4" />
+    </Icon>
+  );
+}

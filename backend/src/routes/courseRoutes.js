@@ -4,15 +4,31 @@ const router = express.Router();
 
 const courseController = require("../controllers/courseController");
 const validateCourse = require("../validators/courseValidator");
+const authMiddleware = require("../middleware/authMiddleware");
+const roleMiddleware = require("../middleware/roleMiddleware");
+const asyncHandler = require("../utils/asyncHandler");
 
-router.get("/", courseController.getAllCourses);
+// Every course route requires a valid session; only admins can write.
+router.use(authMiddleware, roleMiddleware("admin", "student", "instructor"));
 
-router.get("/:id", courseController.getCourseById);
+router.get("/", asyncHandler(courseController.getAllCourses));
 
-router.post("/", validateCourse, courseController.createCourse);
+router.get("/:id", asyncHandler(courseController.getCourseById));
 
-router.put("/:id", validateCourse, courseController.updateCourse);
+router.post(
+  "/",
+  roleMiddleware("admin"),
+  validateCourse,
+  asyncHandler(courseController.createCourse),
+);
 
-router.delete("/:id", courseController.deleteCourse);
+router.put(
+  "/:id",
+  roleMiddleware("admin"),
+  validateCourse,
+  asyncHandler(courseController.updateCourse),
+);
+
+router.delete("/:id", roleMiddleware("admin"), asyncHandler(courseController.deleteCourse));
 
 module.exports = router;

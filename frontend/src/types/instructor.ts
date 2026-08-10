@@ -1,3 +1,5 @@
+import type { PaginationMeta } from "./api";
+
 export interface Instructor {
   id: string;
   full_name: string;
@@ -10,4 +12,9 @@ export interface Instructor {
   has_login?: boolean;
   created_at?: string;
   updated_at?: string;
+}
+
+export interface InstructorListResponse {
+  instructors: Instructor[];
+  pagination: PaginationMeta;
 }

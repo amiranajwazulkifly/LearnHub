@@ -25,6 +25,8 @@ import AnnouncementFormPage from "../pages/admin/AnnouncementFormPage";
 
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
+import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
+import ResetPasswordPage from "../pages/auth/ResetPasswordPage";
 
 import BrowseCoursesPage from "../pages/student/BrowseCoursesPage";
 import CourseDetailsPage from "../pages/student/CourseDetailsPage";
@@ -33,11 +35,15 @@ import ProfilePage from "../pages/student/ProfilePage";
 import TimetablePage from "../pages/student/TimetablePage";
 import StudentDashboardPage from "../pages/student/StudentDashboardPage";
 import StudentAnnouncementsPage from "../pages/student/StudentAnnouncementsPage";
+import StudentTasksPage from "../pages/student/StudentTasksPage";
+import StudentAssignmentDetailPage from "../pages/student/StudentAssignmentDetailPage";
 
 import InstructorDashboardPage from "../pages/instructor/InstructorDashboardPage";
 import InstructorCoursesPage from "../pages/instructor/InstructorCoursesPage";
 import InstructorCourseStudentsPage from "../pages/instructor/InstructorCourseStudentsPage";
 import InstructorProfilePage from "../pages/instructor/InstructorProfilePage";
+import InstructorCourseAssignmentsPage from "../pages/instructor/InstructorCourseAssignmentsPage";
+import InstructorAssignmentSubmissionsPage from "../pages/instructor/InstructorAssignmentSubmissionsPage";
 
 import { useAuthStore } from "../store/useAuthStore";
 
@@ -79,6 +85,10 @@ function AppRoutes() {
         <Route path={ROUTES.LOGIN} element={<LoginPage />} />
 
         <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
+
+        <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
+
+        <Route path={ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
       </Route>
 
       {/* Protected Routes */}
@@ -170,6 +180,13 @@ function AppRoutes() {
               path={ROUTES.STUDENT.ANNOUNCEMENTS}
               element={<StudentAnnouncementsPage />}
             />
+
+            <Route path={ROUTES.STUDENT.TASKS} element={<StudentTasksPage />} />
+
+            <Route
+              path={`${ROUTES.STUDENT.TASKS}/:assignmentId`}
+              element={<StudentAssignmentDetailPage />}
+            />
           </Route>
         </Route>
 
@@ -194,6 +211,16 @@ function AppRoutes() {
             <Route
               path={`${ROUTES.INSTRUCTOR.COURSES}/:courseId/students`}
               element={<InstructorCourseStudentsPage />}
+            />
+
+            <Route
+              path={`${ROUTES.INSTRUCTOR.COURSES}/:courseId/assignments`}
+              element={<InstructorCourseAssignmentsPage />}
+            />
+
+            <Route
+              path={`${ROUTES.INSTRUCTOR.ASSIGNMENTS}/:assignmentId/submissions`}
+              element={<InstructorAssignmentSubmissionsPage />}
             />
           </Route>
         </Route>

@@ -1,184 +1,145 @@
 const { pool } = require("../config/db");
+const ApiError = require("../utils/apiError");
+const { parsePagination, buildPaginationMeta } = require("../utils/pagination");
 
-function handleCourseDatabaseError(error, res, actionLabel) {
+// Translates known Postgres error codes into an ApiError so callers can
+// just `throw` and let asyncHandler + errorMiddleware format the response.
+// Anything unrecognized re-throws as-is and falls through to the generic
+// 500 handler in errorMiddleware.
+function translateCourseDatabaseError(error) {
   if (error.code === "23505" && error.constraint === "courses_code_unique") {
-    return res.status(409).json({
-      success: false,
-      message: "A course with this code already exists",
-    });
+    return new ApiError(409, "A course with this code already exists");
   }
 
   if (error.code === "23503") {
     if (error.constraint === "courses_category_id_fkey") {
-      return res.status(400).json({
-        success: false,
-        message: "Category not found",
-      });
+      return new ApiError(400, "Category not found");
     }
-
     if (error.constraint === "courses_instructor_id_fkey") {
-      return res.status(400).json({
-        success: false,
-        message: "Instructor not found",
-      });
+      return new ApiError(400, "Instructor not found");
     }
   }
 
   if (error.code === "22P02") {
-    return res.status(400).json({
-      success: false,
-      message: "One of the submitted values has an invalid format",
-    });
+    return new ApiError(400, "One of the submitted values has an invalid format");
   }
 
   if (error.code === "23514") {
-    return res.status(400).json({
-      success: false,
-      message: "One of the submitted values does not satisfy course rules",
-    });
+    return new ApiError(400, "One of the submitted values does not satisfy course rules");
   }
 
-  console.error(`${actionLabel} error:`, error);
-
-  return res.status(500).json({
-    success: false,
-    message: `Failed to ${actionLabel.toLowerCase()}`,
-  });
+  return error;
 }
 
 async function getAllCourses(req, res) {
-  try {
-    const { search, category, instructor, status } = req.query;
+  const { search, category, instructor, status } = req.query;
+  const { page, limit, offset } = parsePagination(req.query);
 
-    let query = `
-      SELECT
-        courses.*,
-        categories.name AS category_name,
-        instructors.full_name AS instructor_name
-      FROM courses
-      LEFT JOIN categories
-        ON categories.id = courses.category_id
-      LEFT JOIN instructors
-        ON instructors.id = courses.instructor_id
-      WHERE 1=1
+  let whereClause = " WHERE 1=1";
+  const values = [];
+  let index = 1;
+
+  if (search) {
+    whereClause += `
+      AND (
+        courses.title ILIKE $${index}
+        OR courses.code ILIKE $${index}
+      )
     `;
-
-    const values = [];
-    let index = 1;
-
-    if (search) {
-      query += `
-        AND (
-          courses.title ILIKE $${index}
-          OR courses.code ILIKE $${index}
-        )
-      `;
-      values.push(`%${search}%`);
-      index++;
-    }
-
-    if (category) {
-      query += ` AND categories.name ILIKE $${index}`;
-      values.push(`%${category}%`);
-      index++;
-    }
-
-    if (instructor) {
-      query += ` AND instructors.full_name ILIKE $${index}`;
-      values.push(`%${instructor}%`);
-      index++;
-    }
-
-    if (status) {
-      query += ` AND courses.status::text ILIKE $${index}`;
-      values.push(`%${status}%`);
-      index++;
-    }
-
-    query += " ORDER BY courses.created_at DESC";
-
-    const result = await pool.query(query, values);
-
-    res.status(200).json({
-      success: true,
-      count: result.rows.length,
-      data: result.rows,
-    });
-  } catch (error) {
-    console.error("Get courses error:", error);
-
-    res.status(500).json({
-      success: false,
-      message: "Failed to retrieve courses",
-    });
+    values.push(`%${search}%`);
+    index++;
   }
+
+  if (category) {
+    whereClause += ` AND categories.name ILIKE $${index}`;
+    values.push(`%${category}%`);
+    index++;
+  }
+
+  if (instructor) {
+    whereClause += ` AND instructors.full_name ILIKE $${index}`;
+    values.push(`%${instructor}%`);
+    index++;
+  }
+
+  if (status) {
+    whereClause += ` AND courses.status::text ILIKE $${index}`;
+    values.push(`%${status}%`);
+    index++;
+  }
+
+  const fromClause = `
+    FROM courses
+    LEFT JOIN categories
+      ON categories.id = courses.category_id
+    LEFT JOIN instructors
+      ON instructors.id = courses.instructor_id
+    ${whereClause}
+  `;
+
+  const result = await pool.query(
+    `
+    SELECT courses.*, categories.name AS category_name, instructors.full_name AS instructor_name
+    ${fromClause}
+    ORDER BY courses.created_at DESC
+    LIMIT $${index} OFFSET $${index + 1}
+    `,
+    [...values, limit, offset],
+  );
+
+  const countResult = await pool.query(`SELECT COUNT(*) ${fromClause}`, values);
+
+  res.status(200).json({
+    success: true,
+    message: "Courses retrieved successfully",
+    data: {
+      courses: result.rows,
+      pagination: buildPaginationMeta({ page, limit, total: Number(countResult.rows[0].count) }),
+    },
+  });
 }
 
+// LEFT JOINs so a course missing a category and/or instructor is still
+// fetchable — an earlier duplicate definition of this function (now
+// removed) used inner JOINs and would silently 404 for such courses.
 async function getCourseById(req, res) {
-  try {
-    const { id } = req.params;
+  const { id } = req.params;
 
-    const result = await pool.query(
-      `
-      SELECT
-        courses.*,
-        categories.name AS category_name,
-        instructors.full_name AS instructor_name
-      FROM courses
-      JOIN categories
-        ON categories.id = courses.category_id
-      JOIN instructors
-        ON instructors.id = courses.instructor_id
-      WHERE courses.id = $1;
-      `,
-      [id],
-    );
+  const result = await pool.query(
+    `
+    SELECT
+      courses.*,
+      categories.name AS category_name,
+      instructors.full_name AS instructor_name
+    FROM courses
+    LEFT JOIN categories
+      ON categories.id = courses.category_id
+    LEFT JOIN instructors
+      ON instructors.id = courses.instructor_id
+    WHERE courses.id = $1;
+    `,
+    [id],
+  );
 
-    if (result.rowCount === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Course not found",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: result.rows[0],
-    });
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      success: false,
-      message: "Failed to retrieve course",
-    });
+  if (result.rowCount === 0) {
+    throw new ApiError(404, "Course not found");
   }
+
+  res.status(200).json({
+    success: true,
+    message: "Course retrieved successfully",
+    data: { course: result.rows[0] },
+  });
 }
 
 async function createCourse(req, res) {
-  try {
-    const {
-      code,
-      title,
-      description,
-      category_id,
-      instructor_id,
-      capacity,
-      status,
-    } = req.body;
+  const { code, title, description, category_id, instructor_id, capacity, status } = req.body;
 
+  try {
     const result = await pool.query(
       `
       INSERT INTO courses
-      (
-        code,
-        title,
-        description,
-        category_id,
-        instructor_id,
-        capacity,
-        status
-      )
+      (code, title, description, category_id, instructor_id, capacity, status)
       VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *;
       `,
@@ -196,27 +157,18 @@ async function createCourse(req, res) {
     res.status(201).json({
       success: true,
       message: "Course created successfully",
-      data: result.rows[0],
+      data: { course: result.rows[0] },
     });
   } catch (error) {
-    return handleCourseDatabaseError(error, res, "Create course");
+    throw translateCourseDatabaseError(error);
   }
 }
 
 async function updateCourse(req, res) {
+  const { id } = req.params;
+  const { code, title, description, category_id, instructor_id, capacity, status } = req.body;
+
   try {
-    const { id } = req.params;
-
-    const {
-      code,
-      title,
-      description,
-      category_id,
-      instructor_id,
-      capacity,
-      status,
-    } = req.body;
-
     const result = await pool.query(
       `
       UPDATE courses
@@ -232,109 +184,45 @@ async function updateCourse(req, res) {
       WHERE id = $8
       RETURNING *;
       `,
-      [
-        code,
-        title,
-        description || null,
-        category_id || null,
-        instructor_id || null,
-        capacity,
-        status,
-        id,
-      ],
+      [code, title, description || null, category_id || null, instructor_id || null, capacity, status, id],
     );
 
     if (result.rowCount === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Course not found",
-      });
+      throw new ApiError(404, "Course not found");
     }
 
     res.status(200).json({
       success: true,
       message: "Course updated successfully",
-      data: result.rows[0],
+      data: { course: result.rows[0] },
     });
   } catch (error) {
-    return handleCourseDatabaseError(error, res, "Update course");
+    if (error instanceof ApiError) throw error;
+    throw translateCourseDatabaseError(error);
   }
 }
 
 async function deleteCourse(req, res) {
-  try {
-    const { id } = req.params;
+  const { id } = req.params;
 
-    const result = await pool.query(
-      `
-      DELETE FROM courses
-      WHERE id = $1
-      RETURNING *;
-      `,
-      [id],
-    );
+  const result = await pool.query(
+    `
+    DELETE FROM courses
+    WHERE id = $1
+    RETURNING *;
+    `,
+    [id],
+  );
 
-    if (result.rowCount === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Course not found",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "Course deleted successfully",
-      data: result.rows[0],
-    });
-  } catch (error) {
-    console.error("Delete course error:", error);
-
-    res.status(500).json({
-      success: false,
-      message: "Failed to delete course",
-    });
+  if (result.rowCount === 0) {
+    throw new ApiError(404, "Course not found");
   }
-}
 
-async function getCourseById(req, res) {
-  try {
-    const { id } = req.params;
-
-    const result = await pool.query(
-      `
-      SELECT
-        courses.*,
-        categories.name AS category_name,
-        instructors.full_name AS instructor_name
-      FROM courses
-      LEFT JOIN categories
-        ON categories.id = courses.category_id
-      LEFT JOIN instructors
-        ON instructors.id = courses.instructor_id
-      WHERE courses.id = $1;
-      `,
-      [id],
-    );
-
-    if (result.rowCount === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Course not found",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: result.rows[0],
-    });
-  } catch (error) {
-    console.error("Get course error:", error);
-
-    res.status(500).json({
-      success: false,
-      message: "Failed to retrieve course",
-    });
-  }
+  res.status(200).json({
+    success: true,
+    message: "Course deleted successfully",
+    data: { course: result.rows[0] },
+  });
 }
 
 module.exports = {
