@@ -42,6 +42,53 @@ async function countActiveEnrollments(courseId) {
   return result.rows[0].total;
 }
 
+async function findTimetableConflict(studentId, courseId) {
+  const result = await pool.query(
+    `
+    SELECT
+      existing_course.id AS existing_course_id,
+      existing_course.code AS existing_course_code,
+      existing_course.title AS existing_course_title,
+      existing_schedule.day_of_week,
+      existing_schedule.start_time AS existing_start_time,
+      existing_schedule.end_time AS existing_end_time,
+      new_schedule.start_time AS new_start_time,
+      new_schedule.end_time AS new_end_time
+    FROM enrollments
+    JOIN courses AS existing_course
+      ON existing_course.id = enrollments.course_id
+    JOIN course_schedules AS existing_schedule
+      ON existing_schedule.course_id = existing_course.id
+    JOIN course_schedules AS new_schedule
+      ON new_schedule.course_id = $2
+    WHERE enrollments.student_id = $1
+      AND enrollments.status = 'enrolled'
+
+      AND existing_schedule.day_of_week = new_schedule.day_of_week
+
+      AND existing_schedule.start_time < new_schedule.end_time
+      AND existing_schedule.end_time > new_schedule.start_time
+
+      AND (
+        existing_schedule.start_date IS NULL
+        OR new_schedule.end_date IS NULL
+        OR existing_schedule.start_date <= new_schedule.end_date
+      )
+
+      AND (
+        existing_schedule.end_date IS NULL
+        OR new_schedule.start_date IS NULL
+        OR existing_schedule.end_date >= new_schedule.start_date
+      )
+
+    LIMIT 1;
+    `,
+    [studentId, courseId],
+  );
+
+  return result.rows[0] || null;
+}
+
 async function createEnrollment(studentId, courseId) {
   const result = await pool.query(
     `
@@ -149,6 +196,7 @@ module.exports = {
   findCourseById,
   findActiveEnrollment,
   countActiveEnrollments,
+  findTimetableConflict,
   createEnrollment,
   getEnrollmentsByStudentId,
   cancelEnrollment,

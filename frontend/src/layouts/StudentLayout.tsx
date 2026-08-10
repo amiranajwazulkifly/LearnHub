@@ -1,32 +1,40 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet } from "react-router-dom";
 
-import Navbar from '../components/layout/Navbar';
-import Sidebar from '../components/layout/Sidebar';
-import { ROUTES } from '../constants/routes';
+import Navbar from "../components/layout/Navbar";
+import Sidebar from "../components/layout/Sidebar";
+import { ROUTES } from "../constants/routes";
 
 const studentNavigation = [
   {
-    label: 'Dashboard',
+    label: "Dashboard",
     path: ROUTES.STUDENT.DASHBOARD,
     end: true,
   },
   {
-    label: 'Profile',
+    label: "Profile",
     path: ROUTES.STUDENT.PROFILE,
   },
   {
-    label: 'Browse Courses',
+    label: "Browse Courses",
     path: ROUTES.STUDENT.COURSES,
   },
   {
-    label: 'Timetable',
+    label: "My Courses",
+    path: ROUTES.STUDENT.MY_COURSES,
+  },
+  {
+    label: "Timetable",
     path: ROUTES.STUDENT.TIMETABLE,
+  },
+  {
+    label: "Announcements",
+    path: ROUTES.STUDENT.ANNOUNCEMENTS,
   },
 ] as const;
 
 function StudentLayout() {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="bg-line-grid min-h-screen bg-gray-100 dark:bg-gray-950">
       <Navbar portalName="Student Portal" />
 
       <div className="flex flex-col md:flex-row">

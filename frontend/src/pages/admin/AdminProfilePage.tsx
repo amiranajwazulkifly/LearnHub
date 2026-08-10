@@ -5,6 +5,7 @@ function AdminProfilePage() {
   return (
     <div className="mx-auto max-w-3xl">
       <PageHeader
+        eyebrow="admin / profile"
         title="Admin Profile"
         description="Manage your administrator account information and password."
       />

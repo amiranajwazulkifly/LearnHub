@@ -238,18 +238,18 @@ function SchedulesPage() {
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Schedule Management</h1>
 
-        <p className="mt-2 text-gray-500">
+        <p className="mt-2 text-gray-500 dark:text-gray-400">
           Create and manage course schedules.
         </p>
       </div>
 
       {error && (
-        <div className="mb-4 rounded bg-red-100 p-4 text-red-700">{error}</div>
+        <div className="mb-4 rounded bg-red-100 p-4 text-red-700 dark:bg-red-900/40 dark:text-red-400">{error}</div>
       )}
 
       <form
         onSubmit={handleCreateSchedule}
-        className="mb-6 space-y-4 rounded-lg bg-white p-6 shadow"
+        className="mb-6 space-y-4 rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900"
       >
         <h2 className="text-xl font-semibold">
           {editingId ? "Edit Schedule" : "Add Schedule"}
@@ -264,7 +264,7 @@ function SchedulesPage() {
             id="course"
             value={courseId}
             onChange={(event) => setCourseId(event.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2"
+            className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
           >
             <option value="">Select course</option>
 
@@ -285,7 +285,7 @@ function SchedulesPage() {
             id="dayOfWeek"
             value={dayOfWeek}
             onChange={(event) => setDayOfWeek(event.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2"
+            className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
           >
             {DAYS.map((day) => (
               <option key={day.value} value={day.value}>
@@ -306,7 +306,7 @@ function SchedulesPage() {
               type="time"
               value={startTime}
               onChange={(event) => setStartTime(event.target.value)}
-              className="w-full rounded border border-gray-300 px-3 py-2"
+              className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
             />
           </div>
 
@@ -320,7 +320,7 @@ function SchedulesPage() {
               type="time"
               value={endTime}
               onChange={(event) => setEndTime(event.target.value)}
-              className="w-full rounded border border-gray-300 px-3 py-2"
+              className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
             />
           </div>
         </div>
@@ -335,7 +335,7 @@ function SchedulesPage() {
             type="text"
             value={location}
             onChange={(event) => setLocation(event.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2"
+            className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
             placeholder="Example: Computer Lab 1"
           />
         </div>
@@ -351,7 +351,7 @@ function SchedulesPage() {
               type="date"
               value={startDate}
               onChange={(event) => setStartDate(event.target.value)}
-              className="w-full rounded border border-gray-300 px-3 py-2"
+              className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
             />
           </div>
 
@@ -365,7 +365,7 @@ function SchedulesPage() {
               type="date"
               value={endDate}
               onChange={(event) => setEndDate(event.target.value)}
-              className="w-full rounded border border-gray-300 px-3 py-2"
+              className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
             />
           </div>
         </div>
@@ -377,7 +377,7 @@ function SchedulesPage() {
                 type="button"
                 onClick={() => void handleUpdateSchedule()}
                 disabled={saving}
-                className="rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-50"
+                className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-white disabled:opacity-50"
               >
                 {saving ? "Updating..." : "Update Schedule"}
               </button>
@@ -386,7 +386,7 @@ function SchedulesPage() {
                 type="button"
                 onClick={clearForm}
                 disabled={saving}
-                className="rounded bg-gray-200 px-4 py-2 text-gray-800 disabled:opacity-50"
+                className="rounded bg-gray-200 px-4 py-2 text-gray-800 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-200"
               >
                 Cancel
               </button>
@@ -395,7 +395,7 @@ function SchedulesPage() {
             <button
               type="submit"
               disabled={saving}
-              className="rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-50"
+              className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-white disabled:opacity-50"
             >
               {saving ? "Creating..." : "Create Schedule"}
             </button>
@@ -403,9 +403,9 @@ function SchedulesPage() {
         </div>
       </form>
 
-      <div className="overflow-x-auto rounded-lg bg-white shadow">
+      <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
         <table className="w-full text-left">
-          <thead className="border-b bg-gray-50">
+          <thead className="border-b border-gray-200 bg-gray-50 font-mono text-xs uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:bg-gray-800 dark:text-gray-400">
             <tr>
               <th className="px-6 py-4">Course</th>
               <th className="px-6 py-4">Day</th>
@@ -418,14 +418,14 @@ function SchedulesPage() {
 
           <tbody>
             {schedules.map((schedule) => (
-              <tr key={schedule.id} className="border-b">
+              <tr key={schedule.id} className="border-b border-gray-200 dark:border-gray-800">
                 <td className="px-6 py-4">
                   <div className="font-medium">
                     {schedule.course_title ?? "Unknown Course"}
                   </div>
 
                   {schedule.course_code && (
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
                       {schedule.course_code}
                     </div>
                   )}
@@ -456,7 +456,7 @@ function SchedulesPage() {
                     <button
                       type="button"
                       onClick={() => handleEdit(schedule)}
-                      className="rounded bg-blue-600 px-3 py-2 text-sm text-white"
+                      className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-3 py-2 text-sm text-white"
                     >
                       Edit
                     </button>
@@ -475,7 +475,7 @@ function SchedulesPage() {
 
             {schedules.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                <td colSpan={6} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
                   No schedules found.
                 </td>
               </tr>

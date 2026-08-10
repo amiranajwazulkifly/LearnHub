@@ -26,7 +26,7 @@ export async function getAllEnrollments(): Promise<AdminEnrollmentRow[]> {
 }
 
 export async function updateEnrollmentStatus(
-  id: string,
+  id: number,
   status: EnrollmentStatus
 ): Promise<AdminEnrollmentRow> {
   const { data } = await axiosInstance.patch(`/admin/enrollments/${id}`, { status });

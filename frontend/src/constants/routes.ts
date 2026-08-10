@@ -13,13 +13,19 @@ export const ROUTES = {
     CATEGORIES: "/admin/categories",
     INSTRUCTORS: "/admin/instructors",
     SCHEDULES: "/admin/schedules",
+    STUDENTS: "/admin/students",
+    ENROLLMENTS: "/admin/enrollments",
+    REPORTS: "/admin/reports",
+    ANNOUNCEMENTS: "/admin/announcements",
   },
 
   STUDENT: {
     DASHBOARD: "/student",
     PROFILE: "/student/profile",
     COURSES: "/student/courses",
+    MY_COURSES: "/student/my-courses",
     TIMETABLE: "/student/timetable",
+    ANNOUNCEMENTS: "/student/announcements",
   },
 } as const;
 

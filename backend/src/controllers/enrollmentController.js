@@ -50,6 +50,20 @@ async function createEnrollment(req, res) {
       });
     }
 
+    // Check whether the new course clashes with the student's timetable
+    const timetableConflict = await enrollmentService.findTimetableConflict(
+      studentId,
+      courseId,
+    );
+
+    if (timetableConflict) {
+      return res.status(409).json({
+        success: false,
+        message: "This course conflicts with your current timetable",
+        conflict: timetableConflict,
+      });
+    }
+
     const enrollment = await enrollmentService.createEnrollment(
       studentId,
       courseId,
