@@ -52,6 +52,27 @@
     @apply bg-gray-100 text-gray-900 antialiased dark:bg-gray-950 dark:text-gray-100;
     font-family: var(--font-sans);
   }
+
+  /*
+   * App-wide tactile feedback: every button lifts slightly on hover and
+   * presses down on click, layered on top of whatever hover:/active:
+   * color classes an individual button already has. Applied here once
+   * instead of per-button so it's automatic everywhere, including buttons
+   * added later.
+   */
+  button:not(:disabled) {
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  button:not(:disabled):hover {
+    transform: translateY(-1px);
+  }
+
+  button:not(:disabled):active {
+    transform: translateY(0.5px) scale(0.97);
+  }
 }
 
 @layer utilities {
@@ -198,12 +219,30 @@
   animation: divider-pulse 3.5s ease-in-out infinite;
 }
 
+/* Modal entrance: a quick fade + scale-up, used by Modal.tsx. */
+@keyframes modal-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.96) translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-modal-in {
+  animation: modal-in 0.15s ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-drift,
   .animate-drift-reverse,
   .animate-scan-sweep,
   .animate-divider-pulse,
-  .btn-sheen::after {
+  .animate-modal-in,
+  .btn-sheen::after,
+  button {
     animation: none;
     transition: none;
   }

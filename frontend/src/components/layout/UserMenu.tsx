@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { ROUTES } from '../../constants/routes';
 import { useAuthStore } from '../../store/useAuthStore';
+import ConfirmModal from '../common/ConfirmModal';
 
 function UserMenu() {
   const navigate = useNavigate();
@@ -14,7 +16,11 @@ function UserMenu() {
     (state) => state.logout
   );
 
-  async function handleLogout() {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  async function handleConfirmLogout() {
+    setConfirmOpen(false);
+
     await logout();
 
     navigate(ROUTES.LOGIN, {
@@ -40,11 +46,21 @@ function UserMenu() {
 
       <button
         type="button"
-        onClick={handleLogout}
+        onClick={() => setConfirmOpen(true)}
         className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
       >
         Logout
       </button>
+
+      <ConfirmModal
+        open={confirmOpen}
+        title="Log out?"
+        message="You'll need to sign in again to continue where you left off."
+        confirmLabel="Log out"
+        cancelLabel="Stay signed in"
+        onConfirm={() => void handleConfirmLogout()}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </div>
   );
 }
