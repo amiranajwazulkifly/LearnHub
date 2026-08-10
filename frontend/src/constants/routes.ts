@@ -26,12 +26,14 @@ export const ROUTES = {
     MY_COURSES: "/student/my-courses",
     TIMETABLE: "/student/timetable",
     ANNOUNCEMENTS: "/student/announcements",
+    TASKS: "/student/tasks",
   },
 
   INSTRUCTOR: {
     DASHBOARD: "/instructor",
     PROFILE: "/instructor/profile",
     COURSES: "/instructor/courses",
+    ASSIGNMENTS: "/instructor/assignments",
   },
 } as const;
 

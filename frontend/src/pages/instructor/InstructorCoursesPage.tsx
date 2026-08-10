@@ -79,12 +79,20 @@ export default function InstructorCoursesPage() {
                 </p>
               </div>
 
-              <Link
-                to={`${ROUTES.INSTRUCTOR.COURSES}/${course.id}/students`}
-                className="mt-auto inline-block rounded-lg bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-center text-sm font-medium text-white transition hover:from-brand-700 hover:to-brand-600"
-              >
-                View Students
-              </Link>
+              <div className="mt-auto flex gap-2">
+                <Link
+                  to={`${ROUTES.INSTRUCTOR.COURSES}/${course.id}/students`}
+                  className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-center text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
+                >
+                  Students
+                </Link>
+                <Link
+                  to={`${ROUTES.INSTRUCTOR.COURSES}/${course.id}/assignments`}
+                  className="flex-1 rounded-lg bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-center text-sm font-medium text-white transition hover:from-brand-700 hover:to-brand-600"
+                >
+                  Assignments
+                </Link>
+              </div>
             </div>
           ))}
         </div>

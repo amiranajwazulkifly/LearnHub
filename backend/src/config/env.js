@@ -5,7 +5,12 @@ dotenv.config({
   path: path.resolve(__dirname, "../../.env"),
 });
 
-const requiredVariables = ["DATABASE_URL", "JWT_SECRET"];
+const requiredVariables = [
+  "DATABASE_URL",
+  "JWT_SECRET",
+  "SUPABASE_URL",
+  "SUPABASE_SERVICE_ROLE_KEY",
+];
 
 for (const variable of requiredVariables) {
   if (!process.env[variable]) {
@@ -21,6 +26,8 @@ const env = {
   frontendUrl: process.env.FRONTEND_URL,
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || "1d",
+  supabaseUrl: process.env.SUPABASE_URL,
+  supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
 };
 
 module.exports = env;

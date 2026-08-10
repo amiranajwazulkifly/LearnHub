@@ -3,7 +3,7 @@ import type { Schedule } from "../types/schedule";
 
 export const getSchedules = async (): Promise<Schedule[]> => {
   const response = await api.get("/schedules");
-  return response.data;
+  return response.data.data.schedules;
 };
 
 export const createSchedule = async (schedule: {

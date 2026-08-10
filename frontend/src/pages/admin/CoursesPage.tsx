@@ -25,14 +25,14 @@ function CoursesPage() {
       setLoading(true);
       setError("");
 
-      const response = await getCourses({
+      const courses = await getCourses({
         search: search || undefined,
         category: category || undefined,
         instructor: instructor || undefined,
         status: status || undefined,
       });
 
-      setCourses(response.data ?? []);
+      setCourses(courses ?? []);
     } catch (error) {
       console.error("Failed to load courses:", error);
       setError("Failed to load courses.");
@@ -57,8 +57,8 @@ function CoursesPage() {
     setStatus("");
 
     setTimeout(() => {
-      void getCourses().then((response) => {
-        setCourses(response.data ?? []);
+      void getCourses().then((courses) => {
+        setCourses(courses ?? []);
       });
     }, 0);
   }

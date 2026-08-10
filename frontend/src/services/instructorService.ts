@@ -3,7 +3,7 @@ import type { Instructor } from "../types/instructor";
 
 export const getInstructors = async (): Promise<Instructor[]> => {
   const response = await api.get("/instructors");
-  return response.data;
+  return response.data.data.instructors;
 };
 
 export const createInstructor = async (instructor: {

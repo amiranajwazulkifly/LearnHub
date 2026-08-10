@@ -15,6 +15,7 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 const studentRoutes = require("./routes/studentRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const announcementRoutes = require("./routes/announcementRoutes");
+const assignmentRoutes = require("./routes/assignmentRoutes");
 
 const { apiRateLimiter } = require("./middleware/rateLimitMiddleware");
 
@@ -24,8 +25,8 @@ const ApiError = require("./utils/apiError");
 const app = express();
 const allowedOrigins = [
   process.env.FRONTEND_URL,
-  "http://localhost:5173",
-  "http://127.0.0.1:5173",
+  "http://localhost:5175",
+  "http://127.0.0.1:5175",
 ].filter(Boolean);
 app.disable("x-powered-by");
 app.use(helmet());
@@ -96,6 +97,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api", studentRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/announcements", announcementRoutes);
+app.use("/api/assignments", assignmentRoutes);
 app.use("/api", apiRateLimiter);
 app.use(
   cors({
