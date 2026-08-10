@@ -3,22 +3,30 @@ import { Outlet } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
 import Sidebar from "../components/layout/Sidebar";
 import { ROUTES } from "../constants/routes";
+import {
+  DashboardIcon,
+  MyCoursesIcon,
+  ProfileIcon,
+} from "../components/common/NavIcons";
 
 const instructorNavigation = [
   {
     label: "Dashboard",
     path: ROUTES.INSTRUCTOR.DASHBOARD,
+    icon: <DashboardIcon />,
     end: true,
   },
   {
     label: "Profile",
     path: ROUTES.INSTRUCTOR.PROFILE,
+    icon: <ProfileIcon />,
   },
   {
     label: "My Courses",
     path: ROUTES.INSTRUCTOR.COURSES,
+    icon: <MyCoursesIcon />,
   },
-] as const;
+];
 
 function InstructorLayout() {
   return (
