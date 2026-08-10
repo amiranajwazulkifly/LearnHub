@@ -1,8 +1,12 @@
 const { pool } = require("../config/db");
 const { hashPassword } = require("../utils/password");
 const ApiError = require("../utils/apiError");
+const { parsePagination, buildPaginationMeta } = require("../utils/pagination");
 
+// GET /api/instructors?page=&limit=
 async function getAllInstructors(req, res) {
+  const { page, limit, offset } = parsePagination(req.query);
+
   const result = await pool.query(
     `
     SELECT
@@ -10,13 +14,20 @@ async function getAllInstructors(req, res) {
       (instructors.user_id IS NOT NULL) AS has_login
     FROM instructors
     ORDER BY created_at DESC
+    LIMIT $1 OFFSET $2
     `,
+    [limit, offset],
   );
+
+  const countResult = await pool.query("SELECT COUNT(*) FROM instructors");
 
   res.status(200).json({
     success: true,
     message: "Instructors retrieved successfully",
-    data: { instructors: result.rows },
+    data: {
+      instructors: result.rows,
+      pagination: buildPaginationMeta({ page, limit, total: Number(countResult.rows[0].count) }),
+    },
   });
 }
 
@@ -117,10 +128,12 @@ async function setInstructorAccount(req, res) {
   const passwordHash = await hashPassword(password);
 
   if (instructor.user_id) {
+    // Also revokes any token issued before now, so the instructor's old
+    // password stops granting access to already-issued sessions too.
     await pool.query(
       `
       UPDATE users
-      SET password_hash = $1, updated_at = NOW()
+      SET password_hash = $1, token_valid_after = NOW(), updated_at = NOW()
       WHERE id = $2
       `,
       [passwordHash, instructor.user_id],

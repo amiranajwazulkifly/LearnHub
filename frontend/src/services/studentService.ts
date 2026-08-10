@@ -4,13 +4,14 @@ import axiosInstance from '../api/axiosInstance';
 import type {
   StudentListResponse,
   StudentDetail,
+  AdminEnrollmentListResponse,
   AdminEnrollmentRow,
   EnrollmentStatus,
 } from '../types/student';
 
 export async function getStudents(search = '', page = 1, limit = 20): Promise<StudentListResponse> {
   const { data } = await axiosInstance.get('/students', { params: { search, page, limit } });
-  return data.data; // { students, total, page, limit }
+  return data.data; // { students, pagination }
 }
 
 export async function getStudentDetail(id: string): Promise<StudentDetail> {
@@ -20,9 +21,9 @@ export async function getStudentDetail(id: string): Promise<StudentDetail> {
 
 // /admin/enrollments, not /enrollments — that path is a teammate's
 // student-facing enroll/cancel routes, kept separate to avoid any ambiguity.
-export async function getAllEnrollments(): Promise<AdminEnrollmentRow[]> {
-  const { data } = await axiosInstance.get('/admin/enrollments');
-  return data.data.enrollments;
+export async function getAllEnrollments(page = 1, limit = 20): Promise<AdminEnrollmentListResponse> {
+  const { data } = await axiosInstance.get('/admin/enrollments', { params: { page, limit } });
+  return data.data; // { enrollments, pagination }
 }
 
 export async function updateEnrollmentStatus(

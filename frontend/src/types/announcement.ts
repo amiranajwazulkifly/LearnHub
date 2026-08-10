@@ -1,4 +1,5 @@
 // Dzul
+import type { PaginationMeta } from './api';
 
 export type AnnouncementStatus = 'draft' | 'published' | 'archived';
 
@@ -17,4 +18,9 @@ export interface Announcement {
 export interface CreateAnnouncementInput {
   title: string;
   content: string;
+}
+
+export interface AnnouncementListResponse {
+  announcements: Announcement[];
+  pagination: PaginationMeta;
 }

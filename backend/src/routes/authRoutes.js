@@ -7,6 +7,8 @@ const {
   updateProfile,
   changePassword,
   logout,
+  forgotPassword,
+  resetPassword,
 } = require('../controllers/authController');
 
 const {
@@ -14,6 +16,8 @@ const {
   validateLogin,
   validateUpdateProfile,
   validateChangePassword,
+  validateForgotPassword,
+  validateResetPassword,
 } = require('../validators/authValidator');
 
 const validationMiddleware = require(
@@ -52,6 +56,22 @@ router.post(
   authRateLimiter,
   validationMiddleware(validateLogin),
   asyncHandler(login)
+);
+
+// Public — request a password reset link
+router.post(
+  '/forgot-password',
+  authRateLimiter,
+  validationMiddleware(validateForgotPassword),
+  asyncHandler(forgotPassword)
+);
+
+// Public — consume a reset token to set a new password
+router.post(
+  '/reset-password',
+  authRateLimiter,
+  validationMiddleware(validateResetPassword),
+  asyncHandler(resetPassword)
 );
 
 // Get authenticated user

@@ -9,11 +9,16 @@ import {
 } from "../../services/instructorService";
 
 import type { Instructor } from "../../types/instructor";
+import type { PaginationMeta } from "../../types/api";
 import { getErrorMessage, getValidationErrors } from "../../utils/errorHandler";
 import StatusBadge from "../../components/common/StatusBadge";
+import Pagination from "../../components/common/Pagination";
+import { usePagination } from "../../hooks/usePagination";
 
 function InstructorsPage() {
   const [instructors, setInstructors] = useState<Instructor[]>([]);
+  const [pagination, setPagination] = useState<PaginationMeta | null>(null);
+  const { page, setPage } = usePagination();
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -38,9 +43,10 @@ function InstructorsPage() {
       setLoading(true);
       setError("");
 
-      const data = await getInstructors();
+      const data = await getInstructors(page);
 
-      setInstructors(data);
+      setInstructors(data.instructors);
+      setPagination(data.pagination);
     } catch (error) {
       console.error("Failed to load instructors:", error);
       setError("Failed to load instructors.");
@@ -51,7 +57,7 @@ function InstructorsPage() {
 
   useEffect(() => {
     void loadInstructors();
-  }, []);
+  }, [page]);
 
   function clearForm() {
     setFullName("");
@@ -480,6 +486,8 @@ function InstructorsPage() {
           </tbody>
         </table>
       </div>
+
+      {pagination && <Pagination pagination={pagination} onPageChange={setPage} />}
     </div>
   );
 }

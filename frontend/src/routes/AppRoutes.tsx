@@ -25,6 +25,8 @@ import AnnouncementFormPage from "../pages/admin/AnnouncementFormPage";
 
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
+import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
+import ResetPasswordPage from "../pages/auth/ResetPasswordPage";
 
 import BrowseCoursesPage from "../pages/student/BrowseCoursesPage";
 import CourseDetailsPage from "../pages/student/CourseDetailsPage";
@@ -83,6 +85,10 @@ function AppRoutes() {
         <Route path={ROUTES.LOGIN} element={<LoginPage />} />
 
         <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
+
+        <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
+
+        <Route path={ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
       </Route>
 
       {/* Protected Routes */}

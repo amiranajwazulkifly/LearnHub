@@ -5,8 +5,11 @@ import {
   getAllAnnouncements, publishAnnouncement, archiveAnnouncement, deleteAnnouncement,
 } from '../../services/announcementService';
 import type { Announcement } from '../../types/announcement';
+import type { PaginationMeta } from '../../types/api';
 import StatusBadge from '../../components/common/StatusBadge';
 import type { StatusTone } from '../../components/common/StatusBadge';
+import Pagination from '../../components/common/Pagination';
+import { usePagination } from '../../hooks/usePagination';
 
 const STATUS_TONE: Record<string, StatusTone> = {
   published: 'green',
@@ -16,16 +19,21 @@ const STATUS_TONE: Record<string, StatusTone> = {
 
 export default function AnnouncementsPage() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [pagination, setPagination] = useState<PaginationMeta | null>(null);
   const [loading, setLoading] = useState(true);
+  const { page, setPage } = usePagination();
 
   useEffect(() => {
     load();
-  }, []);
+  }, [page]);
 
   function load() {
     setLoading(true);
-    getAllAnnouncements()
-      .then(setAnnouncements)
+    getAllAnnouncements(page)
+      .then((res) => {
+        setAnnouncements(res.announcements);
+        setPagination(res.pagination);
+      })
       .finally(() => setLoading(false));
   }
 
@@ -97,6 +105,8 @@ export default function AnnouncementsPage() {
           <p className="py-8 text-center text-sm text-gray-400 dark:text-gray-500">No announcements yet.</p>
         )}
       </div>
+
+      {pagination && <Pagination pagination={pagination} onPageChange={setPage} />}
     </div>
   );
 }

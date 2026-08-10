@@ -1,5 +1,6 @@
 const { pool } = require("../config/db");
 const ApiError = require("../utils/apiError");
+const { parsePagination, buildPaginationMeta } = require("../utils/pagination");
 
 // Translates known Postgres error codes into an ApiError so callers can
 // just `throw` and let asyncHandler + errorMiddleware format the response.
@@ -32,25 +33,14 @@ function translateCourseDatabaseError(error) {
 
 async function getAllCourses(req, res) {
   const { search, category, instructor, status } = req.query;
+  const { page, limit, offset } = parsePagination(req.query);
 
-  let query = `
-    SELECT
-      courses.*,
-      categories.name AS category_name,
-      instructors.full_name AS instructor_name
-    FROM courses
-    LEFT JOIN categories
-      ON categories.id = courses.category_id
-    LEFT JOIN instructors
-      ON instructors.id = courses.instructor_id
-    WHERE 1=1
-  `;
-
+  let whereClause = " WHERE 1=1";
   const values = [];
   let index = 1;
 
   if (search) {
-    query += `
+    whereClause += `
       AND (
         courses.title ILIKE $${index}
         OR courses.code ILIKE $${index}
@@ -61,33 +51,50 @@ async function getAllCourses(req, res) {
   }
 
   if (category) {
-    query += ` AND categories.name ILIKE $${index}`;
+    whereClause += ` AND categories.name ILIKE $${index}`;
     values.push(`%${category}%`);
     index++;
   }
 
   if (instructor) {
-    query += ` AND instructors.full_name ILIKE $${index}`;
+    whereClause += ` AND instructors.full_name ILIKE $${index}`;
     values.push(`%${instructor}%`);
     index++;
   }
 
   if (status) {
-    query += ` AND courses.status::text ILIKE $${index}`;
+    whereClause += ` AND courses.status::text ILIKE $${index}`;
     values.push(`%${status}%`);
     index++;
   }
 
-  query += " ORDER BY courses.created_at DESC";
+  const fromClause = `
+    FROM courses
+    LEFT JOIN categories
+      ON categories.id = courses.category_id
+    LEFT JOIN instructors
+      ON instructors.id = courses.instructor_id
+    ${whereClause}
+  `;
 
-  const result = await pool.query(query, values);
+  const result = await pool.query(
+    `
+    SELECT courses.*, categories.name AS category_name, instructors.full_name AS instructor_name
+    ${fromClause}
+    ORDER BY courses.created_at DESC
+    LIMIT $${index} OFFSET $${index + 1}
+    `,
+    [...values, limit, offset],
+  );
+
+  const countResult = await pool.query(`SELECT COUNT(*) ${fromClause}`, values);
 
   res.status(200).json({
     success: true,
     message: "Courses retrieved successfully",
     data: {
       courses: result.rows,
-      count: result.rows.length,
+      pagination: buildPaginationMeta({ page, limit, total: Number(countResult.rows[0].count) }),
     },
   });
 }

@@ -1,17 +1,19 @@
 import axiosInstance from "../api/axiosInstance";
-import type { Course } from "../types/course";
+import type { CourseListResponse } from "../types/course";
 
 export const getCourses = async (params?: {
   search?: string;
   category?: string;
   instructor?: string;
   status?: string;
-}): Promise<Course[]> => {
+  page?: number;
+  limit?: number;
+}): Promise<CourseListResponse> => {
   const response = await axiosInstance.get("/courses", {
     params,
   });
 
-  return response.data.data.courses;
+  return response.data.data;
 };
 
 export const getCourseById = async (id: string): Promise<Course> => {

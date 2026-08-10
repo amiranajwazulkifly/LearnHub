@@ -14,13 +14,13 @@ describe("Courses: response envelope", () => {
     }
   });
 
-  test("GET list is wrapped in {success, message, data: {courses, count}}", async () => {
+  test("GET list is wrapped in {success, message, data: {courses, pagination}}", async () => {
     const res = await request(app).get("/api/courses").set(authHeader(adminToken));
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(Array.isArray(res.body.data.courses)).toBe(true);
-    expect(res.body.data.count).toBe(res.body.data.courses.length);
+    expect(res.body.data.pagination.total).toBe(res.body.data.courses.length);
   });
 
   test("POST create (with category + instructor) returns {success, message, data: {course}}", async () => {

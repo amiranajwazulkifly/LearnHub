@@ -1,3 +1,10 @@
+import type { PaginationMeta } from "./api";
+
+export interface CourseListResponse {
+  courses: Course[];
+  pagination: PaginationMeta;
+}
+
 export interface Course {
   id: string;
   code: string;

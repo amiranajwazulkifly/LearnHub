@@ -125,12 +125,21 @@ function LoginForm() {
       </div>
 
       <div>
-        <label
-          htmlFor="password"
-          className="mb-1 block text-sm font-medium"
-        >
-          Password
-        </label>
+        <div className="mb-1 flex items-center justify-between">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium"
+          >
+            Password
+          </label>
+
+          <Link
+            to={ROUTES.FORGOT_PASSWORD}
+            className="text-sm text-brand-600 hover:underline dark:text-brand-400"
+          >
+            Forgot password?
+          </Link>
+        </div>
 
         <div className="relative">
           <svg

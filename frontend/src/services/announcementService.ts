@@ -1,8 +1,12 @@
 // Dzul
 import axiosInstance from '../api/axiosInstance';
-import type { Announcement, CreateAnnouncementInput } from '../types/announcement';
+import type { Announcement, AnnouncementListResponse, CreateAnnouncementInput } from '../types/announcement';
 
 interface ListApiResponse {
+  data: AnnouncementListResponse;
+}
+
+interface PublishedListApiResponse {
   data: { announcements: Announcement[] };
 }
 
@@ -10,13 +14,13 @@ interface OneApiResponse {
   data: { announcement: Announcement };
 }
 
-export async function getAllAnnouncements(): Promise<Announcement[]> {
-  const { data } = await axiosInstance.get<ListApiResponse>('/announcements');
-  return data.data.announcements;
+export async function getAllAnnouncements(page = 1, limit = 20): Promise<AnnouncementListResponse> {
+  const { data } = await axiosInstance.get<ListApiResponse>('/announcements', { params: { page, limit } });
+  return data.data;
 }
 
 export async function getPublishedAnnouncements(): Promise<Announcement[]> {
-  const { data } = await axiosInstance.get<ListApiResponse>('/announcements/published');
+  const { data } = await axiosInstance.get<PublishedListApiResponse>('/announcements/published');
   return data.data.announcements;
 }
 

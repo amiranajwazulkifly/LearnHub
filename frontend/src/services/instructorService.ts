@@ -1,9 +1,9 @@
 import api from "./api";
-import type { Instructor } from "../types/instructor";
+import type { InstructorListResponse } from "../types/instructor";
 
-export const getInstructors = async (): Promise<Instructor[]> => {
-  const response = await api.get("/instructors");
-  return response.data.data.instructors;
+export const getInstructors = async (page = 1, limit = 20): Promise<InstructorListResponse> => {
+  const response = await api.get("/instructors", { params: { page, limit } });
+  return response.data.data;
 };
 
 export const createInstructor = async (instructor: {

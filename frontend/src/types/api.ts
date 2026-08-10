@@ -4,6 +4,13 @@ export interface ApiResponse<T = undefined> {
   data?: T;
 }
 
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
 export interface ApiValidationError {
   field: string;
   message: string;

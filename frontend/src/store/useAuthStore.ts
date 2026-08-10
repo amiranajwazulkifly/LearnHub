@@ -204,9 +204,16 @@ export const useAuthStore = create<AuthState>(
       });
 
       try {
-        await authService.changePassword(payload);
+        const { token } =
+          await authService.changePassword(payload);
+
+        // The server revokes every token issued before now (e.g. on other
+        // devices) and hands back a fresh one for this session — persist
+        // it so the current tab doesn't get logged out by its own change.
+        authStorage.setToken(token);
 
         set({
+          token,
           isLoading: false,
         });
       } catch (error) {
