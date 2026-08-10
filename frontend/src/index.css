@@ -154,9 +154,55 @@
   animation: drift-reverse 26s ease-in-out infinite;
 }
 
+/* HUD scan line sweeping down across the auth card. */
+@keyframes scan-sweep {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+.animate-scan-sweep {
+  animation: scan-sweep 6s linear infinite;
+}
+
+/* Single "data packet" traveling down the auth card's divider line. */
+@keyframes divider-pulse {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+.animate-divider-pulse {
+  animation: divider-pulse 3.5s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-drift,
   .animate-drift-reverse,
+  .animate-scan-sweep,
+  .animate-divider-pulse,
   .btn-sheen::after {
     animation: none;
     transition: none;
