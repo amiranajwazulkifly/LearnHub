@@ -75,6 +75,7 @@ function AppRoutes() {
 
             <Route path={ROUTES.ADMIN.COURSES} element={<CoursesPage />} />
             <Route path="/admin/courses/create" element={<CourseFormPage />} />
+            <Route path="/admin/courses/:id/edit" element={<CourseFormPage />} />
             <Route
               path={ROUTES.ADMIN.CATEGORIES}
               element={<CategoriesPage />}
