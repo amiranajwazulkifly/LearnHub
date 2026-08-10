@@ -58,7 +58,7 @@ router.post(
 router.get(
   '/me',
   authMiddleware,
-  roleMiddleware('admin', 'student'),
+  roleMiddleware('admin', 'student', 'instructor'),
   asyncHandler(getCurrentUser)
 );
 
@@ -66,7 +66,7 @@ router.get(
 router.patch(
   '/me',
   authMiddleware,
-  roleMiddleware('admin', 'student'),
+  roleMiddleware('admin', 'student', 'instructor'),
   validationMiddleware(validateUpdateProfile),
   asyncHandler(updateProfile)
 );
@@ -75,7 +75,7 @@ router.patch(
 router.patch(
   '/password',
   authMiddleware,
-  roleMiddleware('admin', 'student'),
+  roleMiddleware('admin', 'student', 'instructor'),
   validationMiddleware(validateChangePassword),
   asyncHandler(changePassword)
 );
@@ -84,7 +84,7 @@ router.patch(
 router.post(
   '/logout',
   authMiddleware,
-  roleMiddleware('admin', 'student'),
+  roleMiddleware('admin', 'student', 'instructor'),
   asyncHandler(logout)
 );
 

@@ -7,6 +7,7 @@ const { pool } = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const instructorRoutes = require("./routes/instructorRoutes");
+const instructorPortalRoutes = require("./routes/instructorPortalRoutes");
 const courseRoutes = require("./routes/courseRoutes");
 const scheduleRoutes = require("./routes/scheduleRoutes");
 const enrollmentRoutes = require("./routes/enrollmentRoutes");
@@ -103,6 +104,7 @@ app.get("/api/health", async (req, res, next) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/instructors", instructorRoutes);
+app.use("/api/instructor-portal", instructorPortalRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/schedules", scheduleRoutes);
 app.use("/api/enrollments", enrollmentRoutes);

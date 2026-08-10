@@ -27,6 +27,12 @@ export const ROUTES = {
     TIMETABLE: "/student/timetable",
     ANNOUNCEMENTS: "/student/announcements",
   },
+
+  INSTRUCTOR: {
+    DASHBOARD: "/instructor",
+    PROFILE: "/instructor/profile",
+    COURSES: "/instructor/courses",
+  },
 } as const;
 
 export function getDefaultRouteForRole(role: UserRole): string {
@@ -36,6 +42,10 @@ export function getDefaultRouteForRole(role: UserRole): string {
 
   if (role === ROLES.STUDENT) {
     return ROUTES.STUDENT.DASHBOARD;
+  }
+
+  if (role === ROLES.INSTRUCTOR) {
+    return ROUTES.INSTRUCTOR.DASHBOARD;
   }
 
   return ROUTES.LOGIN;

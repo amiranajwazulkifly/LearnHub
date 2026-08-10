@@ -37,3 +37,9 @@ export const deleteInstructor = async (id: string) => {
   const response = await api.delete(`/instructors/${id}`);
   return response.data;
 };
+
+// Admin-only: grants (or resets) an instructor's login access.
+export const setInstructorAccount = async (id: string, password: string) => {
+  const response = await api.post(`/instructors/${id}/account`, { password });
+  return response.data;
+};

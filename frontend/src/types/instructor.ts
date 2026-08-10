@@ -6,6 +6,8 @@ export interface Instructor {
   expertise: string;
   biography: string;
   is_active: boolean;
+  user_id?: string | null;
+  has_login?: boolean;
   created_at?: string;
   updated_at?: string;
 }
