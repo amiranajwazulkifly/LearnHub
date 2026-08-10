@@ -20,8 +20,8 @@ function CourseTable({ courses, onEdit, onDelete }: CourseTableProps) {
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full border-collapse bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+    <div className="table-scroll overflow-x-auto bg-white dark:bg-gray-900">
+      <table className="w-full border-collapse text-gray-900 dark:text-gray-100">
         <thead>
           <tr className="border-b bg-gray-100 text-left font-mono text-xs uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:bg-gray-800 dark:text-gray-400">
             <th className="px-6 py-4">Code</th>

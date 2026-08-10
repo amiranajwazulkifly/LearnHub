@@ -55,7 +55,7 @@ export default function TimetablePage() {
       {sessions.length === 0 ? (
         <p className="text-gray-500 dark:text-gray-400">No timetable sessions found.</p>
       ) : (
-        <div className="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+        <div className="table-scroll overflow-x-auto rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
             <thead className="bg-gray-50 dark:bg-gray-800">
               <tr>

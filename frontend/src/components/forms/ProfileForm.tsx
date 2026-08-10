@@ -13,6 +13,7 @@ import {
 } from '../../schemas/profileSchema';
 
 import { useAuthStore } from '../../store/useAuthStore';
+import { fieldBorderClasses } from '../../utils/formStyles';
 
 function ProfileForm() {
   const user = useAuthStore(
@@ -219,7 +220,7 @@ function ProfileForm() {
               {...registerProfileField(
                 'fullName'
               )}
-              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
+              className={`w-full rounded-lg border bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(!!profileErrors.fullName)}`}
             />
 
             {profileErrors.fullName && (
@@ -247,7 +248,7 @@ function ProfileForm() {
               {...registerProfileField(
                 'email'
               )}
-              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
+              className={`w-full rounded-lg border bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(!!profileErrors.email)}`}
             />
 
             {profileErrors.email && (
@@ -312,7 +313,7 @@ function ProfileForm() {
               {...registerPasswordField(
                 'currentPassword'
               )}
-              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
+              className={`w-full rounded-lg border bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(!!passwordErrors.currentPassword)}`}
             />
 
             {passwordErrors.currentPassword && (
@@ -340,7 +341,7 @@ function ProfileForm() {
               {...registerPasswordField(
                 'newPassword'
               )}
-              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
+              className={`w-full rounded-lg border bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(!!passwordErrors.newPassword)}`}
             />
 
             {passwordErrors.newPassword && (
@@ -368,7 +369,7 @@ function ProfileForm() {
               {...registerPasswordField(
                 'confirmPassword'
               )}
-              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
+              className={`w-full rounded-lg border bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(!!passwordErrors.confirmPassword)}`}
             />
 
             {passwordErrors.confirmPassword && (

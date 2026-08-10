@@ -98,6 +98,32 @@
   .btn-sheen:hover::after {
     transform: translateX(120%);
   }
+
+  /*
+   * Horizontal-scroll affordance for wide tables: a soft edge shadow that
+   * only appears where there's more content to scroll to. Pure CSS — the
+   * "cover" gradients scroll with the content (hiding the shadow once
+   * you've reached that edge), the shadow gradients stay pinned to the
+   * viewport. Apply directly to the element with overflow-x-auto.
+   */
+  .table-scroll {
+    background-image:
+      linear-gradient(to right, white 30%, transparent),
+      linear-gradient(to left, white 30%, transparent) 100% 0,
+      linear-gradient(to right, oklch(0 0 0 / 12%), transparent),
+      linear-gradient(to left, oklch(0 0 0 / 12%), transparent) 100% 0;
+    background-repeat: no-repeat;
+    background-size: 24px 100%, 24px 100%, 10px 100%, 10px 100%;
+    background-attachment: local, local, scroll, scroll;
+  }
+
+  .dark .table-scroll {
+    background-image:
+      linear-gradient(to right, var(--color-gray-900) 30%, transparent),
+      linear-gradient(to left, var(--color-gray-900) 30%, transparent) 100% 0,
+      linear-gradient(to right, oklch(0 0 0 / 45%), transparent),
+      linear-gradient(to left, oklch(0 0 0 / 45%), transparent) 100% 0;
+  }
 }
 
 @keyframes drift {

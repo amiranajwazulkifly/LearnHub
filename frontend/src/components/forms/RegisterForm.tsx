@@ -14,6 +14,7 @@ import {
 } from '../../schemas/authSchema';
 
 import { useAuthStore } from '../../store/useAuthStore';
+import { fieldBorderClasses } from '../../utils/formStyles';
 
 function RegisterForm() {
   const navigate = useNavigate();
@@ -109,7 +110,7 @@ function RegisterForm() {
             type="text"
             autoComplete="name"
             {...registerField('fullName')}
-            className="w-full rounded-lg border border-gray-300 bg-white py-2 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
+            className={`w-full rounded-lg border bg-white py-2 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(!!errors.fullName)}`}
             placeholder="Your full name"
           />
         </div>
@@ -149,7 +150,7 @@ function RegisterForm() {
             type="email"
             autoComplete="email"
             {...registerField('email')}
-            className="w-full rounded-lg border border-gray-300 bg-white py-2 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
+            className={`w-full rounded-lg border bg-white py-2 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(!!errors.email)}`}
             placeholder="name@example.com"
           />
         </div>
@@ -189,7 +190,7 @@ function RegisterForm() {
             type="password"
             autoComplete="new-password"
             {...registerField('password')}
-            className="w-full rounded-lg border border-gray-300 bg-white py-2 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
+            className={`w-full rounded-lg border bg-white py-2 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(!!errors.password)}`}
             placeholder="At least 8 characters"
           />
         </div>

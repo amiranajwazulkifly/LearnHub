@@ -12,6 +12,14 @@ import { getCourses } from "../../services/courseService";
 import type { Schedule } from "../../types/schedule";
 import type { Course } from "../../types/course";
 
+// Formats a date-only string (e.g. "2026-08-09") without going through
+// UTC parsing — `new Date("2026-08-09")` interprets it as UTC midnight,
+// which can display as the previous day for viewers behind UTC.
+function formatDateOnly(dateStr: string) {
+  const [year, month, day] = dateStr.slice(0, 10).split("-").map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString();
+}
+
 const DAYS = [
   { value: 1, label: "Monday" },
   { value: 2, label: "Tuesday" },
@@ -403,7 +411,7 @@ function SchedulesPage() {
         </div>
       </form>
 
-      <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+      <div className="table-scroll overflow-x-auto rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
         <table className="w-full text-left">
           <thead className="border-b border-gray-200 bg-gray-50 font-mono text-xs uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:bg-gray-800 dark:text-gray-400">
             <tr>
@@ -425,7 +433,7 @@ function SchedulesPage() {
                   </div>
 
                   {schedule.course_code && (
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                    <div className="font-mono text-sm text-brand-600 dark:text-brand-400">
                       {schedule.course_code}
                     </div>
                   )}
@@ -443,12 +451,10 @@ function SchedulesPage() {
 
                 <td className="px-6 py-4">{schedule.location}</td>
 
-                <td className="px-6 py-4">
-                  {schedule.start_date?.slice(0, 10)}
-                  <br />
-                  to
-                  <br />
-                  {schedule.end_date?.slice(0, 10)}
+                <td className="whitespace-nowrap px-6 py-4 font-mono text-sm text-gray-600 dark:text-gray-400">
+                  {schedule.start_date && formatDateOnly(schedule.start_date)}
+                  {" – "}
+                  {schedule.end_date && formatDateOnly(schedule.end_date)}
                 </td>
 
                 <td className="px-6 py-4">
