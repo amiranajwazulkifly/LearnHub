@@ -66,48 +66,59 @@ export default function CourseDetailsPage() {
   }
 
   if (loading) {
-    return <p>Loading course...</p>;
+    return <p className="text-gray-500 dark:text-gray-400">Loading course...</p>;
   }
 
   if (error && !course) {
-    return <p>{error}</p>;
+    return <p className="text-red-600 dark:text-red-400">{error}</p>;
   }
 
   if (!course) {
-    return <p>Course not found</p>;
+    return <p className="text-gray-500 dark:text-gray-400">Course not found</p>;
   }
 
   return (
-    <div>
-      <h1>{course.title}</h1>
+    <div className="mx-auto max-w-2xl rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+      <p className="text-sm font-semibold text-brand-600 dark:text-brand-400">{course.code}</p>
+      <h1 className="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-50">{course.title}</h1>
 
-      <h3>{course.code}</h3>
+      <p className="mt-4 text-gray-600 dark:text-gray-400">{course.description}</p>
 
-      <p>{course.description}</p>
+      <div className="mt-5 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+        <p>
+          <span className="font-medium text-gray-800 dark:text-gray-200">Category:</span>{" "}
+          {course.category_name}
+        </p>
 
-      <p>
-        <strong>Category:</strong> {course.category_name}
-      </p>
+        <p>
+          <span className="font-medium text-gray-800 dark:text-gray-200">Instructor:</span>{" "}
+          {course.instructor_name}
+        </p>
 
-      <p>
-        <strong>Instructor:</strong> {course.instructor_name}
-      </p>
+        <p>
+          <span className="font-medium text-gray-800 dark:text-gray-200">Capacity:</span>{" "}
+          {course.capacity}
+        </p>
 
-      <p>
-        <strong>Capacity:</strong> {course.capacity}
-      </p>
+        <p>
+          <span className="font-medium text-gray-800 dark:text-gray-200">Status:</span>{" "}
+          {course.status}
+        </p>
+      </div>
 
-      <p>
-        <strong>Status:</strong> {course.status}
-      </p>
-
-      <button onClick={handleEnroll} disabled={enrolling}>
+      <button
+        onClick={handleEnroll}
+        disabled={enrolling}
+        className="mt-6 rounded-lg bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-sm font-medium text-white transition hover:from-brand-700 hover:to-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+      >
         {enrolling ? "Enrolling..." : "Enroll"}
       </button>
 
-      {message && <p>{message}</p>}
+      {message && (
+        <p className="mt-3 text-sm text-green-700 dark:text-green-400">{message}</p>
+      )}
 
-      {error && <p>{error}</p>}
+      {error && <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p>}
     </div>
   );
 }

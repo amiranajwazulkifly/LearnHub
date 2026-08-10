@@ -147,8 +147,8 @@ function CourseFormPage() {
 
   if (pageLoading) {
     return (
-      <div className="flex min-h-48 items-center justify-center rounded-lg bg-white shadow">
-        <p className="text-gray-500">Loading course form...</p>
+      <div className="flex min-h-48 items-center justify-center rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+        <p className="text-gray-500 dark:text-gray-400">Loading course form...</p>
       </div>
     );
   }
@@ -160,7 +160,7 @@ function CourseFormPage() {
           {isEditMode ? "Edit Course" : "Create Course"}
         </h1>
 
-        <p className="mt-2 text-gray-500">
+        <p className="mt-2 text-gray-500 dark:text-gray-400">
           {isEditMode
             ? "Update the selected course."
             : "Add a new course to LearnHub."}
@@ -168,14 +168,14 @@ function CourseFormPage() {
       </div>
 
       {error && (
-        <div className="mb-5 rounded-lg bg-red-100 p-4 text-red-700">
+        <div className="mb-5 rounded-lg bg-red-100 p-4 text-red-700 dark:bg-red-900/40 dark:text-red-400">
           {error}
         </div>
       )}
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-5 rounded-xl bg-white p-6 shadow"
+        className="space-y-5 rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900"
       >
         <div>
           <label htmlFor="code" className="mb-2 block font-medium">
@@ -188,7 +188,7 @@ function CourseFormPage() {
             name="code"
             value={formData.code}
             onChange={handleChange}
-            className="w-full rounded border px-3 py-2"
+            className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
           />
         </div>
 
@@ -203,7 +203,7 @@ function CourseFormPage() {
             name="title"
             value={formData.title}
             onChange={handleChange}
-            className="w-full rounded border px-3 py-2"
+            className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
           />
         </div>
 
@@ -218,7 +218,7 @@ function CourseFormPage() {
             value={formData.description}
             onChange={handleChange}
             rows={4}
-            className="w-full rounded border px-3 py-2"
+            className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
           />
         </div>
 
@@ -234,7 +234,7 @@ function CourseFormPage() {
             value={formData.capacity}
             onChange={handleChange}
             min="1"
-            className="w-full rounded border px-3 py-2"
+            className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
           />
         </div>
 
@@ -248,7 +248,7 @@ function CourseFormPage() {
             name="status"
             value={formData.status}
             onChange={handleChange}
-            className="w-full rounded border px-3 py-2"
+            className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
           >
             <option value="draft">Draft</option>
             <option value="published">Published</option>
@@ -266,7 +266,7 @@ function CourseFormPage() {
             name="category_id"
             value={formData.category_id}
             onChange={handleChange}
-            className="w-full rounded border px-3 py-2"
+            className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
           >
             <option value="">Select category</option>
 
@@ -288,7 +288,7 @@ function CourseFormPage() {
             name="instructor_id"
             value={formData.instructor_id}
             onChange={handleChange}
-            className="w-full rounded border px-3 py-2"
+            className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
           >
             <option value="">Select instructor</option>
 
@@ -306,7 +306,7 @@ function CourseFormPage() {
           <button
             type="submit"
             disabled={loading}
-            className="rounded bg-blue-600 px-5 py-2 text-white disabled:opacity-50"
+            className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-5 py-2 text-white disabled:opacity-50"
           >
             {loading
               ? "Saving..."
@@ -319,7 +319,7 @@ function CourseFormPage() {
             type="button"
             onClick={() => navigate("/admin/courses")}
             disabled={loading}
-            className="rounded bg-gray-200 px-5 py-2 disabled:opacity-50"
+            className="rounded bg-gray-200 px-5 py-2 disabled:opacity-50 dark:bg-gray-700"
           >
             Cancel
           </button>

@@ -26,11 +26,15 @@ const studentNavigation = [
     label: "Timetable",
     path: ROUTES.STUDENT.TIMETABLE,
   },
+  {
+    label: "Announcements",
+    path: ROUTES.STUDENT.ANNOUNCEMENTS,
+  },
 ] as const;
 
 function StudentLayout() {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="bg-line-grid min-h-screen bg-gray-100 dark:bg-gray-950">
       <Navbar portalName="Student Portal" />
 
       <div className="flex flex-col md:flex-row">
