@@ -1,6 +1,6 @@
 
 -- Local development administrator
--- The repository stores only the bcrypt hash.
+-- The repository stores only the bcrypt hash. Password: TestPass123!
 INSERT INTO public.users (
   id,
   full_name,
@@ -13,17 +13,22 @@ VALUES (
   '00000000-0000-0000-0000-000000000001',
   'LearnHub Administrator',
   'admin@learnhub.local',
-  '$2b$10$9jaR8drAXkYydgk9f9YUl./lSbkt2BlLUdn3eZvzM2Y1Ge9ovE5eC',
+  '$2b$10$vVXteglVY6QkP86d1d3tyO7UFequ7JgiG8NFkGZ8oIuzmD4xEYVYO',
   'admin',
   'active'
 )
-ON CONFLICT DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET
+  full_name = EXCLUDED.full_name,
+  email = EXCLUDED.email,
+  password_hash = EXCLUDED.password_hash,
+  role = EXCLUDED.role,
+  status = EXCLUDED.status;
 
 -- ============================================================
 -- Seed: core LearnHub demo data
 -- ============================================================
 
--- Sample student account
+-- Sample student account — password: TestPass123!
 INSERT INTO public.users (
   id,
   full_name,
@@ -36,7 +41,7 @@ VALUES (
   '00000000-0000-0000-0000-000000000002',
   'Sample Student',
   'student@learnhub.local',
-  '$2b$10$toFZrNPYt4auF/VoQ0wf2.BIWgRtYRcBbN46b/jT0LEjeiATP52vy',
+  '$2b$10$vVXteglVY6QkP86d1d3tyO7UFequ7JgiG8NFkGZ8oIuzmD4xEYVYO',
   'student',
   'active'
 )
@@ -114,7 +119,7 @@ ON CONFLICT (id) DO UPDATE SET
   is_active = EXCLUDED.is_active;
 
 -- Sample instructor login (Dr. Sarah Ahmad) — same seeded password as the
--- admin/student accounts above.
+-- admin/student accounts above: TestPass123!
 INSERT INTO public.users (
   id,
   full_name,
@@ -127,7 +132,7 @@ VALUES (
   '00000000-0000-0000-0000-000000000003',
   'Dr. Sarah Ahmad',
   'sarah.ahmad@learnhub.local',
-  '$2b$10$toFZrNPYt4auF/VoQ0wf2.BIWgRtYRcBbN46b/jT0LEjeiATP52vy',
+  '$2b$10$vVXteglVY6QkP86d1d3tyO7UFequ7JgiG8NFkGZ8oIuzmD4xEYVYO',
   'instructor',
   'active'
 )
