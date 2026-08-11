@@ -22,7 +22,9 @@ const env = {
   nodeEnv: process.env.NODE_ENV || "development",
   port: Number(process.env.PORT) || 5001,
   databaseUrl: process.env.DATABASE_URL,
-  clientUrl: process.env.CLIENT_URL || "http://localhost:5173",
+  // CLIENT_URL is an older/alternate name for the same thing; FRONTEND_URL
+  // (the var actually set in .env) takes priority.
+  clientUrl: process.env.FRONTEND_URL || process.env.CLIENT_URL || "http://localhost:5175",
   frontendUrl: process.env.FRONTEND_URL,
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || "1d",

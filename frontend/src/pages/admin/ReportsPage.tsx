@@ -23,11 +23,14 @@ export default function ReportsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p className="p-6 text-gray-500">Loading reports…</p>;
+  if (loading) return <p className="p-6 text-gray-500 dark:text-gray-400">Loading reports…</p>;
 
   return (
     <div className="p-6">
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">Reports</h1>
+      <p className="mb-1 font-mono text-xs uppercase tracking-wide text-brand-600 dark:text-brand-400">
+        admin / reports
+      </p>
+      <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-gray-50">Reports</h1>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <ChartCard title="Enrollments — Last 30 Days">
@@ -55,29 +58,29 @@ export default function ReportsPage() {
         </ChartCard>
       </div>
 
-      <h2 className="mb-3 mt-8 text-lg font-semibold text-gray-800">Completion Rates by Course</h2>
-      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+      <h2 className="mb-3 mt-8 text-lg font-semibold text-gray-800 dark:text-gray-200">Completion Rates by Course</h2>
+      <div className="table-scroll overflow-x-auto rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+          <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
-              <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">Course</th>
-              <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">Enrolled</th>
-              <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">Completed</th>
-              <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">Rate</th>
+              <th className="px-4 py-2 text-left font-mono text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Course</th>
+              <th className="px-4 py-2 text-left font-mono text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Enrolled</th>
+              <th className="px-4 py-2 text-left font-mono text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Completed</th>
+              <th className="px-4 py-2 text-left font-mono text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Rate</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
             {completion.map((c) => (
               <tr key={c.id}>
-                <td className="px-4 py-2 text-sm text-gray-800">{c.title}</td>
-                <td className="px-4 py-2 text-sm text-gray-600">{c.total}</td>
-                <td className="px-4 py-2 text-sm text-gray-600">{c.completed}</td>
+                <td className="px-4 py-2 text-sm text-gray-800 dark:text-gray-200">{c.title}</td>
+                <td className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">{c.total}</td>
+                <td className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">{c.completed}</td>
                 <td className="px-4 py-2 text-sm">
                   <div className="flex items-center gap-2">
-                    <div className="h-1.5 w-24 overflow-hidden rounded-full bg-gray-200">
-                      <div className="h-full bg-blue-600" style={{ width: `${c.completionRate}%` }} />
+                    <div className="h-1.5 w-24 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
+                      <div className="h-full bg-brand-600" style={{ width: `${c.completionRate}%` }} />
                     </div>
-                    <span className="text-xs text-gray-500">{c.completionRate}%</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{c.completionRate}%</span>
                   </div>
                 </td>
               </tr>
