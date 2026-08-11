@@ -2,54 +2,66 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  getAllAnnouncements, publishAnnouncement, archiveAnnouncement, moveAnnouncementToDraft, deleteAnnouncement,
+  getAllAnnouncements, publishAnnouncement, archiveAnnouncement, deleteAnnouncement,
 } from '../../services/announcementService';
 import type { Announcement } from '../../types/announcement';
+import type { PaginationMeta } from '../../types/api';
+import StatusBadge from '../../components/common/StatusBadge';
+import type { StatusTone } from '../../components/common/StatusBadge';
+import Pagination from '../../components/common/Pagination';
+import { usePagination } from '../../hooks/usePagination';
+import ConfirmModal from '../../components/common/ConfirmModal';
 
-const STATUS_STYLES: Record<string, string> = {
-  draft: 'bg-amber-100 text-amber-700',
-  published: 'bg-green-100 text-green-700',
-  archived: 'bg-gray-100 text-gray-600',
+const STATUS_TONE: Record<string, StatusTone> = {
+  published: 'green',
+  archived: 'gray',
+  draft: 'amber',
 };
 
 export default function AnnouncementsPage() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [pagination, setPagination] = useState<PaginationMeta | null>(null);
   const [loading, setLoading] = useState(true);
+  const { page, setPage } = usePagination();
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   useEffect(() => {
     load();
-  }, []);
+  }, [page]);
 
   function load() {
     setLoading(true);
-    getAllAnnouncements()
-      .then(setAnnouncements)
+    getAllAnnouncements(page)
+      .then((res) => {
+        setAnnouncements(res.announcements);
+        setPagination(res.pagination);
+      })
       .finally(() => setLoading(false));
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm('Delete this announcement? This cannot be undone.')) return;
+  async function handlePublishToggle(a: Announcement) {
+    const updated = a.status === 'published' ? await archiveAnnouncement(a.id) : await publishAnnouncement(a.id);
+    setAnnouncements((prev) => prev.map((x) => (x.id === a.id ? updated : x)));
+  }
+
+  async function handleConfirmDelete() {
+    if (!deleteTarget) return;
+    const id = deleteTarget;
+    setDeleteTarget(null);
+
     await deleteAnnouncement(id);
     setAnnouncements((prev) => prev.filter((x) => x.id !== id));
   }
 
-  async function applyAction(a: Announcement, action: 'publish' | 'archive' | 'draft') {
-    const updated =
-      action === 'publish' ? await publishAnnouncement(a.id)
-      : action === 'archive' ? await archiveAnnouncement(a.id)
-      : await moveAnnouncementToDraft(a.id);
-    setAnnouncements((prev) => prev.map((x) => (x.id === a.id ? updated : x)));
-  }
-
-  if (loading) return <p className="p-6 text-gray-500">Loading announcements…</p>;
+  if (loading) return <p className="p-6 text-gray-500 dark:text-gray-400">Loading announcements…</p>;
 
   return (
     <div className="p-6">
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Announcements</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Announcements</h1>
         <Link
           to="/admin/announcements/new"
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          className="rounded-md bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-sm font-medium text-white hover:from-brand-700 hover:to-brand-600"
         >
           + New Announcement
         </Link>
@@ -57,61 +69,36 @@ export default function AnnouncementsPage() {
 
       <div className="space-y-3">
         {announcements.map((a) => (
-          <div key={a.id} className="rounded-lg border border-gray-200 bg-white p-4">
+          <div key={a.id} className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-gray-900">{a.title}</h3>
-                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[a.status]}`}>
-                    {a.status}
-                  </span>
-                  <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600">
-                    {a.audience}
-                  </span>
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-50">{a.title}</h3>
+                  <StatusBadge label={a.status} tone={STATUS_TONE[a.status] ?? 'amber'} />
                 </div>
-                <p className="mt-1 line-clamp-2 text-sm text-gray-600">{a.content}</p>
-                <p className="mt-1 text-xs text-gray-400">
+                <p className="mt-1 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">{a.content}</p>
+                <p className="mt-1 font-mono text-xs text-gray-400 dark:text-gray-500">
                   {a.status === 'published' && a.publishedAt
                     ? `Published ${new Date(a.publishedAt).toLocaleDateString()}`
-                    : a.createdAt
-                      ? `Created ${new Date(a.createdAt).toLocaleDateString()}`
-                      : ''}
+                    : `Created ${new Date(a.createdAt).toLocaleDateString()}`}
                 </p>
               </div>
               <div className="flex shrink-0 gap-2">
                 <Link
                   to={`/admin/announcements/${a.id}/edit`}
-                  className="rounded-md border border-gray-300 px-3 py-1 text-xs font-medium hover:bg-gray-50"
+                  className="rounded-md border border-gray-300 px-3 py-1 text-xs font-medium hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
                 >
                   Edit
                 </Link>
-                {a.status !== 'published' && (
-                  <button
-                    onClick={() => applyAction(a, 'publish')}
-                    className="rounded-md border border-gray-300 px-3 py-1 text-xs font-medium hover:bg-gray-50"
-                  >
-                    Publish
-                  </button>
-                )}
-                {a.status === 'published' && (
-                  <button
-                    onClick={() => applyAction(a, 'archive')}
-                    className="rounded-md border border-gray-300 px-3 py-1 text-xs font-medium hover:bg-gray-50"
-                  >
-                    Archive
-                  </button>
-                )}
-                {a.status === 'archived' && (
-                  <button
-                    onClick={() => applyAction(a, 'draft')}
-                    className="rounded-md border border-gray-300 px-3 py-1 text-xs font-medium hover:bg-gray-50"
-                  >
-                    Back to Draft
-                  </button>
-                )}
                 <button
-                  onClick={() => handleDelete(a.id)}
-                  className="rounded-md border border-red-300 px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
+                  onClick={() => handlePublishToggle(a)}
+                  className="rounded-md border border-gray-300 px-3 py-1 text-xs font-medium hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                >
+                  {a.status === 'published' ? 'Unpublish' : 'Publish'}
+                </button>
+                <button
+                  onClick={() => setDeleteTarget(a.id)}
+                  className="rounded-md border border-red-300 px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-950/40"
                 >
                   Delete
                 </button>
@@ -120,9 +107,21 @@ export default function AnnouncementsPage() {
           </div>
         ))}
         {announcements.length === 0 && (
-          <p className="py-8 text-center text-sm text-gray-400">No announcements yet.</p>
+          <p className="py-8 text-center text-sm text-gray-400 dark:text-gray-500">No announcements yet.</p>
         )}
       </div>
+
+      {pagination && <Pagination pagination={pagination} onPageChange={setPage} />}
+
+      <ConfirmModal
+        open={deleteTarget !== null}
+        title="Delete announcement?"
+        message="Are you sure you want to delete this announcement? This cannot be undone."
+        confirmLabel="Delete"
+        variant="danger"
+        onConfirm={() => void handleConfirmDelete()}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

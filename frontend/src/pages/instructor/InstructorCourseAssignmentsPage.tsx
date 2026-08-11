@@ -10,6 +10,7 @@ import {
 import type { Assignment } from "../../types/assignment";
 import { fieldBorderClasses } from "../../utils/formStyles";
 import { ROUTES } from "../../constants/routes";
+import ConfirmModal from "../../components/common/ConfirmModal";
 
 interface FormState {
   title: string;
@@ -40,6 +41,7 @@ export default function InstructorCourseAssignmentsPage() {
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   function loadAssignments() {
     if (!courseId) return;
@@ -108,8 +110,11 @@ export default function InstructorCourseAssignmentsPage() {
     }
   }
 
-  async function handleDelete(id: string) {
-    if (!window.confirm("Delete this assignment? Student submissions will be removed too.")) return;
+  async function handleConfirmDelete() {
+    if (!deleteTarget) return;
+    const id = deleteTarget;
+    setDeleteTarget(null);
+
     await deleteAssignment(id);
     loadAssignments();
   }
@@ -274,7 +279,7 @@ export default function InstructorCourseAssignmentsPage() {
                   Edit
                 </button>
                 <button
-                  onClick={() => handleDelete(a.id)}
+                  onClick={() => setDeleteTarget(a.id)}
                   className="rounded-md border border-red-300 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950/30"
                 >
                   Delete
@@ -284,6 +289,16 @@ export default function InstructorCourseAssignmentsPage() {
           ))}
         </div>
       )}
+
+      <ConfirmModal
+        open={deleteTarget !== null}
+        title="Delete assignment?"
+        message="Student submissions for this assignment will be removed too. This cannot be undone."
+        confirmLabel="Delete"
+        variant="danger"
+        onConfirm={() => void handleConfirmDelete()}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

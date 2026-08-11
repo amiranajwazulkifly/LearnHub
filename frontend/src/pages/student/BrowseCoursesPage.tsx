@@ -21,9 +21,9 @@ export default function BrowseCoursesPage() {
         setLoading(true);
         setError("");
 
-        const courses = await getCourses();
+        const result = await getCourses();
 
-        setCourses(courses);
+        setCourses(result.courses);
       } catch (error) {
         console.error(error);
         setError("Failed to load courses");

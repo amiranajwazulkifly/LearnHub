@@ -1,10 +1,10 @@
 // Dzul
 import axiosInstance from '../api/axiosInstance';
-import type { Announcement, CreateAnnouncementInput } from '../types/announcement';
+import type { Announcement, CreateAnnouncementInput, AnnouncementListResponse } from '../types/announcement';
 
-export async function getAllAnnouncements(): Promise<Announcement[]> {
-  const { data } = await axiosInstance.get('/announcements');
-  return data.data.announcements;
+export async function getAllAnnouncements(page = 1): Promise<AnnouncementListResponse> {
+  const { data } = await axiosInstance.get('/announcements', { params: { page } });
+  return data.data;
 }
 
 export async function getPublishedAnnouncements(): Promise<Announcement[]> {

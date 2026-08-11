@@ -14,6 +14,7 @@ import { getErrorMessage, getValidationErrors } from "../../utils/errorHandler";
 import StatusBadge from "../../components/common/StatusBadge";
 import Pagination from "../../components/common/Pagination";
 import { usePagination } from "../../hooks/usePagination";
+import ConfirmModal from "../../components/common/ConfirmModal";
 
 function InstructorsPage() {
   const [instructors, setInstructors] = useState<Instructor[]>([]);
@@ -37,6 +38,8 @@ function InstructorsPage() {
   const [loginPassword, setLoginPassword] = useState("");
   const [loginSaving, setLoginSaving] = useState(false);
   const [loginError, setLoginError] = useState("");
+
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
   async function loadInstructors() {
     try {
@@ -170,14 +173,10 @@ function InstructorsPage() {
     }
   }
 
-  async function handleDeleteInstructor(id: string) {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this instructor?",
-    );
-
-    if (!confirmed) {
-      return;
-    }
+  async function handleConfirmDelete() {
+    if (!deleteTargetId) return;
+    const id = deleteTargetId;
+    setDeleteTargetId(null);
 
     try {
       setError("");
@@ -190,7 +189,7 @@ function InstructorsPage() {
 
       await loadInstructors();
     } catch (error) {
-      console.error("Failed to delete schedule:", error);
+      console.error("Failed to delete instructor:", error);
       setError(getErrorMessage(error));
     }
   }
@@ -418,7 +417,7 @@ function InstructorsPage() {
 
                       <button
                         type="button"
-                        onClick={() => void handleDeleteInstructor(instructor.id)}
+                        onClick={() => setDeleteTargetId(instructor.id)}
                         className="rounded bg-red-600 px-3 py-2 text-sm text-white"
                       >
                         Delete
@@ -488,6 +487,16 @@ function InstructorsPage() {
       </div>
 
       {pagination && <Pagination pagination={pagination} onPageChange={setPage} />}
+
+      <ConfirmModal
+        open={deleteTargetId !== null}
+        title="Delete instructor?"
+        message="Are you sure you want to delete this instructor? This cannot be undone."
+        confirmLabel="Delete"
+        variant="danger"
+        onConfirm={() => void handleConfirmDelete()}
+        onCancel={() => setDeleteTargetId(null)}
+      />
     </div>
   );
 }
