@@ -10,6 +10,7 @@ import {
 import type { Category } from "../../types/category";
 
 import { getErrorMessage, getValidationErrors } from "../../utils/errorHandler";
+import ConfirmModal from "../../components/common/ConfirmModal";
 
 function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -22,6 +23,7 @@ function CategoriesPage() {
   const [error, setError] = useState("");
 
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   async function loadCategories() {
     try {
@@ -125,14 +127,10 @@ function CategoriesPage() {
     }
   }
 
-  async function handleDeleteCategory(id: string) {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this category?",
-    );
-
-    if (!confirmed) {
-      return;
-    }
+  async function handleConfirmDelete() {
+    if (!deleteTarget) return;
+    const id = deleteTarget;
+    setDeleteTarget(null);
 
     try {
       setError("");
@@ -278,7 +276,7 @@ function CategoriesPage() {
 
                     <button
                       type="button"
-                      onClick={() => void handleDeleteCategory(category.id)}
+                      onClick={() => setDeleteTarget(category.id)}
                       className="rounded bg-red-600 px-3 py-2 text-sm text-white"
                     >
                       Delete
@@ -298,6 +296,16 @@ function CategoriesPage() {
           </tbody>
         </table>
       </div>
+
+      <ConfirmModal
+        open={deleteTarget !== null}
+        title="Delete category?"
+        message="Are you sure you want to delete this category? This cannot be undone."
+        confirmLabel="Delete"
+        variant="danger"
+        onConfirm={() => void handleConfirmDelete()}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

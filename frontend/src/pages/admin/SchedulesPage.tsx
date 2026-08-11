@@ -11,6 +11,7 @@ import { getCourses } from "../../services/courseService";
 
 import type { Schedule } from "../../types/schedule";
 import type { Course } from "../../types/course";
+import ConfirmModal from "../../components/common/ConfirmModal";
 
 // Formats a date-only string (e.g. "2026-08-09") without going through
 // UTC parsing — `new Date("2026-08-09")` interprets it as UTC midnight,
@@ -47,6 +48,7 @@ function SchedulesPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   async function loadData() {
     try {
@@ -55,11 +57,11 @@ function SchedulesPage() {
 
       const [scheduleData, courseData] = await Promise.all([
         getSchedules(),
-        getCourses(),
+        getCourses({ limit: 50 }),
       ]);
 
       setSchedules(scheduleData);
-      setCourses(courseData ?? []);
+      setCourses(courseData?.courses ?? []);
     } catch (error) {
       console.error("Failed to load schedule data:", error);
       setError("Failed to load schedules.");
@@ -206,14 +208,10 @@ function SchedulesPage() {
     }
   }
 
-  async function handleDeleteSchedule(id: string) {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this schedule?",
-    );
-
-    if (!confirmed) {
-      return;
-    }
+  async function handleConfirmDelete() {
+    if (!deleteTarget) return;
+    const id = deleteTarget;
+    setDeleteTarget(null);
 
     try {
       setError("");
@@ -467,7 +465,7 @@ function SchedulesPage() {
 
                     <button
                       type="button"
-                      onClick={() => void handleDeleteSchedule(schedule.id)}
+                      onClick={() => setDeleteTarget(schedule.id)}
                       className="rounded bg-red-600 px-3 py-2 text-sm text-white"
                     >
                       Delete
@@ -487,6 +485,16 @@ function SchedulesPage() {
           </tbody>
         </table>
       </div>
+
+      <ConfirmModal
+        open={deleteTarget !== null}
+        title="Delete schedule?"
+        message="Are you sure you want to delete this schedule? This cannot be undone."
+        confirmLabel="Delete"
+        variant="danger"
+        onConfirm={() => void handleConfirmDelete()}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

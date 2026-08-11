@@ -10,6 +10,7 @@ import StatusBadge from '../../components/common/StatusBadge';
 import type { StatusTone } from '../../components/common/StatusBadge';
 import Pagination from '../../components/common/Pagination';
 import { usePagination } from '../../hooks/usePagination';
+import ConfirmModal from '../../components/common/ConfirmModal';
 
 const STATUS_TONE: Record<string, StatusTone> = {
   published: 'green',
@@ -22,6 +23,7 @@ export default function AnnouncementsPage() {
   const [pagination, setPagination] = useState<PaginationMeta | null>(null);
   const [loading, setLoading] = useState(true);
   const { page, setPage } = usePagination();
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   useEffect(() => {
     load();
@@ -42,8 +44,11 @@ export default function AnnouncementsPage() {
     setAnnouncements((prev) => prev.map((x) => (x.id === a.id ? updated : x)));
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm('Delete this announcement? This cannot be undone.')) return;
+  async function handleConfirmDelete() {
+    if (!deleteTarget) return;
+    const id = deleteTarget;
+    setDeleteTarget(null);
+
     await deleteAnnouncement(id);
     setAnnouncements((prev) => prev.filter((x) => x.id !== id));
   }
@@ -92,7 +97,7 @@ export default function AnnouncementsPage() {
                   {a.status === 'published' ? 'Unpublish' : 'Publish'}
                 </button>
                 <button
-                  onClick={() => handleDelete(a.id)}
+                  onClick={() => setDeleteTarget(a.id)}
                   className="rounded-md border border-red-300 px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-950/40"
                 >
                   Delete
@@ -107,6 +112,16 @@ export default function AnnouncementsPage() {
       </div>
 
       {pagination && <Pagination pagination={pagination} onPageChange={setPage} />}
+
+      <ConfirmModal
+        open={deleteTarget !== null}
+        title="Delete announcement?"
+        message="Are you sure you want to delete this announcement? This cannot be undone."
+        confirmLabel="Delete"
+        variant="danger"
+        onConfirm={() => void handleConfirmDelete()}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

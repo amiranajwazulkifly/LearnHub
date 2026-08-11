@@ -5,12 +5,14 @@ import {
   getMyCourses,
   type Enrollment,
 } from "../../services/enrollmentService";
+import ConfirmModal from "../../components/common/ConfirmModal";
 
 export default function MyCoursesPage() {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [cancelTarget, setCancelTarget] = useState<string | null>(null);
 
   async function loadCourses() {
     try {
@@ -32,14 +34,10 @@ export default function MyCoursesPage() {
     void loadCourses();
   }, []);
 
-  async function handleCancel(enrollmentId: string) {
-    const confirmed = window.confirm(
-      "Are you sure you want to cancel this enrollment?",
-    );
-
-    if (!confirmed) {
-      return;
-    }
+  async function handleConfirmCancel() {
+    if (!cancelTarget) return;
+    const enrollmentId = cancelTarget;
+    setCancelTarget(null);
 
     try {
       setError("");
@@ -112,7 +110,7 @@ export default function MyCoursesPage() {
 
               <button
                 type="button"
-                onClick={() => handleCancel(enrollment.enrollment_id)}
+                onClick={() => setCancelTarget(enrollment.enrollment_id)}
                 className="mt-4 rounded-lg border border-red-300 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950/40"
               >
                 Cancel Enrollment
@@ -121,6 +119,17 @@ export default function MyCoursesPage() {
           ))}
         </div>
       )}
+
+      <ConfirmModal
+        open={cancelTarget !== null}
+        title="Cancel enrollment?"
+        message="Are you sure you want to cancel this enrollment? You may need to re-enroll if space is limited."
+        confirmLabel="Cancel Enrollment"
+        cancelLabel="Keep Enrollment"
+        variant="danger"
+        onConfirm={() => void handleConfirmCancel()}
+        onCancel={() => setCancelTarget(null)}
+      />
     </div>
   );
 }

@@ -9,12 +9,14 @@ import type { Course } from "../../types/course";
 import type { PaginationMeta } from "../../types/api";
 import Pagination from "../../components/common/Pagination";
 import { usePagination } from "../../hooks/usePagination";
+import ConfirmModal from "../../components/common/ConfirmModal";
 
 function CoursesPage() {
   const navigate = useNavigate();
 
   const [courses, setCourses] = useState<Course[]>([]);
   const [pagination, setPagination] = useState<PaginationMeta | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
@@ -76,14 +78,10 @@ function CoursesPage() {
     navigate(`/admin/courses/${course.id}/edit`);
   }
 
-  async function handleDelete(id: string) {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this course?",
-    );
-
-    if (!confirmed) {
-      return;
-    }
+  async function handleConfirmDelete() {
+    if (!deleteTarget) return;
+    const id = deleteTarget;
+    setDeleteTarget(null);
 
     try {
       await deleteCourse(id);
@@ -182,11 +180,21 @@ function CoursesPage() {
           <CourseTable
             courses={courses}
             onEdit={handleEdit}
-            onDelete={handleDelete}
+            onDelete={setDeleteTarget}
           />
           {pagination && <Pagination pagination={pagination} onPageChange={setPage} />}
         </>
       )}
+
+      <ConfirmModal
+        open={deleteTarget !== null}
+        title="Delete course?"
+        message="Are you sure you want to delete this course? This cannot be undone."
+        confirmLabel="Delete"
+        variant="danger"
+        onConfirm={() => void handleConfirmDelete()}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }
