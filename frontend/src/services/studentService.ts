@@ -3,6 +3,7 @@ import axiosInstance from '../api/axiosInstance';
 import type {
   StudentListResponse,
   StudentDetail,
+  AdminEnrollmentListResponse,
   AdminEnrollmentRow,
   EnrollmentStatus,
 } from '../types/student';
@@ -17,9 +18,9 @@ export async function getStudentDetail(id: string): Promise<StudentDetail> {
   return data.data;
 }
 
-export async function getAllEnrollments(): Promise<AdminEnrollmentRow[]> {
-  const { data } = await axiosInstance.get('/admin/enrollments');
-  return data.data.enrollments;
+export async function getAllEnrollments(page = 1, limit = 20): Promise<AdminEnrollmentListResponse> {
+  const { data } = await axiosInstance.get('/admin/enrollments', { params: { page, limit } });
+  return data.data;
 }
 
 export async function updateEnrollmentStatus(

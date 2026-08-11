@@ -7,6 +7,9 @@ export interface Student {
   fullName: string;
   createdAt: string;
   enrollmentCount?: number;
+  studentNumber?: string | null;
+  programme?: string | null;
+  semester?: number | null;
 }
 
 export interface StudentListResponse {
@@ -17,11 +20,11 @@ export interface StudentListResponse {
 export type EnrollmentStatus = 'enrolled' | 'completed' | 'cancelled';
 
 export interface StudentEnrollment {
-  id: number;
+  id: string;
   status: EnrollmentStatus;
   enrolledAt: string;
   completedAt: string | null;
-  courseId: number;
+  courseId: string;
   courseTitle: string;
 }
 
@@ -32,13 +35,13 @@ export interface StudentDetail {
 
 // Admin-wide enrollment management row (EnrollmentsPage)
 export interface AdminEnrollmentRow {
-  id: number;
+  id: string;
   status: EnrollmentStatus;
   enrolledAt: string;
   completedAt: string | null;
   studentId: string;
   studentName: string;
-  courseId: number;
+  courseId: string;
   courseTitle: string;
 }
 

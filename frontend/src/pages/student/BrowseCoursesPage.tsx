@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-
+import { getSchedules } from "../../services/scheduleService";
+import type { Schedule } from "../../types/schedule";
 import CourseCard from "../../components/courses/CourseCard";
 import { getCourses } from "../../services/courseService";
 
@@ -10,7 +11,7 @@ export default function BrowseCoursesPage() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [category, setCategory] = useState("");
   const [instructor, setInstructor] = useState("");
   const [status, setStatus] = useState("");
@@ -21,9 +22,13 @@ export default function BrowseCoursesPage() {
         setLoading(true);
         setError("");
 
-        const result = await getCourses();
+        const [courseResult, scheduleResult] = await Promise.all([
+          getCourses(),
+          getSchedules(),
+        ]);
 
-        setCourses(result.courses);
+        setCourses(courseResult.courses);
+        setSchedules(scheduleResult);
       } catch (error) {
         console.error(error);
         setError("Failed to load courses");
@@ -145,13 +150,21 @@ export default function BrowseCoursesPage() {
 
       {filteredCourses.length === 0 ? (
         <div className="rounded-lg border border-gray-200 bg-white p-8 text-center dark:border-gray-800 dark:bg-gray-900">
-          <p className="text-gray-500 dark:text-gray-400">No courses match your filters.</p>
+          <p className="text-gray-500 dark:text-gray-400">
+            No courses match your filters.
+          </p>
         </div>
       ) : (
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {filteredCourses.map((course) => (
-            <CourseCard key={course.id} course={course} />
-          ))}
+          {filteredCourses.map((course) => {
+            const schedule = schedules.find(
+              (schedule) => schedule.course_id === course.id,
+            );
+
+            return (
+              <CourseCard key={course.id} course={course} schedule={schedule} />
+            );
+          })}
         </div>
       )}
     </div>
