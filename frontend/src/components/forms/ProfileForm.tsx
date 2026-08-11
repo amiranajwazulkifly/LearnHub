@@ -62,6 +62,9 @@ function ProfileForm() {
     defaultValues: {
       fullName: user?.fullName || '',
       email: user?.email || '',
+      address: user?.address || '',
+      gender: user?.gender || '',
+      nationality: user?.nationality || '',
     },
   });
 
@@ -92,6 +95,9 @@ function ProfileForm() {
       resetProfile({
         fullName: user.fullName,
         email: user.email,
+        address: user.address || '',
+        gender: user.gender || '',
+        nationality: user.nationality || '',
       });
     }
   }, [user, resetProfile]);
@@ -259,6 +265,76 @@ function ProfileForm() {
               </p>
             )}
           </div>
+
+          {user.role === 'student' && (
+            <>
+              <div>
+                <label
+                  htmlFor="profile-address"
+                  className="mb-1 block text-sm font-medium"
+                >
+                  Address
+                </label>
+
+                <input
+                  id="profile-address"
+                  type="text"
+                  placeholder="e.g. Shah Alam, Selangor"
+                  {...registerProfileField('address')}
+                  className={`w-full rounded-lg border bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(!!profileErrors.address)}`}
+                />
+
+                {profileErrors.address && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                    {profileErrors.address.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label
+                  htmlFor="profile-gender"
+                  className="mb-1 block text-sm font-medium"
+                >
+                  Gender
+                </label>
+
+                <select
+                  id="profile-gender"
+                  {...registerProfileField('gender')}
+                  className={`w-full rounded-lg border bg-white px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 ${fieldBorderClasses(!!profileErrors.gender)}`}
+                >
+                  <option value="">Prefer not to say</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="profile-nationality"
+                  className="mb-1 block text-sm font-medium"
+                >
+                  Nationality
+                </label>
+
+                <input
+                  id="profile-nationality"
+                  type="text"
+                  placeholder="e.g. Malaysian"
+                  {...registerProfileField('nationality')}
+                  className={`w-full rounded-lg border bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(!!profileErrors.nationality)}`}
+                />
+
+                {profileErrors.nationality && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                    {profileErrors.nationality.message}
+                  </p>
+                )}
+              </div>
+            </>
+          )}
 
           <button
             type="submit"

@@ -14,6 +14,9 @@ export interface LoginRequest {
 export interface UpdateProfileRequest {
   fullName: string;
   email: string;
+  address?: string;
+  gender?: string;
+  nationality?: string;
 }
 
 export interface ChangePasswordRequest {

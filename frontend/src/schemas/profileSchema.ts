@@ -6,13 +6,15 @@ export const profileSchema = z.object({
     .trim()
     .min(2, 'Full name must contain at least 2 characters')
     .max(120, 'Full name cannot exceed 120 characters'),
-
   email: z
     .string()
     .trim()
     .min(1, 'Email is required')
     .email('Enter a valid email address')
     .max(255, 'Email cannot exceed 255 characters'),
+  address: z.string().trim().max(255, 'Address cannot exceed 255 characters').optional(),
+  gender: z.string().trim().max(20).optional(),
+  nationality: z.string().trim().max(80, 'Nationality cannot exceed 80 characters').optional(),
 });
 
 export const changePasswordSchema = z
