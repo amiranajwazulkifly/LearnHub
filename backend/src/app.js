@@ -25,8 +25,8 @@ const ApiError = require("./utils/apiError");
 const app = express();
 const allowedOrigins = [
   process.env.FRONTEND_URL,
-  "http://localhost:5175",
-  "http://127.0.0.1:5175",
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
 ].filter(Boolean);
 app.disable("x-powered-by");
 app.use(helmet());
