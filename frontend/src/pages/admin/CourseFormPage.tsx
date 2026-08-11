@@ -46,11 +46,11 @@ function CourseFormPage() {
 
         const [categoryData, instructorData] = await Promise.all([
           getCategories(),
-          getInstructors(),
+          getInstructors(1, 50),
         ]);
 
         setCategories(categoryData);
-        setInstructors(instructorData);
+        setInstructors(instructorData.instructors);
 
         if (isEditMode && id) {
           const course = await getCourseById(id);
