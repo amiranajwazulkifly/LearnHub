@@ -25,9 +25,11 @@ import AnnouncementFormPage from "../pages/admin/AnnouncementFormPage";
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 import ProfilePage from "../pages/student/ProfilePage";
+import StudentDashboardPage from "../pages/student/StudentDashboardPage";
+import BrowseCoursesPage from "../pages/student/BrowseCoursesPage";
+import TimetablePage from "../pages/student/TimetablePage";
 
 import StudentAnnouncementsPage from "../pages/student/StudentAnnouncementsPage";
-
 import { useAuthStore } from "../store/useAuthStore";
 
 import ProtectedRoute from "./ProtectedRoute";
@@ -109,9 +111,11 @@ function AppRoutes() {
         {/* Student */}
         <Route element={<RoleRoute allowedRoles={[ROLES.STUDENT]} />}>
           <Route element={<StudentLayout />}>
-            <Route path={ROUTES.STUDENT.DASHBOARD} element={<ProfilePage />} />
+            <Route path={ROUTES.STUDENT.DASHBOARD} element={<StudentDashboardPage />} />
 
             <Route path={ROUTES.STUDENT.PROFILE} element={<ProfilePage />} />
+            <Route path={ROUTES.STUDENT.COURSES} element={<BrowseCoursesPage />} />
+            <Route path={ROUTES.STUDENT.TIMETABLE} element={<TimetablePage />} />
 
             <Route path={ROUTES.STUDENT.ANNOUNCEMENTS} element={<StudentAnnouncementsPage />} />
           </Route>
