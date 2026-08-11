@@ -4,14 +4,15 @@ export interface DashboardStats {
   totalStudents: number;
   totalInstructors: number;
   totalCourses: number;
-  totalEnrollments: number;
+  totalActiveEnrollments: number;
 }
 
 export interface RecentActivityItem {
-  id: number;
-  enrolled_at: string;
-  student_name: string;
-  course_title: string;
+  id: string;
+  studentName: string;
+  courseTitle: string;
+  status: string;
+  enrolledAt: string;
 }
 
 export interface EnrollmentTrendPoint {
@@ -20,13 +21,14 @@ export interface EnrollmentTrendPoint {
 }
 
 export interface CoursePopularityItem {
-  id: number;
+  id: string;
   title: string;
-  enrollmentCount: number;
+  activeEnrollments: number;
+  totalEnrollments: number;
 }
 
 export interface CompletionRateItem {
-  id: number;
+  id: string;
   title: string;
   total: number;
   completed: number;
