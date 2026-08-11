@@ -17,9 +17,6 @@ function normalizeEmail(email) {
   return email.trim().toLowerCase();
 }
 
-// Deterministic (unsalted) hash so a presented reset token can be looked up
-// by equality — unlike bcrypt password hashes, which are salted per-call
-// and can only be verified against a known user, not searched by.
 function hashResetToken(token) {
   return crypto.createHash('sha256').update(token).digest('hex');
 }
@@ -36,44 +33,48 @@ function formatUser(user) {
   };
 }
 
+// Student-only fields, merged onto the user object when role === 'student'.
+// A student_profiles row always exists (created by the DB trigger on
+// account creation), so this is a straight lookup, never an insert.
+async function getStudentProfileFields(userId) {
+  const result = await pool.query(
+    `SELECT address, gender, nationality FROM public.student_profiles WHERE user_id = $1`,
+    [userId]
+  );
+  const row = result.rows[0];
+  if (!row) return {};
+  return {
+    address: row.address,
+    gender: row.gender,
+    nationality: row.nationality,
+  };
+}
+
+async function withProfileFields(user) {
+  if (user.role !== 'student') return formatUser(user);
+  const profileFields = await getStudentProfileFields(user.id);
+  return { ...formatUser(user), ...profileFields };
+}
+
 async function findUserByEmail(email) {
   const result = await pool.query(
     `
       SELECT
-        id,
-        full_name,
-        email,
-        password_hash,
-        role,
-        status,
-        created_at,
-        updated_at
+        id, full_name, email, password_hash, role, status, created_at, updated_at
       FROM public.users
       WHERE lower(email) = lower($1)
       LIMIT 1
     `,
     [email]
   );
-
   return result.rows[0] || null;
 }
 
-// Used by authMiddleware — returns the formatted user alongside the raw
-// token_valid_after cutoff (not part of the public user shape) so a single
-// query can both load req.user and check whether the presented token was
-// issued before the account's last logout/password change.
 async function getAuthContext(userId) {
   const result = await pool.query(
     `
       SELECT
-        id,
-        full_name,
-        email,
-        role,
-        status,
-        created_at,
-        updated_at,
-        token_valid_after
+        id, full_name, email, role, status, created_at, updated_at, token_valid_after
       FROM public.users
       WHERE id = $1
       LIMIT 1
@@ -82,18 +83,14 @@ async function getAuthContext(userId) {
   );
 
   const row = result.rows[0];
-
   if (!row) return null;
 
   return {
-    user: formatUser(row),
+    user: await withProfileFields(row),
     tokenValidAfter: row.token_valid_after,
   };
 }
 
-// Invalidates every token issued for this user up to now — used on logout
-// so a token remains usable only until the user explicitly signs out,
-// rather than staying valid until its natural JWT expiry.
 async function revokeUserSessions(userId) {
   await pool.query(
     `UPDATE public.users SET token_valid_after = NOW() WHERE id = $1`,
@@ -101,268 +98,126 @@ async function revokeUserSessions(userId) {
   );
 }
 
-async function registerStudent({
-  fullName,
-  email,
-  password,
-}) {
+async function registerStudent({ fullName, email, password }) {
   const normalizedEmail = normalizeEmail(email);
-
-  const existingUser =
-    await findUserByEmail(normalizedEmail);
+  const existingUser = await findUserByEmail(normalizedEmail);
 
   if (existingUser) {
-    throw new ApiError(
-      409,
-      'An account with this email already exists'
-    );
+    throw new ApiError(409, 'An account with this email already exists');
   }
 
-  const passwordHash =
-    await hashPassword(password);
+  const passwordHash = await hashPassword(password);
 
   try {
     const result = await pool.query(
       `
-        INSERT INTO public.users (
-          full_name,
-          email,
-          password_hash,
-          role,
-          status
-        )
+        INSERT INTO public.users (full_name, email, password_hash, role, status)
         VALUES ($1, $2, $3, 'student', 'active')
-        RETURNING
-          id,
-          full_name,
-          email,
-          role,
-          status,
-          created_at,
-          updated_at
+        RETURNING id, full_name, email, role, status, created_at, updated_at
       `,
-      [
-        fullName.trim(),
-        normalizedEmail,
-        passwordHash,
-      ]
+      [fullName.trim(), normalizedEmail, passwordHash]
     );
 
     const user = result.rows[0];
-
-    return {
-      user: formatUser(user),
-      token: generateToken(user),
-    };
+    return { user: await withProfileFields(user), token: generateToken(user) };
   } catch (error) {
     if (error.code === '23505') {
-      throw new ApiError(
-        409,
-        'An account with this email already exists'
-      );
+      throw new ApiError(409, 'An account with this email already exists');
     }
-
     throw error;
   }
 }
 
-async function loginUser({
-  email,
-  password,
-}) {
+async function loginUser({ email, password }) {
   const normalizedEmail = normalizeEmail(email);
+  const user = await findUserByEmail(normalizedEmail);
 
-  const user =
-    await findUserByEmail(normalizedEmail);
+  if (!user) throw new ApiError(401, 'Invalid email or password');
 
-  if (!user) {
-    throw new ApiError(
-      401,
-      'Invalid email or password'
-    );
-  }
+  const passwordMatches = await comparePassword(password, user.password_hash);
+  if (!passwordMatches) throw new ApiError(401, 'Invalid email or password');
+  if (user.status !== 'active') throw new ApiError(403, 'Your account is not currently active');
 
-  const passwordMatches =
-    await comparePassword(
-      password,
-      user.password_hash
-    );
-
-  if (!passwordMatches) {
-    throw new ApiError(
-      401,
-      'Invalid email or password'
-    );
-  }
-
-  if (user.status !== 'active') {
-    throw new ApiError(
-      403,
-      'Your account is not currently active'
-    );
-  }
-
-  return {
-    user: formatUser(user),
-    token: generateToken(user),
-  };
+  return { user: await withProfileFields(user), token: generateToken(user) };
 }
 
-async function updateCurrentUser(
-  userId,
-  {
-    fullName,
-    email,
-  }
-) {
+async function updateCurrentUser(userId, { fullName, email, address, gender, nationality }) {
   const currentResult = await pool.query(
-    `
-      SELECT
-        id,
-        full_name,
-        email
-      FROM public.users
-      WHERE id = $1
-      LIMIT 1
-    `,
+    `SELECT id, full_name, email, role FROM public.users WHERE id = $1 LIMIT 1`,
     [userId]
   );
 
   const currentUser = currentResult.rows[0];
+  if (!currentUser) throw new ApiError(404, 'User account not found');
 
-  if (!currentUser) {
-    throw new ApiError(
-      404,
-      'User account not found'
-    );
-  }
-
-  const updatedFullName =
-    fullName === undefined
-      ? currentUser.full_name
-      : fullName.trim();
-
-  const updatedEmail =
-    email === undefined
-      ? currentUser.email
-      : normalizeEmail(email);
+  const updatedFullName = fullName === undefined ? currentUser.full_name : fullName.trim();
+  const updatedEmail = email === undefined ? currentUser.email : normalizeEmail(email);
 
   const duplicateResult = await pool.query(
-    `
-      SELECT id
-      FROM public.users
-      WHERE lower(email) = lower($1)
-        AND id <> $2
-      LIMIT 1
-    `,
+    `SELECT id FROM public.users WHERE lower(email) = lower($1) AND id <> $2 LIMIT 1`,
     [updatedEmail, userId]
   );
-
   if (duplicateResult.rows[0]) {
-    throw new ApiError(
-      409,
-      'An account with this email already exists'
-    );
+    throw new ApiError(409, 'An account with this email already exists');
   }
 
+  let updatedUser;
   try {
     const result = await pool.query(
       `
         UPDATE public.users
-        SET
-          full_name = $1,
-          email = $2
+        SET full_name = $1, email = $2
         WHERE id = $3
-        RETURNING
-          id,
-          full_name,
-          email,
-          role,
-          status,
-          created_at,
-          updated_at
+        RETURNING id, full_name, email, role, status, created_at, updated_at
       `,
-      [
-        updatedFullName,
-        updatedEmail,
-        userId,
-      ]
+      [updatedFullName, updatedEmail, userId]
     );
-
-    return formatUser(result.rows[0]);
+    updatedUser = result.rows[0];
   } catch (error) {
     if (error.code === '23505') {
-      throw new ApiError(
-        409,
-        'An account with this email already exists'
-      );
+      throw new ApiError(409, 'An account with this email already exists');
     }
-
     throw error;
   }
+
+  // Student-only fields — only touch student_profiles for student accounts,
+  // and only overwrite a field if the caller actually sent it.
+  if (currentUser.role === 'student' && (address !== undefined || gender !== undefined || nationality !== undefined)) {
+    await pool.query(
+      `
+        UPDATE public.student_profiles
+        SET
+          address = COALESCE($1, address),
+          gender = COALESCE($2, gender),
+          nationality = COALESCE($3, nationality)
+        WHERE user_id = $4
+      `,
+      [address ?? null, gender ?? null, nationality ?? null, userId]
+    );
+  }
+
+  return withProfileFields(updatedUser);
 }
 
-async function changeCurrentUserPassword(
-  userId,
-  {
-    currentPassword,
-    newPassword,
-  }
-) {
+async function changeCurrentUserPassword(userId, { currentPassword, newPassword }) {
   const result = await pool.query(
-    `
-      SELECT
-        id,
-        password_hash
-      FROM public.users
-      WHERE id = $1
-      LIMIT 1
-    `,
+    `SELECT id, password_hash FROM public.users WHERE id = $1 LIMIT 1`,
     [userId]
   );
 
   const user = result.rows[0];
+  if (!user) throw new ApiError(404, 'User account not found');
 
-  if (!user) {
-    throw new ApiError(
-      404,
-      'User account not found'
-    );
-  }
+  const passwordMatches = await comparePassword(currentPassword, user.password_hash);
+  if (!passwordMatches) throw new ApiError(401, 'Current password is incorrect');
 
-  const passwordMatches =
-    await comparePassword(
-      currentPassword,
-      user.password_hash
-    );
-
-  if (!passwordMatches) {
-    throw new ApiError(
-      401,
-      'Current password is incorrect'
-    );
-  }
-
-  const sameAsCurrent =
-    await comparePassword(
-      newPassword,
-      user.password_hash
-    );
-
+  const sameAsCurrent = await comparePassword(newPassword, user.password_hash);
   if (sameAsCurrent) {
-    throw new ApiError(
-      400,
-      'New password must be different from the current password'
-    );
+    throw new ApiError(400, 'New password must be different from the current password');
   }
 
-  const newPasswordHash =
-    await hashPassword(newPassword);
+  const newPasswordHash = await hashPassword(newPassword);
 
-  // Bump token_valid_after so any other token issued before this moment
-  // (e.g. on another device) stops working. We issue a fresh token below
-  // for the current session so the caller isn't logged out by their own
-  // password change.
   const updateResult = await pool.query(
     `
       UPDATE public.users
@@ -370,54 +225,32 @@ async function changeCurrentUserPassword(
       WHERE id = $2
       RETURNING id, full_name, email, role, status, created_at, updated_at, token_valid_after
     `,
-    [
-      newPasswordHash,
-      userId,
-    ]
+    [newPasswordHash, userId]
   );
 
   const updatedUser = updateResult.rows[0];
-
-  // Base the reissued token's timestamp on the DB's own token_valid_after
-  // (+1ms) rather than Node's Date.now() — avoids any dependency on clock
-  // sync between the app server and the database for this comparison to
-  // come out correctly.
   const issuedAtMs = new Date(updatedUser.token_valid_after).getTime() + 1;
 
   return { token: generateToken(updatedUser, { issuedAtMs }) };
 }
 
-// Always resolves the same way regardless of whether the email exists, so
-// the endpoint can't be used to enumerate registered accounts.
 async function requestPasswordReset(email) {
   const normalizedEmail = normalizeEmail(email);
   const user = await findUserByEmail(normalizedEmail);
 
-  if (!user) {
-    return { devResetToken: null };
-  }
+  if (!user) return { devResetToken: null };
 
   const rawToken = crypto.randomBytes(32).toString('hex');
   const expiresAt = new Date(Date.now() + RESET_TOKEN_TTL_MS);
 
   await pool.query(
-    `
-      UPDATE public.users
-      SET reset_token_hash = $1, reset_token_expires_at = $2
-      WHERE id = $3
-    `,
+    `UPDATE public.users SET reset_token_hash = $1, reset_token_expires_at = $2 WHERE id = $3`,
     [hashResetToken(rawToken), expiresAt, user.id]
   );
 
   const resetLink = `${env.clientUrl}/reset-password?token=${rawToken}&email=${encodeURIComponent(normalizedEmail)}`;
-
-  // No transactional email provider is configured for local dev — log the
-  // link so it can be copied straight out of the backend terminal. Swap
-  // this for a real email send once one is wired up.
   console.log(`[password reset] ${normalizedEmail} -> ${resetLink}`);
 
-  // Returned only outside production so the flow is testable without a
-  // mail server; never exposed once a real deployment is configured.
   return { devResetToken: env.nodeEnv === 'production' ? null : rawToken };
 }
 
@@ -435,12 +268,7 @@ async function resetPassword({ email, token, newPassword }) {
   );
 
   const user = result.rows[0];
-
-  if (
-    !user ||
-    !user.reset_token_expires_at ||
-    new Date(user.reset_token_expires_at) < new Date()
-  ) {
+  if (!user || !user.reset_token_expires_at || new Date(user.reset_token_expires_at) < new Date()) {
     throw new ApiError(400, 'This reset link is invalid or has expired');
   }
 
@@ -449,11 +277,7 @@ async function resetPassword({ email, token, newPassword }) {
   await pool.query(
     `
       UPDATE public.users
-      SET
-        password_hash = $1,
-        token_valid_after = NOW(),
-        reset_token_hash = NULL,
-        reset_token_expires_at = NULL
+      SET password_hash = $1, token_valid_after = NOW(), reset_token_hash = NULL, reset_token_expires_at = NULL
       WHERE id = $2
     `,
     [newPasswordHash, user.id]
