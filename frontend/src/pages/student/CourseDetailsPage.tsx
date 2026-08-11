@@ -25,9 +25,9 @@ export default function CourseDetailsPage() {
       }
 
       try {
-        const response = await getCourseById(id);
+        const course = await getCourseById(id);
 
-        setCourse(response.data);
+        setCourse(course);
       } catch (error) {
         console.error(error);
         setError("Failed to load course");

@@ -1,5 +1,5 @@
 import axiosInstance from "../api/axiosInstance";
-import type { CourseListResponse } from "../types/course";
+import type { Course, CourseListResponse } from "../types/course";
 
 export const getCourses = async (params?: {
   search?: string;
