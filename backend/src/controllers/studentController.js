@@ -1,6 +1,7 @@
 // dzul
 const { pool } = require('../config/db');
 const ApiError = require('../utils/apiError');
+const { parsePagination, buildPaginationMeta } = require('../utils/pagination');
 
 function formatStudent(row) {
   return {
@@ -19,9 +20,7 @@ function formatStudent(row) {
 // GET /api/students?search=&page=&limit=
 async function listStudents(req, res) {
   const search = (req.query.search || '').trim();
-  const page = Math.max(1, parseInt(req.query.page, 10) || 1);
-  const limit = Math.min(50, parseInt(req.query.limit, 10) || 20);
-  const offset = (page - 1) * limit;
+  const { page, limit, offset } = parsePagination(req.query);
 
   const result = await pool.query(
     `
@@ -48,9 +47,7 @@ async function listStudents(req, res) {
     message: 'Students retrieved successfully',
     data: {
       students: result.rows.map(formatStudent),
-      total: Number(countResult.rows[0].count),
-      page,
-      limit,
+      pagination: buildPaginationMeta({ page, limit, total: Number(countResult.rows[0].count) }),
     },
   });
 }
@@ -105,9 +102,12 @@ async function getStudentDetail(req, res) {
   });
 }
 
-// GET /api/enrollments  (admin-wide enrollment management)
+// GET /api/enrollments?page=&limit=  (admin-wide enrollment management)
 async function listAllEnrollments(req, res) {
-  const result = await pool.query(`
+  const { page, limit, offset } = parsePagination(req.query);
+
+  const result = await pool.query(
+    `
     SELECT e.id, e.status, e.enrolled_at, e.cancelled_at, e.completed_at,
            u.id AS student_id, u.full_name AS student_name,
            c.id AS course_id, c.title AS course_title
@@ -115,7 +115,12 @@ async function listAllEnrollments(req, res) {
     JOIN public.users u ON u.id = e.student_id
     JOIN public.courses c ON c.id = e.course_id
     ORDER BY e.enrolled_at DESC
-  `);
+    LIMIT $1 OFFSET $2
+  `,
+    [limit, offset]
+  );
+
+  const countResult = await pool.query('SELECT COUNT(*) FROM public.enrollments');
 
   res.status(200).json({
     success: true,
@@ -132,6 +137,7 @@ async function listAllEnrollments(req, res) {
         courseId: r.course_id,
         courseTitle: r.course_title,
       })),
+      pagination: buildPaginationMeta({ page, limit, total: Number(countResult.rows[0].count) }),
     },
   });
 }

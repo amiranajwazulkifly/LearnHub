@@ -32,7 +32,7 @@ function RegisterPage() {
         Create an account
       </h2>
 
-      <p className="mb-6 mt-1 text-sm text-gray-600">
+      <p className="mb-6 mt-1 text-sm text-gray-600 dark:text-gray-400">
         Register as a LearnHub student.
       </p>
 

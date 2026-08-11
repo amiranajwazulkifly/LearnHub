@@ -1,29 +1,28 @@
 // Dzul
+import type { PaginationMeta } from './api';
 
 export interface Student {
-  id: number;
+  id: string;
   email: string;
-  full_name: string;
-  created_at: string;
-  enrollment_count?: number;
+  fullName: string;
+  createdAt: string;
+  enrollmentCount?: number;
 }
 
 export interface StudentListResponse {
   students: Student[];
-  total: number;
-  page: number;
-  limit: number;
+  pagination: PaginationMeta;
 }
 
-export type EnrollmentStatus = 'active' | 'completed' | 'dropped';
+export type EnrollmentStatus = 'enrolled' | 'completed' | 'cancelled';
 
 export interface StudentEnrollment {
   id: number;
   status: EnrollmentStatus;
-  enrolled_at: string;
-  completed_at: string | null;
-  course_id: number;
-  title: string;
+  enrolledAt: string;
+  completedAt: string | null;
+  courseId: number;
+  courseTitle: string;
 }
 
 export interface StudentDetail {
@@ -35,10 +34,15 @@ export interface StudentDetail {
 export interface AdminEnrollmentRow {
   id: number;
   status: EnrollmentStatus;
-  enrolled_at: string;
-  completed_at: string | null;
-  student_id: number;
-  student_name: string;
-  course_id: number;
-  course_title: string;
+  enrolledAt: string;
+  completedAt: string | null;
+  studentId: string;
+  studentName: string;
+  courseId: number;
+  courseTitle: string;
+}
+
+export interface AdminEnrollmentListResponse {
+  enrollments: AdminEnrollmentRow[];
+  pagination: PaginationMeta;
 }

@@ -29,3 +29,17 @@ export interface AuthData {
 export interface CurrentUserData {
   user: User;
 }
+
+export interface ChangePasswordData {
+  token: string;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  token: string;
+  newPassword: string;
+}

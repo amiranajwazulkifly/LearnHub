@@ -7,6 +7,8 @@ const {
   updateProfile,
   changePassword,
   logout,
+  forgotPassword,
+  resetPassword,
 } = require('../controllers/authController');
 
 const {
@@ -14,6 +16,8 @@ const {
   validateLogin,
   validateUpdateProfile,
   validateChangePassword,
+  validateForgotPassword,
+  validateResetPassword,
 } = require('../validators/authValidator');
 
 const validationMiddleware = require(
@@ -54,11 +58,27 @@ router.post(
   asyncHandler(login)
 );
 
+// Public — request a password reset link
+router.post(
+  '/forgot-password',
+  authRateLimiter,
+  validationMiddleware(validateForgotPassword),
+  asyncHandler(forgotPassword)
+);
+
+// Public — consume a reset token to set a new password
+router.post(
+  '/reset-password',
+  authRateLimiter,
+  validationMiddleware(validateResetPassword),
+  asyncHandler(resetPassword)
+);
+
 // Get authenticated user
 router.get(
   '/me',
   authMiddleware,
-  roleMiddleware('admin', 'student'),
+  roleMiddleware('admin', 'student', 'instructor'),
   asyncHandler(getCurrentUser)
 );
 
@@ -66,7 +86,7 @@ router.get(
 router.patch(
   '/me',
   authMiddleware,
-  roleMiddleware('admin', 'student'),
+  roleMiddleware('admin', 'student', 'instructor'),
   validationMiddleware(validateUpdateProfile),
   asyncHandler(updateProfile)
 );
@@ -75,7 +95,7 @@ router.patch(
 router.patch(
   '/password',
   authMiddleware,
-  roleMiddleware('admin', 'student'),
+  roleMiddleware('admin', 'student', 'instructor'),
   validationMiddleware(validateChangePassword),
   asyncHandler(changePassword)
 );
@@ -84,7 +104,7 @@ router.patch(
 router.post(
   '/logout',
   authMiddleware,
-  roleMiddleware('admin', 'student'),
+  roleMiddleware('admin', 'student', 'instructor'),
   asyncHandler(logout)
 );
 

@@ -1,20 +1,26 @@
 // Dzul
+import type { PaginationMeta } from './api';
 
-export type AnnouncementStatus = 'draft' | 'published';
+export type AnnouncementStatus = 'draft' | 'published' | 'archived';
 
 export interface Announcement {
-  id: number;
+  id: string;
   title: string;
   content: string;
   status: AnnouncementStatus;
-  author_id: number;
-  author_name?: string;
-  published_at: string | null;
-  created_at: string;
-  updated_at: string;
+  createdBy: string;
+  authorName?: string;
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateAnnouncementInput {
   title: string;
   content: string;
+}
+
+export interface AnnouncementListResponse {
+  announcements: Announcement[];
+  pagination: PaginationMeta;
 }

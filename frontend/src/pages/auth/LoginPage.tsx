@@ -32,7 +32,7 @@ function LoginPage() {
         Sign in
       </h2>
 
-      <p className="mb-6 mt-1 text-sm text-gray-600">
+      <p className="mb-6 mt-1 text-sm text-gray-600 dark:text-gray-400">
         Sign in to continue to LearnHub.
       </p>
 
