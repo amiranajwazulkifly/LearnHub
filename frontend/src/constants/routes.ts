@@ -5,8 +5,6 @@ export const ROUTES = {
 
   LOGIN: "/login",
   REGISTER: "/register",
-  FORGOT_PASSWORD: "/forgot-password",
-  RESET_PASSWORD: "/reset-password",
 
   ADMIN: {
     DASHBOARD: "/admin",
@@ -25,17 +23,8 @@ export const ROUTES = {
     DASHBOARD: "/student",
     PROFILE: "/student/profile",
     COURSES: "/student/courses",
-    MY_COURSES: "/student/my-courses",
     TIMETABLE: "/student/timetable",
     ANNOUNCEMENTS: "/student/announcements",
-    TASKS: "/student/tasks",
-  },
-
-  INSTRUCTOR: {
-    DASHBOARD: "/instructor",
-    PROFILE: "/instructor/profile",
-    COURSES: "/instructor/courses",
-    ASSIGNMENTS: "/instructor/assignments",
   },
 } as const;
 
@@ -46,10 +35,6 @@ export function getDefaultRouteForRole(role: UserRole): string {
 
   if (role === ROLES.STUDENT) {
     return ROUTES.STUDENT.DASHBOARD;
-  }
-
-  if (role === ROLES.INSTRUCTOR) {
-    return ROUTES.INSTRUCTOR.DASHBOARD;
   }
 
   return ROUTES.LOGIN;

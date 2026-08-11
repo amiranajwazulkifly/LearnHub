@@ -1,36 +1,24 @@
 // Dzul
 import axiosInstance from '../api/axiosInstance';
-import type { Announcement, AnnouncementListResponse, CreateAnnouncementInput } from '../types/announcement';
+import type { Announcement, CreateAnnouncementInput, AnnouncementListResponse } from '../types/announcement';
 
-interface ListApiResponse {
-  data: AnnouncementListResponse;
-}
-
-interface PublishedListApiResponse {
-  data: { announcements: Announcement[] };
-}
-
-interface OneApiResponse {
-  data: { announcement: Announcement };
-}
-
-export async function getAllAnnouncements(page = 1, limit = 20): Promise<AnnouncementListResponse> {
-  const { data } = await axiosInstance.get<ListApiResponse>('/announcements', { params: { page, limit } });
+export async function getAllAnnouncements(page = 1): Promise<AnnouncementListResponse> {
+  const { data } = await axiosInstance.get('/announcements', { params: { page } });
   return data.data;
 }
 
 export async function getPublishedAnnouncements(): Promise<Announcement[]> {
-  const { data } = await axiosInstance.get<PublishedListApiResponse>('/announcements/published');
+  const { data } = await axiosInstance.get('/announcements/published');
   return data.data.announcements;
 }
 
 export async function getAnnouncement(id: string): Promise<Announcement> {
-  const { data } = await axiosInstance.get<OneApiResponse>(`/announcements/${id}`);
+  const { data } = await axiosInstance.get(`/announcements/${id}`);
   return data.data.announcement;
 }
 
 export async function createAnnouncement(payload: CreateAnnouncementInput): Promise<Announcement> {
-  const { data } = await axiosInstance.post<OneApiResponse>('/announcements', payload);
+  const { data } = await axiosInstance.post('/announcements', payload);
   return data.data.announcement;
 }
 
@@ -38,19 +26,22 @@ export async function updateAnnouncement(
   id: string,
   payload: Partial<CreateAnnouncementInput>
 ): Promise<Announcement> {
-  const { data } = await axiosInstance.patch<OneApiResponse>(`/announcements/${id}`, payload);
+  const { data } = await axiosInstance.patch(`/announcements/${id}`, payload);
   return data.data.announcement;
 }
 
 export async function publishAnnouncement(id: string): Promise<Announcement> {
-  const { data } = await axiosInstance.patch<OneApiResponse>(`/announcements/${id}/publish`);
+  const { data } = await axiosInstance.patch(`/announcements/${id}/publish`);
   return data.data.announcement;
 }
 
-// The backend models a 3-state lifecycle (draft/published/archived), not a
-// binary publish toggle — "unpublishing" a published announcement archives it.
 export async function archiveAnnouncement(id: string): Promise<Announcement> {
-  const { data } = await axiosInstance.patch<OneApiResponse>(`/announcements/${id}/archive`);
+  const { data } = await axiosInstance.patch(`/announcements/${id}/archive`);
+  return data.data.announcement;
+}
+
+export async function moveAnnouncementToDraft(id: string): Promise<Announcement> {
+  const { data } = await axiosInstance.patch(`/announcements/${id}/draft`);
   return data.data.announcement;
 }
 

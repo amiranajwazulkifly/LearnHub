@@ -1,47 +1,16 @@
 // Dzul
-import axiosInstance from '../api/axiosInstance'; // Nabil's shared file
+import axiosInstance from '../api/axiosInstance';
 import type { DashboardStats, RecentActivityItem } from '../types/report';
 
-interface StatsApiResponse {
-  data: {
-    totalStudents: number;
-    totalInstructors: number;
-    totalCourses: number;
-    totalActiveEnrollments: number;
-  };
-}
-
-interface RecentActivityApiResponse {
-  data: {
-    activity: Array<{
-      id: number;
-      studentName: string;
-      courseTitle: string;
-      status: string;
-      enrolledAt: string;
-    }>;
-  };
-}
+// Every real response looks like: { success, message, data: {...} }
+// so we always unwrap response.data.data, not response.data.
 
 export async function getDashboardStats(): Promise<DashboardStats> {
-  const { data } = await axiosInstance.get<StatsApiResponse>('/dashboard/stats');
-  const stats = data.data;
-
-  return {
-    totalStudents: stats.totalStudents,
-    totalInstructors: stats.totalInstructors,
-    totalCourses: stats.totalCourses,
-    totalEnrollments: stats.totalActiveEnrollments,
-  };
+  const { data } = await axiosInstance.get('/dashboard/stats');
+  return data.data;
 }
 
 export async function getRecentActivity(): Promise<RecentActivityItem[]> {
-  const { data } = await axiosInstance.get<RecentActivityApiResponse>('/dashboard/recent-activity');
-
-  return data.data.activity.map((item) => ({
-    id: item.id,
-    student_name: item.studentName,
-    course_title: item.courseTitle,
-    enrolled_at: item.enrolledAt,
-  }));
+  const { data } = await axiosInstance.get('/dashboard/recent-activity');
+  return data.data.activity;
 }

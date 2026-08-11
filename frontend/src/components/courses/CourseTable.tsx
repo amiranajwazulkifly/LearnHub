@@ -1,93 +1,45 @@
 import type { Course } from "../../types/course";
-import StatusBadge from "../common/StatusBadge";
-import type { StatusTone } from "../common/StatusBadge";
 
-const STATUS_TONE: Record<string, StatusTone> = {
-  published: "green",
-  archived: "gray",
-  draft: "amber",
-};
-
-interface CourseTableProps {
+interface Props {
   courses: Course[];
-  onEdit: (course: Course) => void;
-  onDelete: (id: string) => void;
+  onDelete: (id: number) => void;
 }
 
-function CourseTable({ courses, onEdit, onDelete }: CourseTableProps) {
-  if (courses.length === 0) {
-    return <p>No courses found.</p>;
-  }
-
+export default function CourseTable({ courses, onDelete }: Props) {
   return (
-    <div className="table-scroll overflow-x-auto bg-white dark:bg-gray-900">
-      <table className="w-full border-collapse text-gray-900 dark:text-gray-100">
-        <thead>
-          <tr className="border-b bg-gray-100 text-left font-mono text-xs uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:bg-gray-800 dark:text-gray-400">
-            <th className="px-6 py-4">Code</th>
-            <th className="px-6 py-4">Title</th>
-            <th className="px-6 py-4">Category</th>
-            <th className="px-6 py-4">Instructor</th>
-            <th className="px-6 py-4">Capacity</th>
-            <th className="px-6 py-4">Status</th>
-            <th className="px-6 py-4">Actions</th>
+    <table border={1} cellPadding={10} width="100%">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Instructor</th>
+          <th>Level</th>
+          <th>Price</th>
+          <th>Duration</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {courses.map((course) => (
+          <tr key={course.id}>
+            <td>{course.id}</td>
+            <td>{course.title}</td>
+            <td>{course.category_name}</td>
+            <td>{course.instructor_name}</td>
+            <td>{course.level}</td>
+            <td>RM {course.price}</td>
+            <td>{course.duration} hrs</td>
+
+            <td>
+              <button>Edit</button>
+
+              <button onClick={() => onDelete(course.id)}>Delete</button>
+            </td>
           </tr>
-        </thead>
-
-        <tbody>
-          {courses.map((course) => (
-            <tr key={course.id} className="border-b hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800/60">
-              <td className="px-6 py-4 font-mono text-sm font-medium text-brand-700 dark:text-brand-400">{course.code}</td>
-
-              <td className="px-6 py-4">
-                <div className="font-medium">{course.title}</div>
-
-                {course.description && (
-                  <div className="mt-1 max-w-xs truncate text-sm text-gray-500 dark:text-gray-400">
-                    {course.description}
-                  </div>
-                )}
-              </td>
-
-              <td className="px-6 py-4">
-                {course.category_name ?? "Not assigned"}
-              </td>
-
-              <td className="px-6 py-4">
-                {course.instructor_name ?? "Not assigned"}
-              </td>
-
-              <td className="px-6 py-4">{course.capacity}</td>
-
-              <td className="px-6 py-4">
-                <StatusBadge label={course.status} tone={STATUS_TONE[course.status] ?? "amber"} />
-              </td>
-
-              <td className="px-6 py-4">
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => onEdit(course)}
-                    className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-3 py-2 text-sm text-white hover:from-brand-700 hover:to-brand-600"
-                  >
-                    Edit
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => onDelete(course.id)}
-                    className="rounded bg-red-600 px-3 py-2 text-sm text-white hover:bg-red-700"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+        ))}
+      </tbody>
+    </table>
   );
 }
-
-export default CourseTable;

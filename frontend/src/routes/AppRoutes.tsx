@@ -7,15 +7,14 @@ import { ROLES } from "../constants/roles";
 import AdminLayout from "../layouts/AdminLayout";
 import AuthLayout from "../layouts/AuthLayout";
 import StudentLayout from "../layouts/StudentLayout";
-import InstructorLayout from "../layouts/InstructorLayout";
 
-import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
 import AdminProfilePage from "../pages/admin/AdminProfilePage";
 import CategoriesPage from "../pages/admin/CategoriesPage";
 import CoursesPage from "../pages/admin/CoursesPage";
 import InstructorsPage from "../pages/admin/InstructorsPage";
 import SchedulesPage from "../pages/admin/SchedulesPage";
-import CourseFormPage from "../pages/admin/CourseFormPage";
+
+import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
 import StudentsPage from "../pages/admin/StudentsPage";
 import StudentDetailsPage from "../pages/admin/StudentDetailsPage";
 import EnrollmentsPage from "../pages/admin/EnrollmentsPage";
@@ -25,26 +24,12 @@ import AnnouncementFormPage from "../pages/admin/AnnouncementFormPage";
 
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
-import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
-import ResetPasswordPage from "../pages/auth/ResetPasswordPage";
-
-import BrowseCoursesPage from "../pages/student/BrowseCoursesPage";
-import CourseDetailsPage from "../pages/student/CourseDetailsPage";
-import MyCoursesPage from "../pages/student/MyCoursesPage";
 import ProfilePage from "../pages/student/ProfilePage";
-import TimetablePage from "../pages/student/TimetablePage";
 import StudentDashboardPage from "../pages/student/StudentDashboardPage";
+import BrowseCoursesPage from "../pages/student/BrowseCoursesPage";
+import TimetablePage from "../pages/student/TimetablePage";
+
 import StudentAnnouncementsPage from "../pages/student/StudentAnnouncementsPage";
-import StudentTasksPage from "../pages/student/StudentTasksPage";
-import StudentAssignmentDetailPage from "../pages/student/StudentAssignmentDetailPage";
-
-import InstructorDashboardPage from "../pages/instructor/InstructorDashboardPage";
-import InstructorCoursesPage from "../pages/instructor/InstructorCoursesPage";
-import InstructorCourseStudentsPage from "../pages/instructor/InstructorCourseStudentsPage";
-import InstructorProfilePage from "../pages/instructor/InstructorProfilePage";
-import InstructorCourseAssignmentsPage from "../pages/instructor/InstructorCourseAssignmentsPage";
-import InstructorAssignmentSubmissionsPage from "../pages/instructor/InstructorAssignmentSubmissionsPage";
-
 import { useAuthStore } from "../store/useAuthStore";
 
 import ProtectedRoute from "./ProtectedRoute";
@@ -58,7 +43,7 @@ function RootRedirect() {
   const isInitialized = useAuthStore((state) => state.isInitialized);
 
   if (!isInitialized) {
-    return <div>Loading LearnHub...</div>;
+    return <main className="p-6">Loading LearnHub...</main>;
   }
 
   if (!isAuthenticated || !user) {
@@ -85,10 +70,6 @@ function AppRoutes() {
         <Route path={ROUTES.LOGIN} element={<LoginPage />} />
 
         <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
-
-        <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
-
-        <Route path={ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
       </Route>
 
       {/* Protected Routes */}
@@ -104,8 +85,7 @@ function AppRoutes() {
             <Route path={ROUTES.ADMIN.PROFILE} element={<AdminProfilePage />} />
 
             <Route path={ROUTES.ADMIN.COURSES} element={<CoursesPage />} />
-            <Route path="/admin/courses/create" element={<CourseFormPage />} />
-            <Route path="/admin/courses/:id/edit" element={<CourseFormPage />} />
+
             <Route
               path={ROUTES.ADMIN.CATEGORIES}
               element={<CategoriesPage />}
@@ -119,109 +99,25 @@ function AppRoutes() {
             <Route path={ROUTES.ADMIN.SCHEDULES} element={<SchedulesPage />} />
 
             <Route path={ROUTES.ADMIN.STUDENTS} element={<StudentsPage />} />
-            <Route
-              path={`${ROUTES.ADMIN.STUDENTS}/:id`}
-              element={<StudentDetailsPage />}
-            />
-
-            <Route
-              path={ROUTES.ADMIN.ENROLLMENTS}
-              element={<EnrollmentsPage />}
-            />
-
+            <Route path={`${ROUTES.ADMIN.STUDENTS}/:id`} element={<StudentDetailsPage />} />
+            <Route path={ROUTES.ADMIN.ENROLLMENTS} element={<EnrollmentsPage />} />
             <Route path={ROUTES.ADMIN.REPORTS} element={<ReportsPage />} />
-
-            <Route
-              path={ROUTES.ADMIN.ANNOUNCEMENTS}
-              element={<AnnouncementsPage />}
-            />
-            <Route
-              path={`${ROUTES.ADMIN.ANNOUNCEMENTS}/new`}
-              element={<AnnouncementFormPage />}
-            />
-            <Route
-              path={`${ROUTES.ADMIN.ANNOUNCEMENTS}/:id/edit`}
-              element={<AnnouncementFormPage />}
-            />
+            <Route path={ROUTES.ADMIN.ANNOUNCEMENTS} element={<AnnouncementsPage />} />
+            <Route path={`${ROUTES.ADMIN.ANNOUNCEMENTS}/new`} element={<AnnouncementFormPage />} />
+            <Route path={`${ROUTES.ADMIN.ANNOUNCEMENTS}/:id/edit`} element={<AnnouncementFormPage />} />
           </Route>
         </Route>
 
         {/* Student */}
         <Route element={<RoleRoute allowedRoles={[ROLES.STUDENT]} />}>
           <Route element={<StudentLayout />}>
-            <Route
-              path={ROUTES.STUDENT.DASHBOARD}
-              element={<StudentDashboardPage />}
-            />
+            <Route path={ROUTES.STUDENT.DASHBOARD} element={<StudentDashboardPage />} />
 
             <Route path={ROUTES.STUDENT.PROFILE} element={<ProfilePage />} />
+            <Route path={ROUTES.STUDENT.COURSES} element={<BrowseCoursesPage />} />
+            <Route path={ROUTES.STUDENT.TIMETABLE} element={<TimetablePage />} />
 
-            <Route
-              path={ROUTES.STUDENT.COURSES}
-              element={<BrowseCoursesPage />}
-            />
-
-            <Route
-              path={`${ROUTES.STUDENT.COURSES}/:id`}
-              element={<CourseDetailsPage />}
-            />
-
-            <Route
-              path={ROUTES.STUDENT.MY_COURSES}
-              element={<MyCoursesPage />}
-            />
-
-            <Route
-              path={ROUTES.STUDENT.TIMETABLE}
-              element={<TimetablePage />}
-            />
-
-            <Route
-              path={ROUTES.STUDENT.ANNOUNCEMENTS}
-              element={<StudentAnnouncementsPage />}
-            />
-
-            <Route path={ROUTES.STUDENT.TASKS} element={<StudentTasksPage />} />
-
-            <Route
-              path={`${ROUTES.STUDENT.TASKS}/:assignmentId`}
-              element={<StudentAssignmentDetailPage />}
-            />
-          </Route>
-        </Route>
-
-        {/* Instructor */}
-        <Route element={<RoleRoute allowedRoles={[ROLES.INSTRUCTOR]} />}>
-          <Route element={<InstructorLayout />}>
-            <Route
-              path={ROUTES.INSTRUCTOR.DASHBOARD}
-              element={<InstructorDashboardPage />}
-            />
-
-            <Route
-              path={ROUTES.INSTRUCTOR.PROFILE}
-              element={<InstructorProfilePage />}
-            />
-
-            <Route
-              path={ROUTES.INSTRUCTOR.COURSES}
-              element={<InstructorCoursesPage />}
-            />
-
-            <Route
-              path={`${ROUTES.INSTRUCTOR.COURSES}/:courseId/students`}
-              element={<InstructorCourseStudentsPage />}
-            />
-
-            <Route
-              path={`${ROUTES.INSTRUCTOR.COURSES}/:courseId/assignments`}
-              element={<InstructorCourseAssignmentsPage />}
-            />
-
-            <Route
-              path={`${ROUTES.INSTRUCTOR.ASSIGNMENTS}/:assignmentId/submissions`}
-              element={<InstructorAssignmentSubmissionsPage />}
-            />
+            <Route path={ROUTES.STUDENT.ANNOUNCEMENTS} element={<StudentAnnouncementsPage />} />
           </Route>
         </Route>
       </Route>

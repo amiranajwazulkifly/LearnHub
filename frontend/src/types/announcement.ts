@@ -2,11 +2,13 @@
 import type { PaginationMeta } from './api';
 
 export type AnnouncementStatus = 'draft' | 'published' | 'archived';
+export type AnnouncementAudience = 'all' | 'students' | 'instructors';
 
 export interface Announcement {
   id: string;
   title: string;
   content: string;
+  audience: AnnouncementAudience;
   status: AnnouncementStatus;
   createdBy: string;
   authorName?: string;
@@ -18,6 +20,7 @@ export interface Announcement {
 export interface CreateAnnouncementInput {
   title: string;
   content: string;
+  audience?: AnnouncementAudience;
 }
 
 export interface AnnouncementListResponse {
