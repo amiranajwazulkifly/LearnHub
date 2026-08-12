@@ -66,12 +66,8 @@ function AuthLayout() {
                 system.auth // secure-link
               </div>
 
-              <div className="mb-2 flex items-center gap-2.5">
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/30 bg-white/10 font-mono text-sm font-bold shadow-[0_0_18px_1px_var(--color-brand-400)] backdrop-blur-sm">
-                  L
-                </span>
-
-                <h1 className="text-2xl font-bold tracking-tight">LearnHub</h1>
+              <div className="mb-2">
+                <img src="/logo-dark.png" alt="LearnHub" className="h-9 w-auto" />
               </div>
 
               <p className="text-sm text-white/70">Course Management System</p>
