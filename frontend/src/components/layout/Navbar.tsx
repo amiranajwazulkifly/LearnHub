@@ -1,3 +1,4 @@
+import Logo from '../common/Logo';
 import ThemeToggle from '../common/ThemeToggle';
 import UserMenu from './UserMenu';
 
@@ -14,11 +15,9 @@ function Navbar({
 
       <div className="flex min-h-16 items-center justify-between px-6">
         <div>
-          <p className="text-lg font-bold text-brand-700 dark:text-brand-300">
-            LearnHub
-          </p>
+          <Logo className="h-7 w-auto" />
 
-          <p className="font-mono text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
+          <p className="mt-1 font-mono text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
             {portalName}
           </p>
         </div>
