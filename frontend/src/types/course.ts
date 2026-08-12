@@ -23,4 +23,8 @@ export interface Course {
 
   category_name?: string;
   instructor_name?: string;
+  instructor_expertise?: string | null;
+  instructor_biography?: string | null;
+
+  enrolled_count?: number;
 }

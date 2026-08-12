@@ -140,3 +140,60 @@ export function AssignmentsIcon(props: IconProps) {
     </Icon>
   );
 }
+
+export function ClockIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3.5 2" />
+    </Icon>
+  );
+}
+
+export function PinIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M12 21s7-6.5 7-11.5a7 7 0 0 0-14 0C5 14.5 12 21 12 21Z" />
+      <circle cx="12" cy="9.5" r="2.5" />
+    </Icon>
+  );
+}
+
+export function CalendarIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <rect x="3" y="4.5" width="18" height="16" rx="2" />
+      <path d="M3 9.5h18M8 2.5v4M16 2.5v4" />
+    </Icon>
+  );
+}
+
+export function AlertIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7.5v6" />
+      <path d="M12 16.5h.01" />
+    </Icon>
+  );
+}
+
+export function GridViewIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <rect x="3" y="3" width="8" height="8" rx="1.2" />
+      <rect x="13" y="3" width="8" height="8" rx="1.2" />
+      <rect x="3" y="13" width="8" height="8" rx="1.2" />
+      <rect x="13" y="13" width="8" height="8" rx="1.2" />
+    </Icon>
+  );
+}
+
+export function ListViewIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M8 6h13M8 12h13M8 18h13" />
+      <path d="M3 6h.01M3 12h.01M3 18h.01" />
+    </Icon>
+  );
+}

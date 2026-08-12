@@ -110,7 +110,15 @@ async function getCourseById(req, res) {
     SELECT
       courses.*,
       categories.name AS category_name,
-      instructors.full_name AS instructor_name
+      instructors.full_name AS instructor_name,
+      instructors.expertise AS instructor_expertise,
+      instructors.biography AS instructor_biography,
+      (
+        SELECT COUNT(*)
+        FROM public.enrollments e
+        WHERE e.course_id = courses.id
+          AND e.status = 'enrolled'
+      ) AS enrolled_count
     FROM courses
     LEFT JOIN categories
       ON categories.id = courses.category_id
@@ -125,10 +133,15 @@ async function getCourseById(req, res) {
     throw new ApiError(404, "Course not found");
   }
 
+  const course = {
+    ...result.rows[0],
+    enrolled_count: Number(result.rows[0].enrolled_count),
+  };
+
   res.status(200).json({
     success: true,
     message: "Course retrieved successfully",
-    data: { course: result.rows[0] },
+    data: { course },
   });
 }
 
