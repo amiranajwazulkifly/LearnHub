@@ -1,0 +1,30 @@
+# Production overrides — layer on top of the base file:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Differences from the dev setup: backend/frontend run their built `prod`
+# stages (no nodemon, no bind-mounted source, no Vite dev server — frontend
+# is a static build served by nginx), and nothing here has a default secret
+# — POSTGRES_PASSWORD, JWT_SECRET, and the SUPABASE_* keys must be supplied
+# via a real .env or your platform's secret store. Studio/pg-meta stay
+# opt-in only (--profile tools) and are not meant to be exposed publicly.
+
+services:
+  backend:
+    build:
+      target: prod
+    image: learnhub-backend:prod
+    restart: always
+    environment:
+      NODE_ENV: production
+    volumes: !override []
+
+  frontend:
+    build:
+      target: prod
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:?set VITE_API_BASE_URL to your backend's public URL, e.g. https://api.example.com/api}
+    image: learnhub-frontend:prod
+    restart: always
+    environment: !override {}
+    volumes: !override []
+    ports: !override ["${FRONTEND_PORT:-8080}:80"]
