@@ -3,8 +3,13 @@ import { getSchedules } from "../../services/scheduleService";
 import type { Schedule } from "../../types/schedule";
 import CourseCard from "../../components/courses/CourseCard";
 import { getCourses } from "../../services/courseService";
+import { GridViewIcon, ListViewIcon } from "../../components/common/NavIcons";
 
 import type { Course } from "../../types/course";
+
+type ViewLayout = "grid" | "list";
+
+const VIEW_STORAGE_KEY = "learnhub-browse-courses-view";
 
 export default function BrowseCoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -15,6 +20,14 @@ export default function BrowseCoursesPage() {
   const [category, setCategory] = useState("");
   const [instructor, setInstructor] = useState("");
   const [status, setStatus] = useState("");
+  const [view, setView] = useState<ViewLayout>(
+    () => (localStorage.getItem(VIEW_STORAGE_KEY) as ViewLayout) || "grid",
+  );
+
+  function changeView(next: ViewLayout) {
+    setView(next);
+    localStorage.setItem(VIEW_STORAGE_KEY, next);
+  }
 
   useEffect(() => {
     async function loadCourses() {
@@ -144,9 +157,41 @@ export default function BrowseCoursesPage() {
         </select>
       </div>
 
-      <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
-        {filteredCourses.length} course(s) found
-      </p>
+      <div className="mb-4 flex items-center justify-between">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          {filteredCourses.length} course(s) found
+        </p>
+
+        <div className="flex items-center gap-1 rounded-lg border border-gray-200 p-1 dark:border-gray-800">
+          <button
+            type="button"
+            onClick={() => changeView("grid")}
+            aria-label="Grid view"
+            aria-pressed={view === "grid"}
+            className={`rounded-md p-1.5 transition ${
+              view === "grid"
+                ? "bg-brand-600 text-white"
+                : "text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+            }`}
+          >
+            <GridViewIcon className="h-4 w-4" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => changeView("list")}
+            aria-label="List view"
+            aria-pressed={view === "list"}
+            className={`rounded-md p-1.5 transition ${
+              view === "list"
+                ? "bg-brand-600 text-white"
+                : "text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+            }`}
+          >
+            <ListViewIcon className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
 
       {filteredCourses.length === 0 ? (
         <div className="rounded-lg border border-gray-200 bg-white p-8 text-center dark:border-gray-800 dark:bg-gray-900">
@@ -154,7 +199,7 @@ export default function BrowseCoursesPage() {
             No courses match your filters.
           </p>
         </div>
-      ) : (
+      ) : view === "grid" ? (
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {filteredCourses.map((course) => {
             const schedule = schedules.find(
@@ -163,6 +208,18 @@ export default function BrowseCoursesPage() {
 
             return (
               <CourseCard key={course.id} course={course} schedule={schedule} />
+            );
+          })}
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {filteredCourses.map((course) => {
+            const schedule = schedules.find(
+              (schedule) => schedule.course_id === course.id,
+            );
+
+            return (
+              <CourseCard key={course.id} course={course} schedule={schedule} layout="list" />
             );
           })}
         </div>
