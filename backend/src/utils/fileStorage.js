@@ -1,6 +1,7 @@
 const crypto = require("crypto");
 const supabase = require("../config/supabaseStorage");
 const ApiError = require("./apiError");
+const env = require("../config/env");
 
 const BUCKET = "assignment-files";
 const MAX_FILE_BYTES = 15 * 1024 * 1024; // 15MB
@@ -30,7 +31,7 @@ async function uploadAssignmentFile(file, folder) {
   const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
 
   return {
-    url: data.publicUrl,
+    url: data.publicUrl.replace(env.supabaseUrl, env.supabasePublicUrl),
     path,
     name: file.originalname,
   };
