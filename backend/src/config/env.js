@@ -29,6 +29,11 @@ const env = {
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || "1d",
   supabaseUrl: process.env.SUPABASE_URL,
+  // Only differs from supabaseUrl in Docker: the backend uploads via the
+  // internal container network (SUPABASE_URL, e.g. http://storage-gateway:8000),
+  // but public file URLs handed to the browser need the host-reachable
+  // address instead. Outside Docker these are the same value.
+  supabasePublicUrl: process.env.SUPABASE_PUBLIC_URL || process.env.SUPABASE_URL,
   supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
 };
 

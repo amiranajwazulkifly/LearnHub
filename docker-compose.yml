@@ -1,0 +1,219 @@
+name: learnhub
+
+# Local-dev-oriented stack. Trimmed from Supabase's full self-hosted stack
+# (~12 services: db, kong, auth/gotrue, rest/postgrest, realtime, storage,
+# imgproxy, pg-meta, studio, edge-runtime, analytics/logflare, vector) down
+# to the ~6 this app and team actually use: db + storage (the only Supabase
+# feature the backend calls — see backend/src/utils/fileStorage.js) + pg-meta
+# + studio (DB browsing/debugging, low-risk to keep) + our own backend +
+# frontend. Auth/Realtime/Analytics/Vector/Edge-Functions are dropped: this
+# app uses its own custom JWT auth, not Supabase Auth, and never touches the
+# others. No Kong either — backend talks to `storage` directly over the
+# Docker network, since it's a server-side client, not a browser (no CORS
+# gateway needed).
+#
+# For production, layer docker-compose.prod.yml on top:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+services:
+  db:
+    image: public.ecr.aws/supabase/postgres:17.6.1.156
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: supabase_admin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: postgres
+      JWT_SECRET: ${SUPABASE_JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
+      JWT_EXP: "3600"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT:-54322}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # One-shot: the postgres image's own bootstrap creates the Supabase
+  # service roles (supabase_storage_admin, etc.) with NO password set at
+  # all — real `supabase start` sets these itself as a step outside the
+  # image, which we replicate here. Must finish before `storage` starts,
+  # since storage authenticates as supabase_storage_admin over the network.
+  fix-roles:
+    image: public.ecr.aws/supabase/postgres:17.6.1.156
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    entrypoint: ["sh", "/docker-init/fix-roles.sh"]
+    volumes:
+      - ./backend/supabase/docker-init/fix-roles.sh:/docker-init/fix-roles.sh:ro
+
+  # Creates the `storage` schema/tables itself on first boot — `migrate`
+  # depends on this being healthy before it runs, because one app migration
+  # inserts a row into storage.buckets.
+  storage:
+    image: public.ecr.aws/supabase/storage-api:v1.67.20
+    restart: unless-stopped
+    depends_on:
+      fix-roles:
+        condition: service_completed_successfully
+    environment:
+      ANON_KEY: ${SUPABASE_ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0}
+      SERVICE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU}
+      AUTH_JWT_SECRET: ${SUPABASE_JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
+      DATABASE_URL: postgresql://supabase_storage_admin:${POSTGRES_PASSWORD:-postgres}@db:5432/postgres
+      FILE_SIZE_LIMIT: "52428800"
+      STORAGE_BACKEND: file
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      TENANT_ID: stub
+      REGION: local
+      GLOBAL_S3_BUCKET: stub
+      ENABLE_IMAGE_TRANSFORMATION: "false"
+    volumes:
+      - storage-data:/var/lib/storage
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:5000/status"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # The @supabase/supabase-js client always calls {SUPABASE_URL}/storage/v1/...
+  # — normally Kong's job to route to storage-api, which itself serves no
+  # such prefix. Rather than run all of Kong for this one rule, a tiny nginx
+  # does just that rewrite. See docker/storage-gateway/nginx.conf.
+  storage-gateway:
+    image: nginx:alpine
+    restart: unless-stopped
+    depends_on:
+      storage:
+        condition: service_healthy
+    volumes:
+      - ./docker/storage-gateway/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      # Host-reachable address for public file URLs (browser downloads) —
+      # the backend uses the internal container address (below) for
+      # uploads, but rewrites public URLs to this one. See fileStorage.js.
+      - "${SUPABASE_PUBLIC_PORT:-54321}:8000"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:8000/status"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # One-shot: applies backend/supabase/migrations/*.sql then seed.sql, then
+  # exits. `backend` waits for this to complete successfully before starting.
+  migrate:
+    image: public.ecr.aws/supabase/postgres:17.6.1.156
+    depends_on:
+      storage:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    entrypoint: ["sh", "/docker-init/migrate.sh"]
+    volumes:
+      - ./backend/supabase/docker-init/migrate.sh:/docker-init/migrate.sh:ro
+      - ./backend/supabase/migrations:/migrations:ro
+      - ./backend/supabase/seed.sql:/seed.sql:ro
+
+  # Both Studio and pg-meta are opt-in (`--profile tools`, see DOCKER.md) —
+  # pure dev tooling with no functional role in the app, so they're skipped
+  # by a plain `docker compose up` and never included in production.
+  pg-meta:
+    image: public.ecr.aws/supabase/postgres-meta:v0.96.6
+    restart: unless-stopped
+    profiles: ["tools"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PG_META_PORT: "8080"
+      PG_META_DB_HOST: db
+      PG_META_DB_NAME: postgres
+      PG_META_DB_USER: postgres
+      PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      PG_META_DB_PORT: "5432"
+
+  # Optional DB browser UI — not used by the app itself, just handy for
+  # development. Table editor works without Kong; the Storage-browsing tab
+  # in Studio won't (that needs the full gateway), which is an accepted gap.
+  studio:
+    image: public.ecr.aws/supabase/studio:2026.07.27-sha-cbb076d
+    restart: unless-stopped
+    profiles: ["tools"]
+    depends_on:
+      - pg-meta
+    environment:
+      STUDIO_PG_META_URL: http://pg-meta:8080
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      DEFAULT_ORGANIZATION_NAME: LearnHub
+      DEFAULT_PROJECT_NAME: LearnHub
+    ports:
+      - "${STUDIO_PORT:-54323}:3000"
+
+  backend:
+    build:
+      context: ./backend
+      target: dev
+    # Distinct tags for the dev vs. prod targets (see docker-compose.prod.yml)
+    # — otherwise both build to the same `learnhub-backend:latest` name and
+    # `docker compose up` (no --build) can silently reuse whichever target
+    # was built most recently, dev or prod, regardless of which one you meant.
+    image: learnhub-backend:dev
+    restart: unless-stopped
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      storage-gateway:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: "5001"
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@db:5432/postgres
+      JWT_SECRET: ${JWT_SECRET:-replace_with_a_long_random_secret}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-30d}
+      FRONTEND_URL: http://localhost:${FRONTEND_PORT:-5175}
+      # Internal container-to-container address, routed through the tiny
+      # storage-gateway nginx (see above) so the supabase-js client's
+      # hardcoded /storage/v1 prefix resolves correctly.
+      SUPABASE_URL: http://storage-gateway:8000
+      SUPABASE_PUBLIC_URL: http://localhost:${SUPABASE_PUBLIC_PORT:-54321}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU}
+    volumes:
+      - ./backend:/app
+      - backend-node-modules:/app/node_modules
+    ports:
+      - "${BACKEND_PORT:-5001}:5001"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:5001/api/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    image: learnhub-frontend:dev
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      VITE_API_BASE_URL: http://localhost:${BACKEND_PORT:-5001}/api
+    volumes:
+      - ./frontend:/app
+      - frontend-node-modules:/app/node_modules
+    ports:
+      - "${FRONTEND_PORT:-5175}:5175"
+
+volumes:
+  db-data:
+  storage-data:
+  backend-node-modules:
+  frontend-node-modules:
