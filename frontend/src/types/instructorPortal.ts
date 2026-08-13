@@ -1,6 +1,8 @@
 export interface InstructorStats {
   courseCount: number;
   studentCount: number;
+  activeAssignmentCount: number;
+  pendingSubmissionCount: number;
 }
 
 export interface InstructorCourse {
@@ -12,6 +14,11 @@ export interface InstructorCourse {
   status: string;
   categoryName: string | null;
   enrolledCount: number;
+  assignmentCount: number;
+  dayOfWeek: number | null;
+  startTime: string | null;
+  endTime: string | null;
+  location: string | null;
 }
 
 export interface CourseRosterStudent {
@@ -27,4 +34,22 @@ export interface CourseRosterStudent {
 export interface CourseRoster {
   course: { id: string; code: string; title: string };
   students: CourseRosterStudent[];
+}
+
+export interface RecentSubmission {
+  id: string;
+  submittedAt: string;
+  grade: number | null;
+  gradedAt: string | null;
+
+  studentId: string;
+  studentName: string;
+  studentEmail: string;
+
+  assignmentId: string;
+  assignmentTitle: string;
+
+  courseId: string;
+  courseCode: string;
+  courseTitle: string;
 }
