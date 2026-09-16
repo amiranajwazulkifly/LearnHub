@@ -25,7 +25,7 @@ import { formatDateTime } from "../../utils/formatters";
 
 // A dot per activity kind, so the feed is scannable without reading every line.
 const KIND_DOTS: Record<ActivityKind, string> = {
-  enrollment: "bg-brand-500",
+  enrollment: "bg-brand",
   assignment: "bg-amber-500",
   announcement: "bg-emerald-500",
 };
@@ -49,13 +49,13 @@ function describeActivity(item: RecentActivityItem): string {
 function CapacityBar({ course }: { course: CourseCapacityItem }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="w-16 shrink-0 font-mono text-xs font-semibold text-brand-600 dark:text-brand-400">
+      <span className="w-16 shrink-0 font-mono text-xs font-semibold text-brand-ink">
         {course.code}
       </span>
 
       <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
         <div
-          className={`h-full ${course.isFull ? "bg-red-500" : "bg-brand-600"}`}
+          className={`h-full ${course.isFull ? "bg-red-500" : "bg-brand"}`}
           style={{ width: `${Math.min(course.percentFull, 100)}%` }}
         />
       </div>
@@ -123,10 +123,10 @@ export default function AdminDashboardPage() {
 
   return (
     <div>
-      <p className="mb-1 font-mono text-xs uppercase tracking-wide text-brand-600 dark:text-brand-400">
+      <p className="mb-1 font-mono text-xs uppercase tracking-wide text-brand-ink">
         admin / dashboard
       </p>
-      <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-gray-50">
+      <h1 className="mb-6 text-2xl font-semibold text-gray-900 dark:text-gray-50">
         Dashboard
       </h1>
       <p className="-mt-3 mb-7 text-gray-500 dark:text-gray-400">

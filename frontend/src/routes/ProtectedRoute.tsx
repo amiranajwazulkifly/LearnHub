@@ -11,7 +11,7 @@ import { useAuthStore } from '../store/useAuthStore';
 // Shown for the moment it takes to confirm a stored token with the API.
 export function SessionCheck() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-100 text-brand-600 dark:bg-gray-950 dark:text-brand-400">
+    <main className="flex min-h-screen items-center justify-center bg-gray-100 text-brand-ink dark:bg-gray-950">
       <LoadingSpinner className="h-6 w-6" label="Checking your session" />
     </main>
   );

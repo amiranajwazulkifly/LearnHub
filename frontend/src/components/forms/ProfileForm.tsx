@@ -133,7 +133,7 @@ function ProfileForm() {
         <div className="border-b border-gray-100 p-6 dark:border-gray-800">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
             {/* Avatar */}
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xl font-semibold text-brand-700 dark:bg-brand-950 dark:text-brand-300">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-brand-soft text-xl font-semibold text-brand-ink">
               {initials}
             </div>
 
@@ -147,7 +147,7 @@ function ProfileForm() {
               </p>
 
               <div className="mt-3 flex flex-wrap gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-100 px-3 py-1 text-xs font-medium capitalize text-brand-700 dark:bg-brand-950/50 dark:text-brand-400">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-soft px-3 py-1 text-xs font-medium capitalize text-brand-ink">
                   {user.role}
                 </span>
 
@@ -226,7 +226,7 @@ function ProfileForm() {
               <p className="flex items-center gap-1.5 font-mono text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
                 Courses
               </p>
-              <p className="mt-1 text-xl font-bold text-gray-900 dark:text-gray-100">
+              <p className="mt-1 text-xl font-semibold text-gray-900 dark:text-gray-100">
                 {user.courseCount ?? 0}
               </p>
             </div>
@@ -235,7 +235,7 @@ function ProfileForm() {
               <p className="flex items-center gap-1.5 font-mono text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
                 Current Students
               </p>
-              <p className="mt-1 text-xl font-bold text-gray-900 dark:text-gray-100">
+              <p className="mt-1 text-xl font-semibold text-gray-900 dark:text-gray-100">
                 {user.studentCount ?? 0}
               </p>
             </div>
@@ -367,7 +367,7 @@ function ProfileForm() {
             <button
               type="submit"
               disabled={isLoading}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-medium text-brand-fg transition hover:bg-brand-hover active:bg-brand-active disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isLoading ? "Saving..." : "Save Profile"}
             </button>
@@ -486,7 +486,7 @@ function ProfileForm() {
             <button
               type="submit"
               disabled={isLoading}
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:border-brand-400 hover:bg-brand-50 hover:text-brand-700 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:text-gray-300 dark:hover:border-brand-600 dark:hover:bg-brand-950/30 dark:hover:text-brand-400"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:border-brand-line hover:bg-brand-soft hover:text-brand-ink-hover disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:text-gray-300"
             >
               {isLoading ? "Changing password..." : "Change Password"}
             </button>

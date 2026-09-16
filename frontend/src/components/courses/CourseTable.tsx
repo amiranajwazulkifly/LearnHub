@@ -19,7 +19,7 @@ export default function CourseTable({ courses, onEdit, onDelete }: Props) {
   return (
     <div className="table-scroll overflow-x-auto rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
       <table className="w-full text-left">
-        <thead className="border-b border-gray-200 bg-gray-50 font-mono text-xs uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:bg-gray-800 dark:text-gray-400">
+        <thead className="border-b border-gray-200 font-mono text-xs uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:text-gray-400">
           <tr>
             <th className="px-6 py-4">Code</th>
             <th className="px-6 py-4">Title</th>
@@ -37,7 +37,7 @@ export default function CourseTable({ courses, onEdit, onDelete }: Props) {
               key={course.id}
               className="border-b border-gray-200 dark:border-gray-800"
             >
-              <td className="px-6 py-4 font-mono text-sm text-brand-600 dark:text-brand-400">
+              <td className="px-6 py-4 font-mono text-sm text-brand-ink">
                 {course.code}
               </td>
               <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-50">

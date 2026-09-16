@@ -123,7 +123,7 @@ export default function NotificationBell() {
         <Bell size={18} />
 
         {unreadCount > 0 && (
-          <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-600 px-1 font-mono text-[10px] font-semibold text-white ring-2 ring-white dark:ring-gray-900">
+          <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1 font-mono text-[10px] font-semibold text-brand-fg ring-2 ring-white dark:ring-gray-900">
             {badge}
           </span>
         )}
@@ -138,7 +138,7 @@ export default function NotificationBell() {
               <button
                 type="button"
                 onClick={() => void handleMarkAll()}
-                className="text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
+                className="text-xs font-medium text-brand-ink hover:underline"
               >
                 Mark all as read
               </button>
@@ -166,12 +166,12 @@ export default function NotificationBell() {
                     type="button"
                     onClick={() => void handleSelect(item)}
                     className={`flex w-full gap-3 px-4 py-3 text-left transition hover:bg-gray-50 dark:hover:bg-gray-800/60 ${
-                      item.readAt ? "" : "bg-brand-50/60 dark:bg-brand-950/20"
+                      item.readAt ? "" : "bg-brand-soft"
                     }`}
                   >
                     <span
                       className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
-                        item.readAt ? "bg-transparent" : "bg-brand-600"
+                        item.readAt ? "bg-transparent" : "bg-brand-ink"
                       }`}
                       aria-hidden="true"
                     />

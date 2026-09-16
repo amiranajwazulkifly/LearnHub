@@ -45,7 +45,7 @@ function ForgotPasswordPage() {
         </p>
         <Link
           to={ROUTES.LOGIN}
-          className="mt-6 inline-block text-sm font-medium text-brand-600 underline dark:text-brand-400"
+          className="mt-6 inline-block text-sm font-medium text-brand-ink underline"
         >
           Back to sign in
         </Link>
@@ -92,7 +92,7 @@ function ForgotPasswordPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="btn-sheen w-full rounded-lg bg-brand-600 px-4 py-2 font-medium text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
+          className="btn-sheen w-full rounded-lg bg-brand px-4 py-2 font-medium text-brand-fg transition hover:bg-brand-hover active:bg-brand-active disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSubmitting ? "Sending..." : "Send reset link"}
         </button>
@@ -100,7 +100,7 @@ function ForgotPasswordPage() {
         <p className="text-center text-sm">
           <Link
             to={ROUTES.LOGIN}
-            className="font-medium text-brand-600 underline dark:text-brand-400"
+            className="font-medium text-brand-ink underline"
           >
             Back to sign in
           </Link>

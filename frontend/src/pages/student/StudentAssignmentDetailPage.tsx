@@ -139,15 +139,15 @@ export default function StudentAssignmentDetailPage() {
     <div className="mx-auto max-w-2xl">
       <Link
         to={ROUTES.STUDENT.TASKS}
-        className="font-mono text-sm text-brand-600 hover:underline dark:text-brand-400"
+        className="font-mono text-sm text-brand-ink hover:underline"
       >
         ← Back to Tasks
       </Link>
 
-      <p className="mt-2 font-mono text-xs font-semibold text-brand-600 dark:text-brand-400">
+      <p className="mt-2 font-mono text-xs font-semibold text-brand-ink">
         {assignment.courseCode} · {assignment.courseTitle}
       </p>
-      <h1 className="mb-2 text-2xl font-bold text-gray-900 dark:text-gray-50">
+      <h1 className="mb-2 text-2xl font-semibold text-gray-900 dark:text-gray-50">
         {assignment.title}
       </h1>
       <p className="mb-6 font-mono text-xs text-gray-500 dark:text-gray-400">
@@ -166,7 +166,7 @@ export default function StudentAssignmentDetailPage() {
       {assignment.hasAttachment && (
         <AttachmentLink
           getDownload={() => getAssignmentAttachmentUrl(assignment.id)}
-          className="mb-6 inline-block text-sm text-brand-600 hover:underline dark:text-brand-400"
+          className="mb-6 inline-block text-sm text-brand-ink hover:underline"
         >
           📎 {assignment.attachmentName}
         </AttachmentLink>
@@ -178,7 +178,7 @@ export default function StudentAssignmentDetailPage() {
             Grade
           </p>
 
-          <p className="mt-1 text-2xl font-bold text-green-800 dark:text-green-400">
+          <p className="mt-1 text-2xl font-semibold text-green-800 dark:text-green-400">
             {formatGrade(submission!.grade, assignment.points)}
           </p>
 
@@ -225,7 +225,7 @@ export default function StudentAssignmentDetailPage() {
                     submission.id,
                   )
                 }
-                className="text-sm font-medium text-brand-600 hover:underline dark:text-brand-400"
+                className="text-sm font-medium text-brand-ink hover:underline"
               >
                 {submission.attachmentName}
               </AttachmentLink>
@@ -293,7 +293,7 @@ export default function StudentAssignmentDetailPage() {
                     submission.id,
                   )
                 }
-                className="text-brand-600 hover:underline dark:text-brand-400"
+                className="text-brand-ink hover:underline"
               >
                 {submission.attachmentName}
               </AttachmentLink>
@@ -315,7 +315,7 @@ export default function StudentAssignmentDetailPage() {
         <button
           type="submit"
           disabled={submitting || !canSubmit}
-          className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50"
+          className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-brand-fg hover:bg-brand-hover active:bg-brand-active disabled:opacity-50"
         >
           {submitting
             ? "Submitting..."

@@ -83,10 +83,10 @@ function TaskCard({
   return (
     <Link
       to={`${ROUTES.STUDENT.TASKS}/${assignment.id}`}
-      className="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-5 transition hover:border-brand-300 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800 dark:bg-gray-900 dark:hover:border-brand-700"
+      className="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-5 transition hover:border-brand-line sm:flex-row sm:items-center sm:justify-between dark:border-gray-800 dark:bg-gray-900"
     >
       <div className="min-w-0">
-        <p className="font-mono text-xs font-semibold text-brand-600 dark:text-brand-400">
+        <p className="font-mono text-xs font-semibold text-brand-ink">
           {assignment.courseCode} · {assignment.courseTitle}
         </p>
 
@@ -172,10 +172,10 @@ export default function StudentTasksPage() {
 
   return (
     <div>
-      <p className="mb-1 font-mono text-xs uppercase tracking-wide text-brand-600 dark:text-brand-400">
+      <p className="mb-1 font-mono text-xs uppercase tracking-wide text-brand-ink">
         student / tasks
       </p>
-      <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-gray-50">
+      <h1 className="mb-6 text-2xl font-semibold text-gray-900 dark:text-gray-50">
         Tasks
       </h1>
 
@@ -196,7 +196,7 @@ export default function StudentTasksPage() {
           action={
             <Link
               to={ROUTES.STUDENT.MY_COURSES}
-              className="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-brand-700"
+              className="rounded-lg bg-brand px-3 py-1.5 text-sm font-medium text-brand-fg transition hover:bg-brand-hover active:bg-brand-active"
             >
               View My Courses
             </Link>

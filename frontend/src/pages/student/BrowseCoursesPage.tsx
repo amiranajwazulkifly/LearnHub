@@ -105,9 +105,9 @@ export default function BrowseCoursesPage() {
     <div className="catalog-page">
       <div className="dashboard-heading">
         <p className="eyebrow">Courses</p>
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-3xl font-semibold">
           Browse{" "}
-          <span className="text-brand-600 dark:text-brand-400">Courses</span>
+          <span className="text-brand-ink">Courses</span>
         </h1>
 
         <p className="mt-2 text-gray-500 dark:text-gray-400">
@@ -134,14 +134,14 @@ export default function BrowseCoursesPage() {
           placeholder="Search title, code, category..."
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
+          className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
         />
 
         <select
           aria-label="Category"
           value={category}
           onChange={(event) => setCategory(event.target.value)}
-          className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
+          className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
         >
           <option value="">All Categories</option>
 
@@ -156,7 +156,7 @@ export default function BrowseCoursesPage() {
           aria-label="Instructor"
           value={instructor}
           onChange={(event) => setInstructor(event.target.value)}
-          className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
+          className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
         >
           <option value="">All Instructors</option>
 
@@ -182,7 +182,7 @@ export default function BrowseCoursesPage() {
             ))}
           </select>
           <button
-            className="text-sm text-brand-600 dark:text-brand-400"
+            className="text-sm text-brand-ink"
             onClick={() => {
               setSearch("");
               setCategory("");
@@ -208,7 +208,7 @@ export default function BrowseCoursesPage() {
             aria-pressed={view === "grid"}
             className={`rounded-md p-1.5 transition ${
               view === "grid"
-                ? "bg-brand-600 text-white"
+                ? "bg-brand text-brand-fg"
                 : "text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
             }`}
           >
@@ -222,7 +222,7 @@ export default function BrowseCoursesPage() {
             aria-pressed={view === "list"}
             className={`rounded-md p-1.5 transition ${
               view === "list"
-                ? "bg-brand-600 text-white"
+                ? "bg-brand text-brand-fg"
                 : "text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
             }`}
           >

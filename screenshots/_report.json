@@ -4,7 +4,7 @@
     "requested": "/login",
     "landed": "/login",
     "redirected": false,
-    "chars": 281,
+    "chars": 266,
     "empty": false
   },
   {
@@ -12,7 +12,7 @@
     "requested": "/register",
     "landed": "/register",
     "redirected": false,
-    "chars": 299,
+    "chars": 284,
     "empty": false
   },
   {
@@ -20,7 +20,7 @@
     "requested": "/forgot-password",
     "landed": "/forgot-password",
     "redirected": false,
-    "chars": 292,
+    "chars": 277,
     "empty": false
   },
   {
@@ -28,7 +28,7 @@
     "requested": "/reset-password",
     "landed": "/reset-password",
     "redirected": false,
-    "chars": 273,
+    "chars": 258,
     "empty": false
   },
   {
@@ -36,7 +36,7 @@
     "requested": "/admin",
     "landed": "/admin",
     "redirected": false,
-    "chars": 1569,
+    "chars": 1662,
     "empty": false
   },
   {
@@ -44,7 +44,7 @@
     "requested": "/admin/courses",
     "landed": "/admin/courses",
     "redirected": false,
-    "chars": 1175,
+    "chars": 1358,
     "empty": false
   },
   {
@@ -52,7 +52,7 @@
     "requested": "/admin/courses/create",
     "landed": "/admin/courses/create",
     "redirected": false,
-    "chars": 523,
+    "chars": 603,
     "empty": false
   },
   {
@@ -60,7 +60,7 @@
     "requested": "/admin/courses/30000000-0000-0000-0000-000000000001/edit",
     "landed": "/admin/courses/30000000-0000-0000-0000-000000000001/edit",
     "redirected": false,
-    "chars": 519,
+    "chars": 599,
     "empty": false
   },
   {
@@ -68,7 +68,7 @@
     "requested": "/admin/categories",
     "landed": "/admin/categories",
     "redirected": false,
-    "chars": 809,
+    "chars": 889,
     "empty": false
   },
   {
@@ -76,7 +76,7 @@
     "requested": "/admin/instructors",
     "landed": "/admin/instructors",
     "redirected": false,
-    "chars": 1080,
+    "chars": 1160,
     "empty": false
   },
   {
@@ -84,7 +84,7 @@
     "requested": "/admin/schedules",
     "landed": "/admin/schedules",
     "redirected": false,
-    "chars": 1857,
+    "chars": 1937,
     "empty": false
   },
   {
@@ -92,7 +92,7 @@
     "requested": "/admin/students",
     "landed": "/admin/students",
     "redirected": false,
-    "chars": 1112,
+    "chars": 1192,
     "empty": false
   },
   {
@@ -100,7 +100,7 @@
     "requested": "/admin/students/00000000-0000-0000-0000-000000000002",
     "landed": "/admin/students/00000000-0000-0000-0000-000000000002",
     "redirected": false,
-    "chars": 690,
+    "chars": 770,
     "empty": false
   },
   {
@@ -108,7 +108,7 @@
     "requested": "/admin/enrollments",
     "landed": "/admin/enrollments",
     "redirected": false,
-    "chars": 1909,
+    "chars": 1989,
     "empty": false
   },
   {
@@ -116,7 +116,7 @@
     "requested": "/admin/reports",
     "landed": "/admin/reports",
     "redirected": false,
-    "chars": 1049,
+    "chars": 1129,
     "empty": false
   },
   {
@@ -124,7 +124,7 @@
     "requested": "/admin/announcements",
     "landed": "/admin/announcements",
     "redirected": false,
-    "chars": 1887,
+    "chars": 1967,
     "empty": false
   },
   {
@@ -132,7 +132,7 @@
     "requested": "/admin/announcements/new",
     "landed": "/admin/announcements/new",
     "redirected": false,
-    "chars": 252,
+    "chars": 332,
     "empty": false
   },
   {
@@ -140,7 +140,7 @@
     "requested": "/admin/announcements/50000000-0000-0000-0000-000000000001/edit",
     "landed": "/admin/announcements/50000000-0000-0000-0000-000000000001/edit",
     "redirected": false,
-    "chars": 253,
+    "chars": 333,
     "empty": false
   },
   {
@@ -148,7 +148,7 @@
     "requested": "/admin/profile",
     "landed": "/admin/profile",
     "redirected": false,
-    "chars": 556,
+    "chars": 611,
     "empty": false
   },
   {
@@ -156,7 +156,7 @@
     "requested": "/student",
     "landed": "/student",
     "redirected": false,
-    "chars": 1318,
+    "chars": 1605,
     "empty": false
   },
   {
@@ -164,7 +164,7 @@
     "requested": "/student/courses",
     "landed": "/student/courses",
     "redirected": false,
-    "chars": 2472,
+    "chars": 2280,
     "empty": false
   },
   {
@@ -172,7 +172,7 @@
     "requested": "/student/courses/30000000-0000-0000-0000-000000000001",
     "landed": "/student/courses/30000000-0000-0000-0000-000000000001",
     "redirected": false,
-    "chars": 1046,
+    "chars": 1152,
     "empty": false
   },
   {
@@ -180,7 +180,7 @@
     "requested": "/student/my-courses",
     "landed": "/student/my-courses",
     "redirected": false,
-    "chars": 1354,
+    "chars": 1445,
     "empty": false
   },
   {
@@ -188,7 +188,7 @@
     "requested": "/student/timetable",
     "landed": "/student/timetable",
     "redirected": false,
-    "chars": 814,
+    "chars": 925,
     "empty": false
   },
   {
@@ -196,7 +196,7 @@
     "requested": "/student/tasks",
     "landed": "/student/tasks",
     "redirected": false,
-    "chars": 786,
+    "chars": 905,
     "empty": false
   },
   {
@@ -204,7 +204,7 @@
     "requested": "/student/tasks/80000000-0000-0000-0000-000000000001",
     "landed": "/student/tasks/80000000-0000-0000-0000-000000000001",
     "redirected": false,
-    "chars": 786,
+    "chars": 866,
     "empty": false
   },
   {
@@ -212,7 +212,7 @@
     "requested": "/student/announcements",
     "landed": "/student/announcements",
     "redirected": false,
-    "chars": 1131,
+    "chars": 1211,
     "empty": false
   },
   {
@@ -220,7 +220,7 @@
     "requested": "/student/profile",
     "landed": "/student/profile",
     "redirected": false,
-    "chars": 702,
+    "chars": 755,
     "empty": false
   },
   {
@@ -228,7 +228,7 @@
     "requested": "/instructor",
     "landed": "/instructor",
     "redirected": false,
-    "chars": 1038,
+    "chars": 1171,
     "empty": false
   },
   {
@@ -236,7 +236,7 @@
     "requested": "/instructor/courses",
     "landed": "/instructor/courses",
     "redirected": false,
-    "chars": 1160,
+    "chars": 1240,
     "empty": false
   },
   {
@@ -244,7 +244,7 @@
     "requested": "/instructor/courses/30000000-0000-0000-0000-000000000001/students",
     "landed": "/instructor/courses/30000000-0000-0000-0000-000000000001/students",
     "redirected": false,
-    "chars": 780,
+    "chars": 860,
     "empty": false
   },
   {
@@ -252,7 +252,7 @@
     "requested": "/instructor/courses/30000000-0000-0000-0000-000000000001/assignments",
     "landed": "/instructor/courses/30000000-0000-0000-0000-000000000001/assignments",
     "redirected": false,
-    "chars": 1121,
+    "chars": 1201,
     "empty": true
   },
   {
@@ -260,7 +260,7 @@
     "requested": "/instructor/assignments/80000000-0000-0000-0000-000000000002/submissions",
     "landed": "/instructor/assignments/80000000-0000-0000-0000-000000000002/submissions",
     "redirected": false,
-    "chars": 1175,
+    "chars": 1255,
     "empty": false
   },
   {
@@ -268,7 +268,7 @@
     "requested": "/instructor/profile",
     "landed": "/instructor/profile",
     "redirected": false,
-    "chars": 895,
+    "chars": 945,
     "empty": false
   }
 ]

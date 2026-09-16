@@ -69,7 +69,7 @@ export default function SeatsIndicator({
         aria-label="Seats taken"
       >
         <div
-          className={`h-full ${isFull ? "bg-red-500" : "bg-brand-600"}`}
+          className={`h-full ${isFull ? "bg-red-500" : "bg-brand"}`}
           style={{ width: `${percent}%` }}
         />
       </div>

@@ -176,7 +176,7 @@ function RegisterForm() {
       <button
         type="submit"
         disabled={isLoading}
-        className="btn-sheen w-full rounded-lg bg-brand-600 px-4 py-2 font-medium text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
+        className="btn-sheen w-full rounded-lg bg-brand px-4 py-2 font-medium text-brand-fg transition hover:bg-brand-hover active:bg-brand-active disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isLoading ? "Creating account..." : "Create student account"}
       </button>
@@ -185,7 +185,7 @@ function RegisterForm() {
         Already have an account?{" "}
         <Link
           to={ROUTES.LOGIN}
-          className="font-medium text-brand-600 underline dark:text-brand-400"
+          className="font-medium text-brand-ink underline"
         >
           Sign in
         </Link>

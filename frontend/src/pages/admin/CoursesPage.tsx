@@ -102,7 +102,7 @@ function CoursesPage() {
     <div>
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Course Management</h1>
+          <h1 className="text-3xl font-semibold">Course Management</h1>
 
           <p className="mt-2 text-gray-500 dark:text-gray-400">
             Manage, search and filter LearnHub courses.
@@ -112,7 +112,7 @@ function CoursesPage() {
         <button
           type="button"
           onClick={() => navigate("/admin/courses/create")}
-          className="rounded bg-brand-600 px-5 py-2 text-white hover:bg-brand-700"
+          className="rounded bg-brand px-5 py-2 text-brand-fg hover:bg-brand-hover active:bg-brand-active"
         >
           + Add Course
         </button>
@@ -162,7 +162,7 @@ function CoursesPage() {
           onChange={(event) => setSearch(event.target.value)}
           aria-label="Search courses"
           placeholder="Search title or code"
-          className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
+          className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
         />
 
         <input
@@ -171,7 +171,7 @@ function CoursesPage() {
           onChange={(event) => setCategory(event.target.value)}
           aria-label="Category"
           placeholder="Category"
-          className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
+          className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
         />
 
         <input
@@ -180,14 +180,14 @@ function CoursesPage() {
           onChange={(event) => setInstructor(event.target.value)}
           aria-label="Instructor"
           placeholder="Instructor"
-          className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
+          className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
         />
 
         <select
           aria-label="Status"
           value={status}
           onChange={(event) => setStatus(event.target.value)}
-          className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
+          className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
         >
           <option value="">All status</option>
           <option value="draft">Draft</option>
@@ -198,7 +198,7 @@ function CoursesPage() {
         <div className="flex gap-2">
           <button
             type="submit"
-            className="rounded bg-brand-600 px-4 py-2 text-white"
+            className="rounded bg-brand px-4 py-2 text-brand-fg"
           >
             Search
           </button>

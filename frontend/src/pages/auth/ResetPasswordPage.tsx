@@ -55,7 +55,7 @@ function ResetPasswordPage() {
         </p>
         <Link
           to={ROUTES.FORGOT_PASSWORD}
-          className="mt-6 inline-block text-sm font-medium text-brand-600 underline dark:text-brand-400"
+          className="mt-6 inline-block text-sm font-medium text-brand-ink underline"
         >
           Request a new link
         </Link>
@@ -136,7 +136,7 @@ function ResetPasswordPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="btn-sheen w-full rounded-lg bg-brand-600 px-4 py-2 font-medium text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
+          className="btn-sheen w-full rounded-lg bg-brand px-4 py-2 font-medium text-brand-fg transition hover:bg-brand-hover active:bg-brand-active disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSubmitting ? "Resetting..." : "Reset password"}
         </button>

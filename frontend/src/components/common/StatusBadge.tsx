@@ -5,21 +5,22 @@ interface StatusBadgeProps {
   tone: StatusTone;
 }
 
+// Each tone is a soft tint with a darker ink from the same hue. The tokens
+// switch between light and dark values on their own, so no dark: variants
+// are needed. Lime ("brand") is reserved for brand states such as upcoming
+// work, and never stands in for success.
 const TONE_STYLES: Record<StatusTone, string> = {
-  green:
-    "border-green-200 text-green-700 dark:border-green-900 dark:text-green-400 [&>span]:bg-green-500",
-  amber:
-    "border-amber-200 text-amber-700 dark:border-amber-900 dark:text-amber-400 [&>span]:bg-amber-500",
-  red: "border-red-200 text-red-700 dark:border-red-900 dark:text-red-400 [&>span]:bg-red-500",
-  gray: "border-gray-200 text-gray-600 dark:border-gray-800 dark:text-gray-400 [&>span]:bg-gray-400",
-  brand:
-    "border-brand-200 text-brand-700 dark:border-brand-900 dark:text-brand-400 [&>span]:bg-brand-500",
+  green: "bg-success-soft text-success-ink [&>span]:bg-success",
+  amber: "bg-warning-soft text-warning-ink [&>span]:bg-warning",
+  red: "bg-danger-soft text-danger-ink [&>span]:bg-danger",
+  gray: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 [&>span]:bg-gray-400",
+  brand: "bg-brand-soft text-brand-ink [&>span]:bg-brand-ink",
 };
 
 function StatusBadge({ label, tone }: StatusBadgeProps) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-medium capitalize whitespace-nowrap ${TONE_STYLES[tone]}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium capitalize whitespace-nowrap ${TONE_STYLES[tone]}`}
     >
       <span className="h-1.5 w-1.5 rounded-full" />
       {label}

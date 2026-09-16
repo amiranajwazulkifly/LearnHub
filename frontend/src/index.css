@@ -1,69 +1,218 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
+
+/* ==========================================================================
+   LearnHub design tokens: Deep Navy + Acid Lime + Geist
+
+   Two layers:
+   1. @theme holds static palettes (brand, gray) and type/shadow tokens that
+      Tailwind turns into utilities.
+   2. :root and .dark hold the semantic, theme-aware values. @theme inline
+      exposes them as utilities (bg-brand, text-brand-ink, border-brand-line,
+      ring-focus...) that switch automatically, so components need no dark:
+      variant for brand colour.
+
+   Lime is a fill colour. It is never used for small text on a light surface:
+   text-brand-ink is a darker lime (#657A22) there and a lighter one in dark
+   mode. Text on a lime fill is always deep navy (text-brand-fg), never white.
+   ========================================================================== */
+
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
-  --color-brand-50: #f6f2ff;
-  --color-brand-100: #f1ecff;
-  --color-brand-200: #dfd2ff;
-  --color-brand-300: #c4aaff;
-  --color-brand-400: #ad88ff;
-  --color-brand-500: #8850fa;
-  --color-brand-600: #6c24f5;
-  --color-brand-700: #591bd2;
-  --color-brand-800: #4819a8;
-  --color-brand-900: #341672;
-  --color-brand-950: #23163c;
-  --color-blue-50: var(--color-brand-50);
-  --color-blue-100: var(--color-brand-100);
-  --color-blue-200: var(--color-brand-200);
-  --color-blue-300: var(--color-brand-300);
-  --color-blue-400: var(--color-brand-400);
-  --color-blue-500: var(--color-brand-500);
-  --color-blue-600: var(--color-brand-600);
-  --color-blue-700: var(--color-brand-700);
-  --color-blue-800: var(--color-brand-800);
-  --color-blue-900: var(--color-brand-900);
-  --color-blue-950: var(--color-brand-950);
-  --color-gray-50: #f8f9fb;
-  --color-gray-100: #f3f4f7;
-  --color-gray-200: #e4e6ee;
-  --color-gray-300: #cbd0de;
-  --color-gray-400: #7c86a1;
-  --color-gray-500: #69738e;
-  --color-gray-600: #525e78;
-  --color-gray-700: #35405b;
-  --color-gray-800: #282e40;
-  --color-gray-900: #171c2b;
-  --color-gray-950: #101322;
+  --font-sans: "Geist", "Geist Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Acid Lime. 400–600 are the spec's fills; 700–950 are for text and deep
+     tints. Components should prefer the semantic tokens below. */
+  --color-brand-50: #f7fbea;
+  --color-brand-100: #eef7d2;
+  --color-brand-200: #ddeea6;
+  --color-brand-300: #cde67f;
+  --color-brand-400: #c6f06a;
+  --color-brand-500: #b5d94c;
+  --color-brand-600: #a3c742;
+  --color-brand-700: #8eae36;
+  --color-brand-800: #657a22;
+  --color-brand-900: #4a5a19;
+  --color-brand-950: #2a3310;
+
+  /* Navy-tuned neutrals. One static scale serves both themes. Light mode
+     uses the low steps for surfaces and borders and the high steps for text;
+     dark mode is the reverse. 900/950 are the spec's navy surface and
+     background, and 800 is the dark border. */
+  --color-gray-50: #f4f6f8;
+  --color-gray-100: #eef1f4;
+  --color-gray-200: #e5e8eb;
+  --color-gray-300: #dde2e7;
+  --color-gray-400: #8a94a1;
+  --color-gray-500: #6b7480;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #33445a;
+  --color-gray-800: #263547;
+  --color-gray-900: #152235;
+  --color-gray-950: #0c1624;
+
+  /* Soft, navy-based elevation. No coloured or oversized shadows. */
+  --shadow-sm: 0 1px 2px rgb(12 22 36 / 0.05);
+  --shadow-md: 0 1px 2px rgb(12 22 36 / 0.04), 0 6px 18px rgb(12 22 36 / 0.05);
+  --shadow-lg: 0 1px 2px rgb(12 22 36 / 0.06), 0 10px 24px rgb(12 22 36 / 0.08);
+  --shadow-xl: 0 2px 4px rgb(12 22 36 / 0.06), 0 16px 32px rgb(12 22 36 / 0.1);
+  --shadow-2xl: 0 2px 4px rgb(12 22 36 / 0.08), 0 20px 40px rgb(12 22 36 / 0.14);
+
+  --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
+
+@theme inline {
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-active: var(--brand-active);
+  --color-brand-fg: var(--brand-fg);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-ink-hover: var(--brand-ink-hover);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-line: var(--brand-line);
+  --color-focus: var(--focus-ring);
+
+  --color-success: var(--success);
+  --color-success-ink: var(--success-ink);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-ink: var(--warning-ink);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-ink: var(--danger-ink);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-ink: var(--info-ink);
+  --color-info-soft: var(--info-soft);
+}
+
 :root {
-  --canvas: #f8f9fb;
-  --surface: #fff;
-  --ink: #101322;
-  --muted: #69738e;
-  --line: #e4e6ee;
-  --soft: #f1ecff;
-  --accent: #6c24f5;
+  /* Surfaces */
+  --canvas: #f4f6f8;
+  --surface: #ffffff;
+  --surface-2: #eef1f4;
+  --nav-bg: rgb(255 255 255 / 0.92);
+  --field: #ffffff;
+
+  /* Text */
+  --ink: #0c1624;
+  --muted: #4b5563;
+  --subtle: #7b8490;
+
+  /* Borders */
+  --line: #e5e8eb;
+  --line-strong: #dde2e7;
+
+  /* Neutral tint for hovers and secondary fills. Not brand-coloured. */
+  --soft: #eef1f4;
+
+  /* Brand */
+  --brand: #b5d94c;
+  --brand-hover: #a3c742;
+  --brand-active: #8eae36;
+  --brand-fg: #0c1624;
+  /* The spec's #657A22, darkened 1.4% so small text clears WCAG AA on every
+     light surface it sits on, including the lime tint (4.5:1 minimum). */
+  --brand-ink: #607420;
+  --brand-ink-hover: #4b5b18;
+  --brand-soft: rgb(181 217 76 / 0.16);
+  --brand-line: rgb(142 174 54 / 0.45);
+  --focus-ring: rgb(181 217 76 / 0.38);
+  /* A 2px focus outline needs 3:1 against the page, which pure lime on white
+     doesn't reach. */
+  --focus-outline: #7fa02f;
+
+  /* Semantic status */
+  --success: #22c55e;
+  --success-ink: #15803d;
+  --success-soft: rgb(34 197 94 / 0.12);
+  --warning: #f59e0b;
+  --warning-ink: #b45309;
+  --warning-soft: rgb(245 158 11 / 0.12);
+  --danger: #ef4444;
+  --danger-ink: #b91c1c;
+  --danger-soft: rgb(239 68 68 / 0.12);
+  --info: #3b82f6;
+  --info-ink: #1d4ed8;
+  --info-soft: rgb(59 130 246 / 0.12);
+
+  /* Charts. The first series is a deeper lime in light mode so a 2px line
+     stays visible on white. */
+  --chart-1: #7fa02f;
+  --chart-2: #0ea5e9;
+  --chart-3: #14b8a6;
+  --chart-4: #6366f1;
+  --chart-5: #f59e0b;
+  --chart-6: #f43f5e;
+  --chart-7: #64748b;
+  --chart-grid: #e5e8eb;
+  --chart-axis: #7b8490;
+
+  --shadow-card: 0 1px 2px rgb(12 22 36 / 0.04), 0 6px 18px rgb(12 22 36 / 0.05);
+  --shadow-pop: 0 1px 2px rgb(12 22 36 / 0.06), 0 12px 28px rgb(12 22 36 / 0.1);
+
+  /* Kept for any older reference; resolves to legible brand text. */
+  --accent: var(--brand-ink);
+
   color-scheme: light;
 }
+
 .dark {
-  --canvas: #101322;
-  --surface: #171c2b;
-  --ink: #f4f5fa;
-  --muted: #a1abc2;
-  --line: #2c3346;
-  --soft: #2b2045;
-  --accent: #b18aff;
+  --canvas: #0c1624;
+  --surface: #152235;
+  --surface-2: #1b2a3f;
+  --nav-bg: rgb(12 22 36 / 0.92);
+  --field: #101b2a;
+
+  --ink: #f4f6f8;
+  --muted: #a9b2bd;
+  --subtle: #778292;
+
+  --line: #263547;
+  --line-strong: #2f4057;
+
+  --soft: #1b2a3f;
+
+  --brand: #b5d94c;
+  --brand-hover: #c6f06a;
+  --brand-active: #a3c742;
+  --brand-fg: #0c1624;
+  --brand-ink: #c6f06a;
+  --brand-ink-hover: #d6f590;
+  --brand-soft: rgb(181 217 76 / 0.12);
+  --brand-line: rgb(181 217 76 / 0.35);
+  --focus-ring: rgb(181 217 76 / 0.45);
+  --focus-outline: #b5d94c;
+
+  --success-ink: #4ade80;
+  --success-soft: rgb(34 197 94 / 0.14);
+  --warning-ink: #fbbf24;
+  --warning-soft: rgb(245 158 11 / 0.14);
+  --danger-ink: #f87171;
+  --danger-soft: rgb(239 68 68 / 0.14);
+  --info-ink: #60a5fa;
+  --info-soft: rgb(59 130 246 / 0.14);
+
+  --chart-1: #b5d94c;
+  --chart-2: #38bdf8;
+  --chart-grid: #263547;
+  --chart-axis: #778292;
+
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.25);
+  --shadow-pop: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 28px rgb(0 0 0 / 0.35);
+
   color-scheme: dark;
 }
+
 @layer base {
   body {
     margin: 0;
     background: var(--canvas);
     color: var(--ink);
     font-family: var(--font-sans);
+    letter-spacing: -0.005em;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   button,
   a,
@@ -78,13 +227,14 @@
   button,
   a {
     transition:
-      background-color 0.15s,
-      color 0.15s,
-      border-color 0.15s;
+      background-color 160ms var(--ease-standard),
+      color 160ms var(--ease-standard),
+      border-color 160ms var(--ease-standard),
+      box-shadow 160ms var(--ease-standard);
   }
   :focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 4px;
+    outline: 2px solid var(--focus-outline);
+    outline-offset: 3px;
   }
   input:not([type="checkbox"]):not([type="radio"]),
   select,
@@ -92,10 +242,26 @@
     border-radius: 8px;
     min-height: 42px;
   }
-  h1,
-  h2,
-  h3 {
+  input[type="checkbox"],
+  input[type="radio"] {
+    accent-color: var(--brand);
+  }
+  ::placeholder {
+    color: var(--subtle);
+    opacity: 1;
+  }
+  ::selection {
+    background: rgb(181 217 76 / 0.35);
+    color: var(--ink);
+  }
+  h1 {
     letter-spacing: -0.035em;
+  }
+  h2 {
+    letter-spacing: -0.025em;
+  }
+  h3 {
+    letter-spacing: -0.015em;
   }
   table {
     font-size: 14px;
@@ -107,20 +273,34 @@
   td {
     line-height: 1.6;
   }
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: var(--font-mono);
+  }
 }
+
+/* Dark-mode form fields sit slightly below the surface they're on, as in the
+   spec, rather than a lighter box on top of it. Unlayered, so it takes
+   precedence over the dark:bg-gray-800 utility these fields carry. */
+.dark :is(input, select, textarea)[class*="dark:bg-gray-800"] {
+  background-color: var(--field);
+}
+
 .eyebrow {
   font-size: 11px;
   line-height: 1.65;
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.17em;
-  color: var(--muted);
+  letter-spacing: 0.12em;
+  color: var(--subtle);
 }
 .accent-rule {
   display: block;
   width: 28px;
   height: 2px;
-  background: var(--accent);
+  background: var(--brand);
   margin: 20px 0;
 }
 .primary-button,
@@ -136,15 +316,25 @@
   white-space: nowrap;
 }
 .primary-button {
-  background: #6c24f5;
-  color: white;
-  border: 1px solid #6c24f5;
+  background: var(--brand);
+  color: var(--brand-fg);
+  border: 1px solid var(--brand);
 }
 .primary-button:hover {
-  background: #591bd2;
+  background: var(--brand-hover);
+  border-color: var(--brand-hover);
+}
+.primary-button:active {
+  background: var(--brand-active);
+  border-color: var(--brand-active);
+}
+.primary-button:disabled,
+.secondary-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 .secondary-button {
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-strong);
   background: var(--surface);
   color: var(--ink);
 }
@@ -158,7 +348,9 @@
 .topbar {
   height: 86px;
   display: flex;
-  background: var(--surface);
+  background: var(--nav-bg);
+  backdrop-filter: saturate(140%) blur(8px);
+  -webkit-backdrop-filter: saturate(140%) blur(8px);
   border-bottom: 1px solid var(--line);
   position: sticky;
   top: 0;
@@ -181,9 +373,9 @@
 }
 .shell-brand > span {
   font-size: 10px;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--subtle);
 }
 .topbar-workspace {
   flex: 1;
@@ -220,8 +412,10 @@
   gap: 16px;
   padding: 13px 20px;
   font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
   border-radius: 7px;
-  color: var(--ink);
+  color: var(--muted);
 }
 .sidebar-link svg {
   width: 19px;
@@ -230,14 +424,17 @@
   flex-shrink: 0;
 }
 .sidebar-link:hover {
-  background: var(--canvas);
-}
-.sidebar-link.active {
-  color: var(--accent);
   background: var(--soft);
+  color: var(--ink);
+}
+/* Active: a lime marker and icon on a faint tint, with the label in full
+   ink. The item is never filled with lime. */
+.sidebar-link.active {
+  color: var(--ink);
+  background: rgb(181 217 76 / 0.1);
 }
 .sidebar-link.active svg {
-  color: var(--accent);
+  color: var(--brand-ink);
 }
 .sidebar-link.active:before {
   content: "";
@@ -247,7 +444,7 @@
   bottom: 8px;
   width: 3px;
   border-radius: 2px;
-  background: var(--accent);
+  background: var(--brand);
 }
 .nav-account {
   margin-top: 22px;
@@ -257,8 +454,9 @@
 }
 .nav-badge {
   margin-left: auto;
+  font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--accent);
+  color: var(--brand-ink);
 }
 .sidebar-note {
   margin-top: auto;
@@ -288,13 +486,16 @@
 }
 .app-content h1 {
   font-size: 38px;
-  line-height: 1.16;
-  font-weight: 700;
+  line-height: 1.1;
+  font-weight: 620;
+  letter-spacing: -0.035em;
 }
 .student-shell .dashboard-heading h1,
 .instructor-shell .dashboard-heading h1 {
   font-size: clamp(34px, 3.8vw, 56px);
-  letter-spacing: -0.05em;
+  letter-spacing: -0.04em;
+  line-height: 1.04;
+  font-weight: 650;
 }
 .dashboard-heading {
   margin-bottom: 30px;
@@ -316,6 +517,8 @@
 .metric strong {
   display: block;
   font-size: 36px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
   letter-spacing: -0.04em;
   line-height: 1.4;
   margin-top: 5px;
@@ -343,7 +546,7 @@
   font-weight: 600;
 }
 .panel-heading > a {
-  color: var(--accent);
+  color: var(--brand-ink);
   font-size: 13px;
 }
 .account-menu {
@@ -362,8 +565,8 @@
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: var(--soft);
-  color: var(--accent);
+  background: var(--brand-soft);
+  color: var(--brand-ink);
   font-size: 14px;
   font-weight: 600;
 }
@@ -392,7 +595,7 @@
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
-  box-shadow: 0 12px 30px #00000012;
+  box-shadow: var(--shadow-pop);
   z-index: 50;
   font-size: 14px;
 }
@@ -421,7 +624,7 @@
 .academic-art {
   position: relative;
   overflow: hidden;
-  background: var(--soft);
+  background: var(--surface-2);
   background-image:
     linear-gradient(var(--line) 1px, transparent 1px),
     linear-gradient(90deg, var(--line) 1px, transparent 1px);
@@ -434,7 +637,7 @@
   position: absolute;
   width: 320px;
   height: 320px;
-  border: 1px solid var(--accent);
+  border: 1px solid var(--brand-line);
   border-radius: 50%;
   right: -100px;
   top: 30px;
@@ -449,6 +652,12 @@
 .auth-page {
   min-height: 100vh;
   background: var(--surface);
+}
+/* Full-page layouts in dark mode sit on the deepest navy; only cards and form
+   surfaces step up to --surface. */
+.dark .auth-page,
+.dark .landing {
+  background: var(--canvas);
 }
 .auth-page > header {
   display: flex;
@@ -466,13 +675,13 @@
 }
 .auth-editorial h1 {
   font-size: 56px;
-  line-height: 1.05;
-  font-weight: 700;
+  line-height: 1.02;
+  font-weight: 650;
   margin: 24px 0;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.04em;
 }
 .auth-editorial h1 span {
-  color: var(--accent);
+  color: var(--brand-ink);
 }
 .auth-editorial > p:not(.eyebrow) {
   color: var(--muted);
@@ -525,13 +734,13 @@
 }
 .hero-copy h1 {
   font-size: clamp(42px, 4.8vw, 72px);
-  line-height: 1.02;
-  font-weight: 750;
-  letter-spacing: -0.065em;
+  line-height: 1;
+  font-weight: 650;
+  letter-spacing: -0.04em;
   margin: 22px 0 16px;
 }
 .hero-copy h1 span {
-  color: var(--accent);
+  color: var(--brand-ink);
 }
 .hero-description {
   color: var(--muted);
@@ -561,6 +770,8 @@
 }
 .capability-strip strong {
   font-size: 21px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
   letter-spacing: -0.035em;
 }
 .capability-strip span {
@@ -587,7 +798,7 @@
 .composition-grid:after {
   content: "";
   position: absolute;
-  border: 1px solid #a588dd;
+  border: 1px solid var(--line-strong);
   border-radius: 50%;
   width: 280px;
   height: 280px;
@@ -610,14 +821,16 @@
   top: 128px;
   width: 154px;
   height: 205px;
-  background: #6c24f5;
-  color: white;
+  background: var(--brand);
+  color: var(--brand-fg);
+  font-weight: 600;
+  letter-spacing: -0.03em;
   padding: 36px 24px;
   font-size: 26px;
   line-height: 1.2;
 }
 .learn-block .accent-rule {
-  background: white;
+  background: var(--brand-fg);
 }
 .workspace-preview {
   position: absolute;
@@ -629,7 +842,7 @@
   border: 1px solid var(--line);
   border-radius: 4px;
   padding: 20px;
-  box-shadow: 0 4px 12px #10132206;
+  box-shadow: var(--shadow-card);
   font-size: 10px;
 }
 .workspace-preview > div {
@@ -660,7 +873,7 @@
 }
 .preview-state:before {
   content: "•";
-  color: var(--accent);
+  color: var(--brand-ink);
   margin-right: 5px;
 }
 .poster {
@@ -669,11 +882,14 @@
   bottom: 0;
   width: 145px;
   z-index: 3;
-  background: var(--soft);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
   padding: 26px 18px;
-  font-family: Georgia, serif;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.035em;
   font-size: 22px;
-  line-height: 1.1;
+  line-height: 1.05;
 }
 .poster small {
   display: block;
@@ -703,12 +919,12 @@
   padding-right: 0;
 }
 .role-columns .eyebrow {
-  color: var(--accent);
+  color: var(--brand-ink);
   font-size: 10px;
 }
 .role-columns h2 {
   font-size: 23px;
-  font-weight: 650;
+  font-weight: 600;
   margin: 9px 0 6px;
 }
 .role-columns article > p:not(.eyebrow) {
@@ -728,14 +944,14 @@
 }
 .role-columns li:before {
   content: "—";
-  color: #b6bdd0;
+  color: var(--subtle);
   margin-right: 15px;
 }
 .role-columns li:last-child {
   border: 0;
 }
 .role-columns article > a {
-  color: var(--accent);
+  color: var(--brand-ink);
   font-size: 13px;
 }
 .role-columns article > a span {
@@ -775,9 +991,10 @@
   place-items: center;
   width: 28px;
   height: 28px;
-  border: 1px solid #b99afb;
-  color: var(--accent);
+  border: 1px solid var(--brand-line);
+  color: var(--brand-ink);
   border-radius: 50%;
+  font-family: var(--font-mono);
   font-size: 12px;
   margin-bottom: 10px;
 }
@@ -785,7 +1002,7 @@
   content: "";
   position: absolute;
   height: 1px;
-  background: #dac8fc;
+  background: var(--line);
   left: 35px;
   right: -17px;
   top: 14px;
@@ -804,8 +1021,8 @@
   margin-top: 5px;
 }
 .workflow-poster {
-  background: #1d2330;
-  color: white;
+  background: #0c1624;
+  color: #f4f6f8;
   position: relative;
   overflow: hidden;
   padding: 30px;
@@ -814,7 +1031,7 @@
   align-items: flex-end;
 }
 .workflow-poster .eyebrow {
-  color: #e0e3ed;
+  color: #a9b2bd;
   align-self: flex-start;
 }
 .workflow-poster > p:last-child {
@@ -826,7 +1043,7 @@
   position: absolute;
   width: 210px;
   height: 210px;
-  border: 1px solid #ffffff60;
+  border: 1px solid rgb(181 217 76 / 0.3);
   border-radius: 50%;
   right: -30px;
   top: -30px;
@@ -855,7 +1072,7 @@
   }
 }
 .animate-modal-in {
-  animation: modal-in 0.15s ease-out;
+  animation: modal-in 180ms var(--ease-standard);
 }
 @media (min-width: 1600px) {
   .app-content {
@@ -965,7 +1182,7 @@
     display: block;
     position: fixed;
     inset: 76px 0 0;
-    background: #10132255;
+    background: rgb(12 22 36 / 0.45);
     z-index: 24;
   }
   .app-content {
@@ -1127,9 +1344,10 @@
   margin-bottom: 16px;
 }
 .course-card-top > span {
+  font-family: var(--font-mono);
   font-size: 12px;
   font-weight: 500;
-  color: var(--accent);
+  color: var(--brand-ink);
 }
 .course-card h2 {
   font-size: 17px;
@@ -1188,10 +1406,15 @@
   font-size: 12px;
   color: var(--muted);
 }
+.category-tabs button:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
 .category-tabs button.selected {
-  background: #6c24f5;
-  color: #fff;
-  border-color: #6c24f5;
+  background: var(--brand);
+  color: var(--brand-fg);
+  border-color: var(--brand);
+  font-weight: 500;
 }
 .course-identity {
   display: flex;
@@ -1265,11 +1488,13 @@
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--accent);
+  color: var(--brand-ink);
 }
 .next-date strong {
   font-size: 48px;
-  letter-spacing: -0.05em;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
   line-height: 1.4;
 }
 .next-date small {
@@ -1280,7 +1505,7 @@
 }
 .next-class-info h3 {
   font-size: 22px;
-  font-weight: 650;
+  font-weight: 600;
   margin-bottom: 12px;
 }
 .next-class-info p {
@@ -1329,7 +1554,9 @@
 }
 .progress-ring strong {
   font-size: 30px;
-  letter-spacing: -0.05em;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
 }
 .progress-ring span,
 .progress-content p {
@@ -1391,7 +1618,7 @@
   margin-bottom: 5px;
 }
 .task-row:hover h3 {
-  color: var(--accent);
+  color: var(--brand-ink);
 }
 @media (max-width: 1300px) {
   .next-art {
@@ -1456,6 +1683,7 @@
 }
 .week-controls button:hover {
   background: var(--soft);
+  color: var(--ink);
 }
 .week-controls > span {
   padding: 0 10px;
@@ -1500,11 +1728,11 @@
   color: var(--muted);
 }
 .today {
-  background: color-mix(in srgb, var(--soft) 40%, var(--surface));
+  background: color-mix(in srgb, var(--brand-soft) 45%, var(--surface));
 }
 .calendar-day.today,
 .calendar-day.today span {
-  color: var(--accent);
+  color: var(--brand-ink);
 }
 .calendar-times > span {
   height: 72px;
@@ -1531,7 +1759,7 @@
   flex-direction: column;
   gap: 3px;
   padding: 10px 7px;
-  background: var(--soft);
+  background: var(--surface-2);
   border-left-width: 3px;
   border-radius: 4px;
   overflow: auto;
@@ -1562,8 +1790,8 @@
   flex-direction: column;
   gap: 8px;
   padding: 15px;
-  border-left: 3px solid var(--accent);
-  background: var(--soft);
+  border-left: 3px solid var(--brand);
+  background: var(--brand-soft);
   border-radius: 4px;
   font-size: 12px;
 }
@@ -1583,6 +1811,8 @@
 }
 .week-stats strong {
   font-size: 20px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
   display: block;
 }
 .week-stats span {
@@ -1638,7 +1868,7 @@
     gap: 5px;
     margin-top: 14px;
     border-left-width: 3px;
-    background: var(--soft);
+    background: var(--surface-2);
     padding: 14px;
     font-size: 13px;
   }
@@ -1670,7 +1900,7 @@
   border-top: 1px solid var(--line);
 }
 .submission-table a:hover {
-  color: var(--accent);
+  color: var(--brand-ink);
 }
 .row-actions {
   position: relative;
@@ -1694,10 +1924,10 @@
   border: 1px solid var(--line);
   border-radius: 6px;
   z-index: 5;
-  box-shadow: 0 4px 15px #00000012;
+  box-shadow: var(--shadow-pop);
 }
 .row-actions button {
-  color: #c63344;
+  color: var(--danger-ink);
   font-size: 13px;
   padding: 8px 20px;
 }
@@ -1756,7 +1986,7 @@
 }
 .feed-item.unread h3:before {
   content: "•";
-  color: var(--accent);
+  color: var(--brand-ink);
   margin-right: 10px;
 }
 .workspace-preview {

@@ -33,34 +33,37 @@ export function formatTime(time: string): string {
 // Stable color per course so the same course always renders with the same
 // accent across the weekly board and any legend, without needing a color
 // field in the schema.
+// The chart palette from the design system: lime first, then hues far enough
+// apart to tell neighbouring sessions apart on the week board. Chips use a
+// soft tint of the same hue with a legible ink.
 const COURSE_COLORS = [
   {
-    border: "border-l-emerald-500",
-    chip: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300",
+    border: "border-l-brand",
+    chip: "bg-brand-soft text-brand-ink",
   },
   {
-    border: "border-l-amber-500",
-    chip: "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300",
-  },
-  {
-    border: "border-l-rose-500",
-    chip: "bg-rose-100 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300",
-  },
-  {
-    border: "border-l-cyan-500",
-    chip: "bg-cyan-100 text-cyan-700 dark:bg-cyan-950/50 dark:text-cyan-300",
-  },
-  {
-    border: "border-l-orange-500",
-    chip: "bg-orange-100 text-orange-700 dark:bg-orange-950/50 dark:text-orange-300",
+    border: "border-l-sky-400",
+    chip: "bg-sky-500/12 text-sky-700 dark:text-sky-300",
   },
   {
     border: "border-l-teal-500",
-    chip: "bg-teal-100 text-teal-700 dark:bg-teal-950/50 dark:text-teal-300",
+    chip: "bg-teal-500/12 text-teal-700 dark:text-teal-300",
   },
   {
-    border: "border-l-fuchsia-500",
-    chip: "bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-950/50 dark:text-fuchsia-300",
+    border: "border-l-indigo-500",
+    chip: "bg-indigo-500/12 text-indigo-700 dark:text-indigo-300",
+  },
+  {
+    border: "border-l-amber-500",
+    chip: "bg-amber-500/12 text-amber-700 dark:text-amber-300",
+  },
+  {
+    border: "border-l-rose-500",
+    chip: "bg-rose-500/12 text-rose-700 dark:text-rose-300",
+  },
+  {
+    border: "border-l-slate-400",
+    chip: "bg-slate-500/12 text-slate-700 dark:text-slate-300",
   },
 ] as const;
 

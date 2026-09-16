@@ -83,12 +83,12 @@ export default function AnnouncementsPage() {
   return (
     <div className="p-6">
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">
           Announcements
         </h1>
         <Link
           to="/admin/announcements/new"
-          className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
+          className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-brand-fg hover:bg-brand-hover active:bg-brand-active"
         >
           + New Announcement
         </Link>

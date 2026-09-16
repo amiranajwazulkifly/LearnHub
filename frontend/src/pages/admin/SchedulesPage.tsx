@@ -249,7 +249,7 @@ function SchedulesPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">Schedule Management</h1>
+        <h1 className="text-3xl font-semibold">Schedule Management</h1>
 
         <p className="mt-2 text-gray-500 dark:text-gray-400">
           Create and manage course schedules.
@@ -279,7 +279,7 @@ function SchedulesPage() {
             id="course"
             value={courseId}
             onChange={(event) => setCourseId(event.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
+            className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
           >
             <option value="">Select course</option>
 
@@ -300,7 +300,7 @@ function SchedulesPage() {
             id="dayOfWeek"
             value={dayOfWeek}
             onChange={(event) => setDayOfWeek(event.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
+            className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
           >
             {DAYS.map((day) => (
               <option key={day.value} value={day.value}>
@@ -321,7 +321,7 @@ function SchedulesPage() {
               type="time"
               value={startTime}
               onChange={(event) => setStartTime(event.target.value)}
-              className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
+              className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
             />
           </div>
 
@@ -335,7 +335,7 @@ function SchedulesPage() {
               type="time"
               value={endTime}
               onChange={(event) => setEndTime(event.target.value)}
-              className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
+              className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
             />
           </div>
         </div>
@@ -350,7 +350,7 @@ function SchedulesPage() {
             type="text"
             value={location}
             onChange={(event) => setLocation(event.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
+            className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
             placeholder="Example: Computer Lab 1"
           />
         </div>
@@ -366,7 +366,7 @@ function SchedulesPage() {
               type="date"
               value={startDate}
               onChange={(event) => setStartDate(event.target.value)}
-              className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
+              className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
             />
           </div>
 
@@ -380,7 +380,7 @@ function SchedulesPage() {
               type="date"
               value={endDate}
               onChange={(event) => setEndDate(event.target.value)}
-              className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
+              className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
             />
           </div>
         </div>
@@ -392,7 +392,7 @@ function SchedulesPage() {
                 type="button"
                 onClick={() => void handleUpdateSchedule()}
                 disabled={saving}
-                className="rounded bg-brand-600 px-4 py-2 text-white disabled:opacity-50"
+                className="rounded bg-brand px-4 py-2 text-brand-fg disabled:opacity-50"
               >
                 {saving ? "Updating..." : "Update Schedule"}
               </button>
@@ -410,7 +410,7 @@ function SchedulesPage() {
             <button
               type="submit"
               disabled={saving}
-              className="rounded bg-brand-600 px-4 py-2 text-white disabled:opacity-50"
+              className="rounded bg-brand px-4 py-2 text-brand-fg disabled:opacity-50"
             >
               {saving ? "Creating..." : "Create Schedule"}
             </button>
@@ -420,7 +420,7 @@ function SchedulesPage() {
 
       <div className="table-scroll overflow-x-auto rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
         <table className="w-full text-left">
-          <thead className="border-b border-gray-200 bg-gray-50 font-mono text-xs uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:bg-gray-800 dark:text-gray-400">
+          <thead className="border-b border-gray-200 font-mono text-xs uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:text-gray-400">
             <tr>
               <th className="px-6 py-4">Course</th>
               <th className="px-6 py-4">Day</th>
@@ -443,7 +443,7 @@ function SchedulesPage() {
                   </div>
 
                   {schedule.course_code && (
-                    <div className="font-mono text-sm text-brand-600 dark:text-brand-400">
+                    <div className="font-mono text-sm text-brand-ink">
                       {schedule.course_code}
                     </div>
                   )}
@@ -472,7 +472,7 @@ function SchedulesPage() {
                     <button
                       type="button"
                       onClick={() => handleEdit(schedule)}
-                      className="rounded bg-brand-600 px-3 py-2 text-sm text-white"
+                      className="rounded bg-brand px-3 py-2 text-sm text-brand-fg"
                     >
                       Edit
                     </button>

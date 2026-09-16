@@ -160,7 +160,7 @@ export default function StudentDashboardPage() {
     <div>
       <div className="dashboard-heading">
         <p className="eyebrow">Dashboard</p>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">
           Welcome back, {firstName}!
         </h1>
         <p className="mt-1 text-gray-500 dark:text-gray-400">
@@ -263,7 +263,7 @@ export default function StudentDashboardPage() {
               <div
                 className="progress-ring"
                 style={{
-                  background: `conic-gradient(var(--accent) ${progress}%, var(--line) 0)`,
+                  background: `conic-gradient(var(--brand) ${progress}%, var(--line) 0)`,
                 }}
               >
                 <div>

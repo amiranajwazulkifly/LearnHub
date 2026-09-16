@@ -173,7 +173,7 @@ function CategoriesPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">Category Management</h1>
+        <h1 className="text-3xl font-semibold">Category Management</h1>
 
         <p className="mt-2 text-gray-500 dark:text-gray-400">
           Manage LearnHub course categories.
@@ -204,7 +204,7 @@ function CategoriesPage() {
             type="text"
             value={name}
             onChange={(event) => setName(event.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
+            className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
             placeholder="Example: Technology"
           />
         </div>
@@ -221,7 +221,7 @@ function CategoriesPage() {
             id="category-description"
             value={description}
             onChange={(event) => setDescription(event.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
+            className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
             rows={3}
             placeholder="Enter category description"
           />
@@ -234,7 +234,7 @@ function CategoriesPage() {
                 type="button"
                 onClick={() => void handleUpdateCategory()}
                 disabled={saving}
-                className="rounded bg-brand-600 px-4 py-2 text-white disabled:opacity-50"
+                className="rounded bg-brand px-4 py-2 text-brand-fg disabled:opacity-50"
               >
                 {saving ? "Updating..." : "Update Category"}
               </button>
@@ -252,7 +252,7 @@ function CategoriesPage() {
             <button
               type="submit"
               disabled={saving}
-              className="rounded bg-brand-600 px-4 py-2 text-white disabled:opacity-50"
+              className="rounded bg-brand px-4 py-2 text-brand-fg disabled:opacity-50"
             >
               {saving ? "Creating..." : "Create Category"}
             </button>
@@ -262,7 +262,7 @@ function CategoriesPage() {
 
       <div className="table-scroll overflow-x-auto rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
         <table className="w-full text-left">
-          <thead className="border-b border-gray-200 bg-gray-50 font-mono text-xs uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:bg-gray-800 dark:text-gray-400">
+          <thead className="border-b border-gray-200 font-mono text-xs uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:text-gray-400">
             <tr>
               <th className="px-6 py-4">Name</th>
               <th className="px-6 py-4">Description</th>
@@ -285,7 +285,7 @@ function CategoriesPage() {
                     <button
                       type="button"
                       onClick={() => handleEdit(category)}
-                      className="rounded bg-brand-600 px-3 py-2 text-sm text-white"
+                      className="rounded bg-brand px-3 py-2 text-sm text-brand-fg"
                     >
                       Edit
                     </button>

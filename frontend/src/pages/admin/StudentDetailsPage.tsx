@@ -33,11 +33,11 @@ export default function StudentDetailsPage() {
 
   return (
     <div className="p-6">
-      <Link to="/admin/students" className="font-mono text-sm text-brand-600 hover:underline dark:text-brand-400">
+      <Link to="/admin/students" className="font-mono text-sm text-brand-ink hover:underline">
         ← Back to Students
       </Link>
 
-      <h1 className="mt-2 text-2xl font-bold text-gray-900 dark:text-gray-50">{student.fullName}</h1>
+      <h1 className="mt-2 text-2xl font-semibold text-gray-900 dark:text-gray-50">{student.fullName}</h1>
       <p className="text-gray-500 dark:text-gray-400">{student.email}</p>
       {student.programme && (
         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -51,7 +51,7 @@ export default function StudentDetailsPage() {
       <h2 className="mb-3 mt-6 text-lg font-semibold text-gray-800 dark:text-gray-200">Enrollment History</h2>
       <div className="table-scroll overflow-x-auto rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
-          <thead className="bg-gray-50 dark:bg-gray-800">
+          <thead>
             <tr>
               <th className="px-4 py-2 text-left font-mono text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Course</th>
               <th className="px-4 py-2 text-left font-mono text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Status</th>

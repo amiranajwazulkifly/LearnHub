@@ -245,7 +245,7 @@ export default function CourseDetailsPage() {
       <nav className="mb-6 flex flex-wrap items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
         <Link
           to={ROUTES.STUDENT.COURSES}
-          className="hover:text-brand-600 dark:hover:text-brand-400"
+          className="hover:text-brand-ink-hover"
         >
           Browse Courses
         </Link>
@@ -267,7 +267,7 @@ export default function CourseDetailsPage() {
         <div className="space-y-6 lg:col-span-2">
           <div>
             <div className="mb-3 flex flex-wrap items-center gap-2">
-              <span className="rounded-md border border-brand-200 bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700 dark:border-brand-900 dark:bg-brand-950 dark:text-brand-300">
+              <span className="rounded-md border border-brand-line bg-brand-soft px-2.5 py-1 text-xs font-semibold text-brand-ink">
                 {course.code}
               </span>
 
@@ -278,7 +278,7 @@ export default function CourseDetailsPage() {
               )}
             </div>
 
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-50">
+            <h1 className="text-3xl font-semibold text-gray-900 dark:text-gray-50">
               {course.title}
             </h1>
 
@@ -300,7 +300,7 @@ export default function CourseDetailsPage() {
           </div>
 
           <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-50">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
               About this Course
             </h2>
 
@@ -334,7 +334,7 @@ export default function CourseDetailsPage() {
 
               <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
                 <div
-                  className="h-full rounded-full bg-brand-600"
+                  className="h-full rounded-full bg-brand"
                   style={{ width: `${fillPercent}%` }}
                 />
               </div>
@@ -348,7 +348,7 @@ export default function CourseDetailsPage() {
 
             <div className="mt-5 space-y-3 border-t border-gray-100 pt-4 text-sm dark:border-gray-800">
               <div className="flex items-start gap-3">
-                <ClockIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
+                <ClockIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-ink" />
 
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -363,7 +363,7 @@ export default function CourseDetailsPage() {
               </div>
 
               <div className="flex items-start gap-3">
-                <PinIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
+                <PinIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-ink" />
 
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -376,7 +376,7 @@ export default function CourseDetailsPage() {
               </div>
 
               <div className="flex items-start gap-3">
-                <CalendarIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
+                <CalendarIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-ink" />
 
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -394,7 +394,7 @@ export default function CourseDetailsPage() {
             <button
               onClick={handleEnroll}
               disabled={enrollDisabled}
-              className="mt-5 w-full rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-5 w-full rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-brand-fg transition hover:bg-brand-hover active:bg-brand-active disabled:cursor-not-allowed disabled:opacity-60"
             >
               {enrollLabel}
             </button>
@@ -429,7 +429,7 @@ export default function CourseDetailsPage() {
               </h3>
 
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-600 text-sm font-bold text-white">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-semibold text-brand-fg">
                   {getInitials(course.instructor_name)}
                 </div>
 

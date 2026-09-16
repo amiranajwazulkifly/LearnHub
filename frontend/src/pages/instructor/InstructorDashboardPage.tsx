@@ -63,7 +63,7 @@ export default function InstructorDashboardPage() {
         <p className="eyebrow">Instructor dashboard</p>
         <h1>
           Welcome back,{" "}
-          <span className="text-brand-600 dark:text-brand-400">
+          <span className="text-brand-ink">
             {user?.fullName || "Instructor"}!
           </span>
         </h1>
@@ -127,11 +127,11 @@ export default function InstructorDashboardPage() {
               courses.map((course) => (
                 <div
                   key={course.id}
-                  className="flex items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white p-4 transition hover:border-brand-400 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-brand-600"
+                  className="flex items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white p-4 transition hover:border-brand-line dark:border-gray-800 dark:bg-gray-900"
                 >
                   <div className="min-w-0">
                     <div className="mb-1 flex flex-wrap items-center gap-3">
-                      <span className="rounded-md bg-brand-50 px-2 py-1 font-mono text-xs font-medium text-brand-700 dark:bg-brand-950/40 dark:text-brand-400">
+                      <span className="rounded-md bg-brand-soft px-2 py-1 font-mono text-xs font-medium text-brand-ink">
                         {course.code}
                       </span>
 

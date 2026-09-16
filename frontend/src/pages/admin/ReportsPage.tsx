@@ -40,10 +40,14 @@ const EXPORTS: { type: ExportType; label: string }[] = [
   { type: "enrollment-trend", label: "Enrollment trend" },
 ];
 
-// Recharts needs concrete colors, so these mirror the brand tokens rather
-// than reading them from CSS. Both stay legible on the light and dark card.
-const BRAND = "#7c3aed";
-const AXIS = "#9ca3af";
+// Chart colours are CSS variables (see --chart-* in index.css), so they
+// switch with the theme. The first series is a deeper lime in light mode, so a
+// 2px line stays visible on white.
+const BRAND = "var(--chart-1)";
+// Bars are large areas, visible at full brand lime in both themes.
+const BRAND_FILL = "var(--brand)";
+const AXIS = "var(--chart-axis)";
+const GRID = "var(--chart-grid)";
 
 /** Dates on the axis are short ("5 Sep"); the tooltip shows the full date. */
 function shortDate(value: string): string {
@@ -125,7 +129,7 @@ export default function ReportsPage() {
           aria-pressed={days === range.days}
           className={`rounded-md px-2 py-1 font-mono text-xs transition ${
             days === range.days
-              ? "bg-brand-600 text-white"
+              ? "bg-brand text-brand-fg"
               : "text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
           }`}
         >
@@ -137,10 +141,10 @@ export default function ReportsPage() {
 
   return (
     <div className="p-4 sm:p-6">
-      <p className="mb-1 font-mono text-xs uppercase tracking-wide text-brand-600 dark:text-brand-400">
+      <p className="mb-1 font-mono text-xs uppercase tracking-wide text-brand-ink">
         admin / reports
       </p>
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Reports</h1>
+      <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">Reports</h1>
 
       {/* Exports */}
       <div className="mb-6 mt-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
@@ -176,7 +180,7 @@ export default function ReportsPage() {
         >
           <ResponsiveContainer width="100%" height={240}>
             <LineChart data={trendPoints} margin={{ top: 5, right: 8, bottom: 5, left: -20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={AXIS} strokeOpacity={0.25} />
+              <CartesianGrid strokeDasharray="3 3" stroke={GRID} vertical={false} />
               <XAxis
                 dataKey="date"
                 tickFormatter={shortDate}
@@ -205,7 +209,7 @@ export default function ReportsPage() {
                 sit horizontally and stay readable, where a rotated full title
                 is neither. The tooltip carries the full name. */}
             <BarChart data={popularity} margin={{ top: 5, right: 8, bottom: 5, left: -20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={AXIS} strokeOpacity={0.25} />
+              <CartesianGrid strokeDasharray="3 3" stroke={GRID} vertical={false} />
               <XAxis
                 dataKey="code"
                 tick={{ fontSize: 11, fill: AXIS }}
@@ -219,7 +223,7 @@ export default function ReportsPage() {
                 }
                 formatter={(value) => [Number(value ?? 0), "Enrollments"]}
               />
-              <Bar dataKey="totalEnrollments" fill={BRAND} radius={[4, 4, 0, 0]} />
+              <Bar dataKey="totalEnrollments" fill={BRAND_FILL} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -237,7 +241,7 @@ export default function ReportsPage() {
       ) : (
         <div className="table-scroll overflow-x-auto rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
-            <thead className="bg-gray-50 dark:bg-gray-800">
+            <thead>
               <tr>
                 {["Course", "Total", "Enrolled", "Completed", "Rate"].map((heading) => (
                   <th
@@ -253,7 +257,7 @@ export default function ReportsPage() {
               {completion.map((c) => (
                 <tr key={c.id}>
                   <td className="px-4 py-2 text-sm text-gray-800 dark:text-gray-200">
-                    <span className="font-mono text-xs font-semibold text-brand-600 dark:text-brand-400">
+                    <span className="font-mono text-xs font-semibold text-brand-ink">
                       {c.code}
                     </span>{" "}
                     <span className="text-gray-600 dark:text-gray-400">{c.title}</span>
@@ -264,7 +268,7 @@ export default function ReportsPage() {
                   <td className="px-4 py-2 text-sm">
                     <div className="flex items-center gap-2">
                       <div className="h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
-                        <div className="h-full bg-brand-600" style={{ width: `${c.completionRate}%` }} />
+                        <div className="h-full bg-brand" style={{ width: `${c.completionRate}%` }} />
                       </div>
                       <span className="text-xs text-gray-500 dark:text-gray-400">
                         {c.completionRate}%

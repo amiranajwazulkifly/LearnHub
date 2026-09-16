@@ -176,7 +176,7 @@ export default function InstructorCourseAssignmentsPage() {
       {/* Back link */}
       <Link
         to={ROUTES.INSTRUCTOR.COURSES}
-        className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
+        className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-brand-ink hover:text-brand-ink-hover"
       >
         <ArrowLeft size={16} />
         Back to My Courses
@@ -185,11 +185,11 @@ export default function InstructorCourseAssignmentsPage() {
       {/* Header */}
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="mb-1 font-mono text-xs uppercase tracking-wide text-brand-600 dark:text-brand-400">
+          <p className="mb-1 font-mono text-xs uppercase tracking-wide text-brand-ink">
             instructor / assignments
           </p>
 
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">
             Assignments
           </h1>
 
@@ -200,7 +200,7 @@ export default function InstructorCourseAssignmentsPage() {
 
         <button
           onClick={openCreateForm}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-700"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-medium text-brand-fg transition hover:bg-brand-hover active:bg-brand-active"
         >
           <Plus size={17} />
           New Assignment
@@ -370,7 +370,7 @@ export default function InstructorCourseAssignmentsPage() {
                 <div className="flex items-start gap-3">
                   <FileText
                     size={18}
-                    className="mt-0.5 shrink-0 text-brand-500"
+                    className="mt-0.5 shrink-0 text-brand-ink"
                   />
 
                   <div>
@@ -399,7 +399,7 @@ export default function InstructorCourseAssignmentsPage() {
             <button
               type="submit"
               disabled={saving}
-              className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50"
+              className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-brand-fg hover:bg-brand-hover active:bg-brand-active disabled:opacity-50"
             >
               {saving
                 ? "Saving..."
@@ -422,7 +422,7 @@ export default function InstructorCourseAssignmentsPage() {
       {/* Empty state */}
       {assignments.length === 0 ? (
         <div className="rounded-xl border border-gray-200 bg-white p-10 text-center dark:border-gray-800 dark:bg-gray-900">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-100 text-brand-600 dark:bg-brand-950/50 dark:text-brand-400">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-soft text-brand-ink">
             <ClipboardList size={22} />
           </div>
 
@@ -447,13 +447,13 @@ export default function InstructorCourseAssignmentsPage() {
             return (
               <div
                 key={assignment.id}
-                className="rounded-xl border border-gray-200 bg-white p-5 transition hover:border-brand-400 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-brand-600"
+                className="rounded-xl border border-gray-200 bg-white p-5 transition hover:border-brand-line dark:border-gray-800 dark:bg-gray-900"
               >
                 <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                   {/* Assignment info */}
                   <div className="min-w-0 flex-1">
                     <div className="mb-3 flex flex-wrap items-center gap-2">
-                      <span className="inline-flex items-center gap-1.5 rounded-md bg-brand-100 px-2.5 py-1 text-xs font-medium text-brand-700 dark:bg-brand-950/50 dark:text-brand-400">
+                      <span className="inline-flex items-center gap-1.5 rounded-md bg-brand-soft px-2.5 py-1 text-xs font-medium text-brand-ink">
                         <ClipboardList size={14} />
                         Assignment
                       </span>
@@ -485,7 +485,7 @@ export default function InstructorCourseAssignmentsPage() {
 
                     <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-600 dark:text-gray-400">
                       <div className="flex items-center gap-2">
-                        <FileText size={16} className="text-brand-500" />
+                        <FileText size={16} className="text-brand-ink" />
                         <span>
                           {assignment.points
                             ? `${assignment.points} points`
@@ -508,7 +508,7 @@ export default function InstructorCourseAssignmentsPage() {
                           getDownload={() =>
                             getAssignmentAttachmentUrl(assignment.id)
                           }
-                          className="flex items-center gap-2 text-brand-600 hover:underline dark:text-brand-400"
+                          className="flex items-center gap-2 text-brand-ink hover:underline"
                         >
                           <FileText size={16} />
                           {assignment.attachmentName ?? "View attachment"}
@@ -521,7 +521,7 @@ export default function InstructorCourseAssignmentsPage() {
                         and the dashboard always report the same numbers. */}
                     {assignment.counts && (
                       <div className="mt-4 flex flex-wrap gap-2">
-                        <span className="inline-flex items-center gap-1.5 rounded-md bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-700 dark:bg-brand-950/40 dark:text-brand-300">
+                        <span className="inline-flex items-center gap-1.5 rounded-md bg-brand-soft px-2.5 py-1 text-xs font-medium text-brand-ink">
                           {assignment.counts.submitted} Submitted
                         </span>
 
@@ -546,7 +546,7 @@ export default function InstructorCourseAssignmentsPage() {
                   <div className="flex flex-wrap gap-2">
                     <Link
                       to={`${ROUTES.INSTRUCTOR.ASSIGNMENTS}/${assignment.id}/submissions`}
-                      className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-medium text-white transition hover:bg-brand-700"
+                      className="inline-flex items-center gap-2 rounded-lg bg-brand px-3.5 py-2 text-sm font-medium text-brand-fg transition hover:bg-brand-hover active:bg-brand-active"
                     >
                       <Users size={16} />
                       View Submissions
@@ -603,7 +603,7 @@ function AttachmentHint({
 
       <AttachmentLink
         getDownload={() => getAssignmentAttachmentUrl(assignment.id)}
-        className="font-medium text-brand-600 hover:underline dark:text-brand-400"
+        className="font-medium text-brand-ink hover:underline"
       >
         {assignment.attachmentName}
       </AttachmentLink>

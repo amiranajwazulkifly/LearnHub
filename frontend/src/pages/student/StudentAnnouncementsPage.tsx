@@ -109,12 +109,12 @@ export default function StudentAnnouncementsPage() {
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     {isNew && (
-                      <span className="rounded-full bg-brand-600 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-white">
+                      <span className="rounded-full bg-brand px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-brand-fg">
                         New
                       </span>
                     )}
 
-                    <span className="rounded-full bg-brand-50 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-brand-700 dark:bg-brand-950 dark:text-brand-300">
+                    <span className="rounded-full bg-brand-soft px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-brand-ink">
                       {AUDIENCE_LABEL[a.audience] ?? a.audience}
                     </span>
                   </div>

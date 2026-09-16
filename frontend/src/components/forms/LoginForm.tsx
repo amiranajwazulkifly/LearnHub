@@ -103,7 +103,7 @@ function LoginForm() {
 
           <Link
             to={ROUTES.FORGOT_PASSWORD}
-            className="text-sm text-brand-600 hover:underline dark:text-brand-400"
+            className="text-sm text-brand-ink hover:underline"
           >
             Forgot password?
           </Link>
@@ -144,7 +144,7 @@ function LoginForm() {
       <button
         type="submit"
         disabled={isLoading}
-        className="btn-sheen w-full rounded-lg bg-brand-600 px-4 py-2 font-medium text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
+        className="btn-sheen w-full rounded-lg bg-brand px-4 py-2 font-medium text-brand-fg transition hover:bg-brand-hover active:bg-brand-active disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isLoading ? "Signing in..." : "Sign in"}
       </button>
@@ -153,7 +153,7 @@ function LoginForm() {
         Don&apos;t have an account?{" "}
         <Link
           to={ROUTES.REGISTER}
-          className="font-medium text-brand-600 underline dark:text-brand-400"
+          className="font-medium text-brand-ink underline"
         >
           Register
         </Link>

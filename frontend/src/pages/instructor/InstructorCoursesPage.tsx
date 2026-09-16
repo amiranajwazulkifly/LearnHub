@@ -54,12 +54,12 @@ export default function InstructorCoursesPage() {
 
   return (
     <div>
-      <p className="mb-1 font-mono text-xs uppercase tracking-wide text-brand-600 dark:text-brand-400">
+      <p className="mb-1 font-mono text-xs uppercase tracking-wide text-brand-ink">
         instructor / courses
       </p>
 
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">
           My Courses
         </h1>
 
@@ -94,17 +94,17 @@ export default function InstructorCoursesPage() {
           {courses.map((course) => (
             <div
               key={course.id}
-              className="flex flex-col rounded-xl border border-gray-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-brand-400 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-brand-600"
+              className="flex flex-col rounded-xl border border-gray-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-brand-line hover:shadow-md dark:border-gray-800 dark:bg-gray-900"
             >
               {/* Top */}
               <div className="mb-4 flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="mb-2 flex items-center gap-2">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-100 text-brand-600 dark:bg-brand-950/50 dark:text-brand-400">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-soft text-brand-ink">
                       <BookOpen size={18} />
                     </div>
 
-                    <p className="font-mono text-sm font-semibold text-brand-600 dark:text-brand-400">
+                    <p className="font-mono text-sm font-semibold text-brand-ink">
                       {course.code}
                     </p>
                   </div>
@@ -138,7 +138,7 @@ export default function InstructorCoursesPage() {
                 <div className="flex items-start gap-3">
                   <CalendarDays
                     size={17}
-                    className="mt-0.5 shrink-0 text-brand-500"
+                    className="mt-0.5 shrink-0 text-brand-ink"
                   />
 
                   <div>
@@ -214,7 +214,7 @@ export default function InstructorCoursesPage() {
               <div className="mt-auto grid grid-cols-2 gap-2">
                 <Link
                   to={`${ROUTES.INSTRUCTOR.COURSES}/${course.id}/students`}
-                  className="flex items-center justify-center gap-2 rounded-lg border border-gray-300 px-4 py-2.5 text-center text-sm font-medium text-gray-700 transition hover:border-brand-400 hover:bg-brand-50 hover:text-brand-700 dark:border-gray-700 dark:text-gray-200 dark:hover:border-brand-600 dark:hover:bg-brand-950/30 dark:hover:text-brand-400"
+                  className="flex items-center justify-center gap-2 rounded-lg border border-gray-300 px-4 py-2.5 text-center text-sm font-medium text-gray-700 transition hover:border-brand-line hover:bg-brand-soft hover:text-brand-ink-hover dark:border-gray-700 dark:text-gray-200"
                 >
                   <Users size={16} />
                   Students
@@ -222,7 +222,7 @@ export default function InstructorCoursesPage() {
 
                 <Link
                   to={`${ROUTES.INSTRUCTOR.COURSES}/${course.id}/assignments`}
-                  className="flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-center text-sm font-medium text-white transition hover:bg-brand-700"
+                  className="flex items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-center text-sm font-medium text-brand-fg transition hover:bg-brand-hover active:bg-brand-active"
                 >
                   <ClipboardList size={16} />
                   Assignments

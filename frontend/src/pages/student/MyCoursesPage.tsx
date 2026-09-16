@@ -100,7 +100,7 @@ export default function MyCoursesPage() {
 
   return (
     <div>
-      <h1 className="mb-5 text-2xl font-bold text-gray-900 dark:text-gray-50">
+      <h1 className="mb-5 text-2xl font-semibold text-gray-900 dark:text-gray-50">
         My Courses
       </h1>
 
@@ -123,7 +123,7 @@ export default function MyCoursesPage() {
           action={
             <Link
               to={ROUTES.STUDENT.COURSES}
-              className="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-brand-700"
+              className="rounded-lg bg-brand px-3 py-1.5 text-sm font-medium text-brand-fg transition hover:bg-brand-hover active:bg-brand-active"
             >
               Browse Courses
             </Link>
@@ -186,7 +186,7 @@ export default function MyCoursesPage() {
                     className="enrollment-row"
                   >
                     <div className="mb-2 flex flex-wrap items-center gap-2">
-                      <span className="font-mono text-xs font-semibold text-brand-600 dark:text-brand-400">
+                      <span className="font-mono text-xs font-semibold text-brand-ink">
                         {enrollment.code}
                       </span>
 
@@ -282,7 +282,7 @@ export default function MyCoursesPage() {
                     <div className="mt-4 flex gap-2">
                       <Link
                         to={`${ROUTES.STUDENT.COURSES}/${enrollment.course_id}`}
-                        className="flex-1 rounded-lg bg-brand-600 px-3 py-2 text-center text-sm font-medium text-white transition hover:bg-brand-700"
+                        className="flex-1 rounded-lg bg-brand px-3 py-2 text-center text-sm font-medium text-brand-fg transition hover:bg-brand-hover active:bg-brand-active"
                       >
                         Open Course
                       </Link>

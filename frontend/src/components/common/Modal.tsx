@@ -32,7 +32,7 @@ function Modal({ open, onClose, labelledBy, children }: ModalProps) {
       <div
         aria-hidden="true"
         onClick={onClose}
-        className="absolute inset-0 bg-gray-950/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-gray-950/55"
       />
 
       <div

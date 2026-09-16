@@ -63,7 +63,7 @@ export default function ErrorState({
           <button
             type="button"
             onClick={onRetry}
-            className="rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-brand-700"
+            className="rounded-lg bg-brand px-3 py-1.5 text-sm font-medium text-brand-fg transition hover:bg-brand-hover active:bg-brand-active"
           >
             Retry
           </button>

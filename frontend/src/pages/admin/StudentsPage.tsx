@@ -31,22 +31,22 @@ export default function StudentsPage() {
 
   return (
     <div className="p-6">
-      <p className="mb-1 font-mono text-xs uppercase tracking-wide text-brand-600 dark:text-brand-400">
+      <p className="mb-1 font-mono text-xs uppercase tracking-wide text-brand-ink">
         admin / students
       </p>
-      <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-gray-50">Students</h1>
+      <h1 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-gray-50">Students</h1>
 
       <input
         type="text"
         placeholder="Search by name or email…"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="mb-4 w-full max-w-sm rounded-md border border-gray-300 px-3 py-2 text-sm bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
+        className="mb-4 w-full max-w-sm rounded-md border border-gray-300 px-3 py-2 text-sm bg-white text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
       />
 
       <div className="table-scroll overflow-x-auto rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
-          <thead className="bg-gray-50 dark:bg-gray-800">
+          <thead>
             <tr>
               <th className="px-4 py-2 text-left font-mono text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Name</th>
               <th className="px-4 py-2 text-left font-mono text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Email</th>
@@ -59,7 +59,7 @@ export default function StudentsPage() {
             {students.map((s) => (
               <tr key={s.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                 <td className="px-4 py-2 text-sm">
-                  <Link to={`/admin/students/${s.id}`} className="font-medium text-brand-600 hover:underline dark:text-brand-400">
+                  <Link to={`/admin/students/${s.id}`} className="font-medium text-brand-ink hover:underline">
                     {s.fullName}
                   </Link>
                 </td>

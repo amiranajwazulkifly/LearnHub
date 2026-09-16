@@ -43,11 +43,11 @@ export default function EnrollmentsPage() {
 
   return (
     <div className="p-6">
-      <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-gray-50">Enrollment Management</h1>
+      <h1 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-gray-50">Enrollment Management</h1>
 
       <div className="table-scroll overflow-x-auto rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
-          <thead className="bg-gray-50 dark:bg-gray-800">
+          <thead>
             <tr>
               <th className="px-4 py-2 text-left font-mono text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Student</th>
               <th className="px-4 py-2 text-left font-mono text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Course</th>
@@ -67,7 +67,7 @@ export default function EnrollmentsPage() {
                   <select
                     value={r.status}
                     onChange={(e) => handleStatusChange(r.id, e.target.value as EnrollmentStatus)}
-                    className="rounded-md border border-gray-300 px-2 py-1 text-sm bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
+                    className="rounded-md border border-gray-300 px-2 py-1 text-sm bg-white text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
                   >
                     <option value="enrolled">enrolled</option>
                     <option value="completed">completed</option>

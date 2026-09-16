@@ -58,7 +58,7 @@ export default function InstructorCourseStudentsPage() {
       {/* Back */}
       <Link
         to={ROUTES.INSTRUCTOR.COURSES}
-        className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
+        className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-brand-ink hover:text-brand-ink-hover"
       >
         <ArrowLeft size={16} />
         Back to My Courses
@@ -66,17 +66,17 @@ export default function InstructorCourseStudentsPage() {
 
       {/* Header */}
       <div className="mb-6">
-        <p className="mb-1 font-mono text-xs uppercase tracking-wide text-brand-600 dark:text-brand-400">
+        <p className="mb-1 font-mono text-xs uppercase tracking-wide text-brand-ink">
           instructor / students
         </p>
 
         <div className="flex flex-wrap items-center gap-3">
-          <span className="rounded-md bg-brand-100 px-2.5 py-1 font-mono text-xs font-semibold text-brand-700 dark:bg-brand-950/50 dark:text-brand-400">
+          <span className="rounded-md bg-brand-soft px-2.5 py-1 font-mono text-xs font-semibold text-brand-ink">
             {roster.course.code}
           </span>
         </div>
 
-        <h1 className="mt-2 text-2xl font-bold text-gray-900 dark:text-gray-50">
+        <h1 className="mt-2 text-2xl font-semibold text-gray-900 dark:text-gray-50">
           {roster.course.title}
         </h1>
 
@@ -88,7 +88,7 @@ export default function InstructorCourseStudentsPage() {
       {/* Summary */}
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-100 text-brand-600 dark:bg-brand-950/50 dark:text-brand-400">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-soft text-brand-ink">
             <Users size={18} />
           </div>
 
@@ -97,7 +97,7 @@ export default function InstructorCourseStudentsPage() {
               Total Students
             </p>
 
-            <p className="text-xl font-bold text-gray-900 dark:text-gray-50">
+            <p className="text-xl font-semibold text-gray-900 dark:text-gray-50">
               {roster.students.length}
             </p>
           </div>
@@ -113,7 +113,7 @@ export default function InstructorCourseStudentsPage() {
               Enrolled
             </p>
 
-            <p className="text-xl font-bold text-gray-900 dark:text-gray-50">
+            <p className="text-xl font-semibold text-gray-900 dark:text-gray-50">
               {enrolledCount}
             </p>
           </div>
@@ -129,7 +129,7 @@ export default function InstructorCourseStudentsPage() {
               Completed
             </p>
 
-            <p className="text-xl font-bold text-gray-900 dark:text-gray-50">
+            <p className="text-xl font-semibold text-gray-900 dark:text-gray-50">
               {completedCount}
             </p>
           </div>
@@ -150,7 +150,7 @@ export default function InstructorCourseStudentsPage() {
 
         <div className="table-scroll overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
-            <thead className="bg-gray-50 dark:bg-gray-950/40">
+            <thead>
               <tr>
                 <th className="px-5 py-3 text-left font-mono text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
                   Student
@@ -187,7 +187,7 @@ export default function InstructorCourseStudentsPage() {
                     {/* Student */}
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-semibold text-brand-700 dark:bg-brand-950/50 dark:text-brand-400">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-soft text-xs font-semibold text-brand-ink">
                           {initials}
                         </div>
 

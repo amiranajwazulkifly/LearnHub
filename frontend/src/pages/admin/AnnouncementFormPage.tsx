@@ -66,7 +66,7 @@ export default function AnnouncementFormPage() {
 
   return (
     <div className="mx-auto max-w-xl p-6">
-      <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-gray-50">
+      <h1 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-gray-50">
         {isEdit ? "Edit Announcement" : "New Announcement"}
       </h1>
 
@@ -128,7 +128,7 @@ export default function AnnouncementFormPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50"
+            className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-brand-fg hover:bg-brand-hover active:bg-brand-active disabled:opacity-50"
           >
             {isSubmitting
               ? "Saving…"

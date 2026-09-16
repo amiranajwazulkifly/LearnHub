@@ -248,7 +248,7 @@ function InstructorsPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">Instructor Management</h1>
+        <h1 className="text-3xl font-semibold">Instructor Management</h1>
 
         <p className="mt-2 text-gray-500 dark:text-gray-400">
           Manage LearnHub instructors.
@@ -276,7 +276,7 @@ function InstructorsPage() {
             type="text"
             value={fullName}
             onChange={(event) => setFullName(event.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
+            className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
             placeholder="Example: Dr. Sarah Ahmad"
           />
         </div>
@@ -288,7 +288,7 @@ function InstructorsPage() {
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
+            className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
             placeholder="sarah@example.com"
           />
         </div>
@@ -300,7 +300,7 @@ function InstructorsPage() {
             type="text"
             value={phone}
             onChange={(event) => setPhone(event.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
+            className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
             placeholder="0111111111"
           />
         </div>
@@ -312,7 +312,7 @@ function InstructorsPage() {
             type="text"
             value={expertise}
             onChange={(event) => setExpertise(event.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
+            className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
             placeholder="Web Development"
           />
         </div>
@@ -323,7 +323,7 @@ function InstructorsPage() {
           <textarea
             value={biography}
             onChange={(event) => setBiography(event.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
+            className="w-full rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
             rows={3}
             placeholder="Enter instructor biography"
           />
@@ -345,7 +345,7 @@ function InstructorsPage() {
                 type="button"
                 onClick={() => void handleUpdateInstructor()}
                 disabled={saving}
-                className="rounded bg-brand-600 px-4 py-2 text-white disabled:opacity-50"
+                className="rounded bg-brand px-4 py-2 text-brand-fg disabled:opacity-50"
               >
                 {saving ? "Updating..." : "Update Instructor"}
               </button>
@@ -363,7 +363,7 @@ function InstructorsPage() {
             <button
               type="submit"
               disabled={saving}
-              className="rounded bg-brand-600 px-4 py-2 text-white disabled:opacity-50"
+              className="rounded bg-brand px-4 py-2 text-brand-fg disabled:opacity-50"
             >
               {saving ? "Creating..." : "Create Instructor"}
             </button>
@@ -373,7 +373,7 @@ function InstructorsPage() {
 
       <div className="table-scroll overflow-x-auto rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
         <table className="w-full text-left">
-          <thead className="border-b border-gray-200 bg-gray-50 font-mono text-xs uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:bg-gray-800 dark:text-gray-400">
+          <thead className="border-b border-gray-200 font-mono text-xs uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:text-gray-400">
             <tr>
               <th className="px-6 py-4">Name</th>
               <th className="px-6 py-4">Email</th>
@@ -415,7 +415,7 @@ function InstructorsPage() {
                       <button
                         type="button"
                         onClick={() => handleEdit(instructor)}
-                        className="rounded bg-brand-600 px-3 py-2 text-sm text-white"
+                        className="rounded bg-brand px-3 py-2 text-sm text-brand-fg"
                       >
                         Edit
                       </button>
@@ -458,7 +458,7 @@ function InstructorsPage() {
                               setLoginPassword(event.target.value)
                             }
                             placeholder="At least 8 characters"
-                            className="w-64 rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500"
+                            className="w-64 rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500"
                           />
                         </div>
 
@@ -466,7 +466,7 @@ function InstructorsPage() {
                           type="button"
                           onClick={() => void handleSaveLogin()}
                           disabled={loginSaving}
-                          className="rounded bg-brand-600 px-4 py-2 text-sm text-white disabled:opacity-50"
+                          className="rounded bg-brand px-4 py-2 text-sm text-brand-fg disabled:opacity-50"
                         >
                           {loginSaving ? "Saving..." : "Save"}
                         </button>

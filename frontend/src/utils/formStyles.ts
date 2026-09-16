@@ -4,5 +4,5 @@
 export function fieldBorderClasses(hasError?: boolean): string {
   return hasError
     ? "border-red-400 focus:border-red-500 focus:ring-red-500/30 dark:border-red-600"
-    : "border-gray-300 focus:border-brand-500 focus:ring-brand-500/30 dark:border-gray-700";
+    : "border-gray-300 focus:border-brand focus:ring-focus dark:border-gray-700";
 }

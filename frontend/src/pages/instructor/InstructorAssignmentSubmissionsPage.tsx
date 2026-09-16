@@ -190,7 +190,7 @@ export default function InstructorAssignmentSubmissionsPage() {
       {/* Back link */}
       <Link
         to={`/instructor/courses/${assignment.courseId}/assignments`}
-        className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
+        className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-brand-ink hover:text-brand-ink-hover"
       >
         <ArrowLeft size={16} />
         Back to Assignments
@@ -198,17 +198,17 @@ export default function InstructorAssignmentSubmissionsPage() {
 
       {/* Header */}
       <div className="mb-6">
-        <p className="mb-1 font-mono text-xs uppercase tracking-wide text-brand-600 dark:text-brand-400">
+        <p className="mb-1 font-mono text-xs uppercase tracking-wide text-brand-ink">
           instructor / submissions
         </p>
 
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">
           {assignment.title}
         </h1>
 
         <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-gray-500 dark:text-gray-400">
           <div className="flex items-center gap-2">
-            <FileText size={16} className="text-brand-500" />
+            <FileText size={16} className="text-brand-ink" />
 
             <span>{points ? `${points} points` : "No points set"}</span>
           </div>
@@ -226,7 +226,7 @@ export default function InstructorAssignmentSubmissionsPage() {
       {/* Summary cards */}
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-100 text-brand-600 dark:bg-brand-950/50 dark:text-brand-400">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-soft text-brand-ink">
             <FileText size={18} />
           </div>
 
@@ -235,7 +235,7 @@ export default function InstructorAssignmentSubmissionsPage() {
               Submitted
             </p>
 
-            <p className="text-xl font-bold text-gray-900 dark:text-gray-50">
+            <p className="text-xl font-semibold text-gray-900 dark:text-gray-50">
               {submittedCount}
             </p>
           </div>
@@ -251,7 +251,7 @@ export default function InstructorAssignmentSubmissionsPage() {
               Graded
             </p>
 
-            <p className="text-xl font-bold text-gray-900 dark:text-gray-50">
+            <p className="text-xl font-semibold text-gray-900 dark:text-gray-50">
               {gradedCount}
             </p>
           </div>
@@ -267,7 +267,7 @@ export default function InstructorAssignmentSubmissionsPage() {
               Missing
             </p>
 
-            <p className="text-xl font-bold text-gray-900 dark:text-gray-50">
+            <p className="text-xl font-semibold text-gray-900 dark:text-gray-50">
               {missingCount}
             </p>
           </div>
@@ -302,7 +302,7 @@ export default function InstructorAssignmentSubmissionsPage() {
                 {/* Student heading */}
                 <div className="flex flex-col gap-3 border-b border-gray-100 p-5 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-600 dark:bg-brand-950/50 dark:text-brand-400">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-soft text-brand-ink">
                       <User size={18} />
                     </div>
 
@@ -375,7 +375,7 @@ export default function InstructorAssignmentSubmissionsPage() {
                               href={submission.submissionLink}
                               target="_blank"
                               rel="noreferrer"
-                              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-brand-600 transition hover:bg-brand-50 dark:border-gray-700 dark:text-brand-400 dark:hover:bg-brand-950/30"
+                              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-brand-ink transition hover:bg-brand-soft dark:border-gray-700"
                             >
                               <ExternalLink size={15} />
                               Open Link
@@ -390,7 +390,7 @@ export default function InstructorAssignmentSubmissionsPage() {
                                   submission.id,
                                 )
                               }
-                              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-brand-600 transition hover:bg-brand-50 dark:border-gray-700 dark:text-brand-400 dark:hover:bg-brand-950/30"
+                              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-brand-ink transition hover:bg-brand-soft dark:border-gray-700"
                             >
                               <FileText size={15} />
                               {submission.attachmentName ?? "View Attachment"}
@@ -433,7 +433,7 @@ export default function InstructorAssignmentSubmissionsPage() {
                                 })
                               }
                               placeholder="Grade"
-                              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+                              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
                             />
 
                             {points && (
@@ -462,14 +462,14 @@ export default function InstructorAssignmentSubmissionsPage() {
                               })
                             }
                             placeholder="Feedback for the student (optional)"
-                            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+                            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
                           />
                         </div>
 
                         <button
                           onClick={() => handleGrade(submission.id)}
                           disabled={savingId === submission.id}
-                          className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-700 disabled:opacity-50"
+                          className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-brand-fg transition hover:bg-brand-hover active:bg-brand-active disabled:opacity-50"
                         >
                           <Save size={16} />
 
