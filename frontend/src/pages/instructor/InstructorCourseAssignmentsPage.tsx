@@ -168,9 +168,7 @@ export default function InstructorCourseAssignmentsPage() {
   }
 
   if (loading) {
-    return (
-      <SkeletonList />
-    );
+    return <SkeletonList />;
   }
 
   return (
@@ -202,7 +200,7 @@ export default function InstructorCourseAssignmentsPage() {
 
         <button
           onClick={openCreateForm}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2.5 text-sm font-medium text-white transition hover:from-brand-700 hover:to-brand-600"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-700"
         >
           <Plus size={17} />
           New Assignment
@@ -401,7 +399,7 @@ export default function InstructorCourseAssignmentsPage() {
             <button
               type="submit"
               disabled={saving}
-              className="rounded-md bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-sm font-medium text-white hover:from-brand-700 hover:to-brand-600 disabled:opacity-50"
+              className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50"
             >
               {saving
                 ? "Saving..."
@@ -507,7 +505,9 @@ export default function InstructorCourseAssignmentsPage() {
 
                       {assignment.hasAttachment && (
                         <AttachmentLink
-                          getDownload={() => getAssignmentAttachmentUrl(assignment.id)}
+                          getDownload={() =>
+                            getAssignmentAttachmentUrl(assignment.id)
+                          }
                           className="flex items-center gap-2 text-brand-600 hover:underline dark:text-brand-400"
                         >
                           <FileText size={16} />
@@ -546,7 +546,7 @@ export default function InstructorCourseAssignmentsPage() {
                   <div className="flex flex-wrap gap-2">
                     <Link
                       to={`${ROUTES.INSTRUCTOR.ASSIGNMENTS}/${assignment.id}/submissions`}
-                      className="inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-brand-600 to-brand-500 px-3.5 py-2 text-sm font-medium text-white transition hover:from-brand-700 hover:to-brand-600"
+                      className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-medium text-white transition hover:bg-brand-700"
                     >
                       <Users size={16} />
                       View Submissions

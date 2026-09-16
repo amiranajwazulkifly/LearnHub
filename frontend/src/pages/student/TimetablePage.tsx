@@ -1,176 +1,259 @@
 import { useEffect, useState } from "react";
-
+import { Link } from "react-router-dom";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   getMyTimetable,
   type TimetableSession,
 } from "../../services/timetableService";
-
 import PageHeader from "../../components/layout/PageHeader";
-import { PinIcon, ProfileIcon } from "../../components/common/NavIcons";
 import { SkeletonList } from "../../components/common/Skeleton";
 import EmptyState from "../../components/common/EmptyState";
 import {
-  DAY_NAMES,
   DAY_ORDER,
+  DAY_SHORT_NAMES,
+  DAY_NAMES,
   formatTime,
-  getCourseColor,
-  getTodayDayOfWeek,
-  isSessionActiveOn,
   dateForDayThisWeek,
+  sessionsOnDate,
+  getNextSession,
+  getCourseColor,
+  layoutDaySessions,
 } from "../../utils/timetable";
-
+const minutes = (time: string) => {
+  const [h, m] = time.split(":").map(Number);
+  return h * 60 + m;
+};
 export default function TimetablePage() {
   const [sessions, setSessions] = useState<TimetableSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const [week, setWeek] = useState(0);
   useEffect(() => {
-    async function loadTimetable() {
-      try {
-        setLoading(true);
-        setError("");
-
-        const response = await getMyTimetable();
-
-        setSessions(response.data);
-      } catch (error) {
-        console.error(error);
-        setError("Failed to load timetable");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    void loadTimetable();
+    getMyTimetable()
+      .then((r) => setSessions(r.data))
+      .catch(() => setError("Failed to load timetable"))
+      .finally(() => setLoading(false));
   }, []);
-
-  if (loading) {
-    return <SkeletonList rows={3} height="h-40" />;
-  }
-
-  if (error) {
-    return <p className="text-red-600 dark:text-red-400">{error}</p>;
-  }
-
-  const todayDow = getTodayDayOfWeek();
-
-  const uniqueCourses = [
-    ...new Map(sessions.map((session) => [session.course_id, session])).values(),
+  if (loading) return <SkeletonList rows={3} height="h-40" />;
+  if (error)
+    return (
+      <p role="alert" className="text-red-600 dark:text-red-400">
+        {error}
+      </p>
+    );
+  const anchor = new Date();
+  anchor.setDate(anchor.getDate() + week * 7);
+  const dates = DAY_ORDER.map((d) => dateForDayThisWeek(d, anchor));
+  const days = dates.map((date) => sessionsOnDate(sessions, date));
+  const weekSessions = days.flat();
+  const firstHour = Math.min(
+    8,
+    ...weekSessions.map((s) => Math.floor(minutes(s.start_time) / 60)),
+  );
+  const lastHour = Math.max(
+    18,
+    ...weekSessions.map((s) => Math.ceil(minutes(s.end_time) / 60)),
+  );
+  const hours = Array.from(
+    { length: lastHour - firstHour },
+    (_, i) => firstHour + i,
+  );
+  const courses = [
+    ...new Map(weekSessions.map((s) => [s.course_id, s])).values(),
   ];
-
+  const next = getNextSession(sessions);
+  const shortDate = (date: Date) =>
+    date.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+  function sessionContent(session: TimetableSession) {
+    return (
+      <>
+        <strong>{session.code}</strong>
+        <span>
+          {formatTime(session.start_time)} – {formatTime(session.end_time)}
+        </span>
+        <span>{session.instructor_name}</span>
+        <span>{session.location || "TBA"}</span>
+      </>
+    );
+  }
   return (
     <div>
       <PageHeader
-        eyebrow="student / timetable"
+        eyebrow="Student"
         title="My Timetable"
-        description="Your weekly recurring class schedule, at a glance."
+        description="Your weekly class schedule, at a glance."
+        actions={
+          <div className="week-controls">
+            <button
+              aria-label="Previous week"
+              onClick={() => setWeek((w) => w - 1)}
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <span>
+              {shortDate(dates[0])} – {shortDate(dates[6])}{" "}
+              {dates[6].getFullYear()}
+            </span>
+            <button
+              aria-label="Next week"
+              onClick={() => setWeek((w) => w + 1)}
+            >
+              <ChevronRight size={18} />
+            </button>
+            <button onClick={() => setWeek(0)}>Today</button>
+          </div>
+        }
       />
-
       {sessions.length === 0 ? (
         <EmptyState
           title="Nothing scheduled"
           description="Once you enroll in a course with weekly sessions, they will appear here."
         />
       ) : (
-        <>
-          {uniqueCourses.length > 1 && (
-            <div className="mb-5 flex flex-wrap items-center gap-3 rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-900">
-              {uniqueCourses.map((course) => (
-                <span
-                  key={course.course_id}
-                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-mono text-[11px] font-medium ${getCourseColor(course.course_id).chip}`}
+        <div className="timetable-layout">
+          <div>
+            <div
+              className="week-grid"
+              style={{ gridTemplateRows: `64px ${hours.length * 72}px` }}
+            >
+              <div className="calendar-corner">TIME</div>
+              {dates.map((date, i) => (
+                <div
+                  key={i}
+                  className={`calendar-day ${date.toDateString() === new Date().toDateString() ? "today" : ""}`}
                 >
-                  {course.code}
-                </span>
+                  <strong>{DAY_SHORT_NAMES[DAY_ORDER[i]]}</strong>
+                  <span>{shortDate(date)}</span>
+                </div>
+              ))}
+              <div className="calendar-times">
+                {hours.map((h) => (
+                  <span key={h}>{String(h).padStart(2, "0")}:00</span>
+                ))}
+              </div>
+              {days.map((daySessions, i) => (
+                <div
+                  key={i}
+                  className={`calendar-column ${dates[i].toDateString() === new Date().toDateString() ? "today" : ""}`}
+                >
+                  {layoutDaySessions(daySessions).map(
+                    ({ session, lane, lanes }) => {
+                      return (
+                        <Link
+                          key={session.schedule_id}
+                          to={`/student/courses/${session.course_id}`}
+                          className={`calendar-event ${getCourseColor(session.course_id).border}`}
+                          style={{
+                            top:
+                              (minutes(session.start_time) - firstHour * 60) *
+                              1.2,
+                            height: Math.max(
+                              (minutes(session.end_time) -
+                                minutes(session.start_time)) *
+                                1.2 -
+                                4,
+                              28,
+                            ),
+                            left: `calc(${(lane / lanes) * 100}% + 3px)`,
+                            width: `calc(${100 / lanes}% - 6px)`,
+                          }}
+                          title={`${session.title} · ${session.instructor_name} · ${session.location || "TBA"}`}
+                        >
+                          {sessionContent(session)}
+                        </Link>
+                      );
+                    },
+                  )}
+                </div>
               ))}
             </div>
-          )}
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
-            {DAY_ORDER.map((dow) => {
-              const daySessions = sessions
-                .filter((session) => session.day_of_week === dow)
-                .filter((session) => isSessionActiveOn(session, dateForDayThisWeek(dow)))
-                .sort((a, b) => a.start_time.localeCompare(b.start_time));
-
-              const isToday = dow === todayDow;
-
-              return (
-                <div key={dow} className="min-w-0">
-                  <div
-                    className={`mb-3 flex items-center justify-between rounded-lg px-3 py-2 ${
-                      isToday
-                        ? "bg-linear-to-r from-brand-600 to-brand-500 text-white"
-                        : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-                    }`}
-                  >
-                    <span className="text-sm font-semibold">
-                      {DAY_NAMES[dow]}
-                      <span
-                        className={`ml-1.5 font-mono text-[11px] font-normal ${
-                          isToday ? "text-white/80" : "text-gray-500 dark:text-gray-400"
-                        }`}
+            <div className="daily-schedule">
+              {days.map((daySessions, i) => (
+                <section className="panel" key={i}>
+                  <h2>
+                    {DAY_NAMES[DAY_ORDER[i]]} <span>{shortDate(dates[i])}</span>
+                  </h2>
+                  {daySessions.length ? (
+                    daySessions.map((s) => (
+                      <Link
+                        className={`daily-event ${getCourseColor(s.course_id).border}`}
+                        key={s.schedule_id}
+                        to={`/student/courses/${s.course_id}`}
                       >
-                        {dateForDayThisWeek(dow).toLocaleDateString(undefined, {
-                          day: "numeric",
-                          month: "short",
-                        })}
-                      </span>
-                    </span>
-                    {isToday && (
-                      <span className="font-mono text-[10px] uppercase tracking-wide text-white/90">
-                        Today
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="space-y-3">
-                    {daySessions.length === 0 ? (
-                      <div className="rounded-lg border border-dashed border-gray-200 p-4 text-center text-xs text-gray-400 dark:border-gray-800 dark:text-gray-600">
-                        No classes
-                      </div>
-                    ) : (
-                      daySessions.map((session) => {
-                        const color = getCourseColor(session.course_id);
-
-                        return (
-                          <div
-                            key={session.schedule_id}
-                            className={`rounded-lg border-l-4 bg-white p-3 shadow-sm dark:bg-gray-900 ${color.border}`}
-                          >
-                            <p className="font-mono text-xs font-semibold text-gray-500 dark:text-gray-400">
-                              {formatTime(session.start_time)} - {formatTime(session.end_time)}
-                            </p>
-
-                            <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-50">
-                              {session.code}
-                            </p>
-
-                            <p className="text-xs text-gray-600 dark:text-gray-400">
-                              {session.title}
-                            </p>
-
-                            <div className="mt-2 space-y-1 text-xs text-gray-500 dark:text-gray-400">
-                              <p className="flex items-center gap-1.5">
-                                <ProfileIcon className="h-3.5 w-3.5 shrink-0" />
-                                {session.instructor_name}
-                              </p>
-
-                              <p className="flex items-center gap-1.5">
-                                <PinIcon className="h-3.5 w-3.5 shrink-0" />
-                                {session.location || "TBA"}
-                              </p>
-                            </div>
-                          </div>
-                        );
-                      })
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                        {sessionContent(s)}
+                        <span>{s.title}</span>
+                      </Link>
+                    ))
+                  ) : (
+                    <p>No classes</p>
+                  )}
+                </section>
+              ))}
+            </div>
           </div>
-        </>
+          <aside className="timetable-summary">
+            <section className="panel">
+              <div className="panel-heading">
+                <h2>Next class</h2>
+              </div>
+              {next ? (
+                <>
+                  <div className="next-session">
+                    {sessionContent(next.session)}
+                  </div>
+                  <Link
+                    className="primary-button"
+                    to={`/student/courses/${next.session.course_id}`}
+                  >
+                    View course →
+                  </Link>
+                </>
+              ) : (
+                <p className="empty-copy">No upcoming classes this week.</p>
+              )}
+            </section>
+            <section className="panel">
+              <h2>This week’s summary</h2>
+              <div className="week-stats">
+                <div>
+                  <strong>{weekSessions.length}</strong>
+                  <span>Classes</span>
+                </div>
+                <div>
+                  <strong>{courses.length}</strong>
+                  <span>Courses</span>
+                </div>
+                <div>
+                  <strong>
+                    {Number(
+                      (
+                        weekSessions.reduce(
+                          (sum, s) =>
+                            sum + minutes(s.end_time) - minutes(s.start_time),
+                          0,
+                        ) / 60
+                      ).toFixed(1),
+                    )}
+                    h
+                  </strong>
+                  <span>Total time</span>
+                </div>
+              </div>
+              {courses.map((c) => (
+                <div className="week-course" key={c.course_id}>
+                  <span>{c.code}</span>
+                  <small>
+                    {
+                      weekSessions.filter((s) => s.course_id === c.course_id)
+                        .length
+                    }{" "}
+                    session(s)
+                  </small>
+                </div>
+              ))}
+            </section>
+          </aside>
+        </div>
       )}
     </div>
   );

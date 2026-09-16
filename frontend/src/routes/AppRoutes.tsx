@@ -52,6 +52,8 @@ import { useAuthStore } from "../store/useAuthStore";
 import ProtectedRoute, { SessionCheck } from "./ProtectedRoute";
 import RoleRoute from "./RoleRoute";
 
+import LandingPage from "../pages/LandingPage";
+
 function RootRedirect() {
   const user = useAuthStore((state) => state.user);
 
@@ -64,7 +66,7 @@ function RootRedirect() {
   }
 
   if (!isAuthenticated || !user) {
-    return <Navigate to={ROUTES.LOGIN} replace />;
+    return <LandingPage />;
   }
 
   return <Navigate to={getDefaultRouteForRole(user.role)} replace />;
@@ -107,7 +109,10 @@ function AppRoutes() {
 
             <Route path={ROUTES.ADMIN.COURSES} element={<CoursesPage />} />
             <Route path="/admin/courses/create" element={<CourseFormPage />} />
-            <Route path="/admin/courses/:id/edit" element={<CourseFormPage />} />
+            <Route
+              path="/admin/courses/:id/edit"
+              element={<CourseFormPage />}
+            />
             <Route
               path={ROUTES.ADMIN.CATEGORIES}
               element={<CategoriesPage />}

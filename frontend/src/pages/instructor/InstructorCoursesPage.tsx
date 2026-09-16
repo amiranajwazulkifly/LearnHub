@@ -49,9 +49,7 @@ export default function InstructorCoursesPage() {
   }, []);
 
   if (loading) {
-    return (
-      <SkeletonCards cards={3} />
-    );
+    return <SkeletonCards cards={3} />;
   }
 
   return (
@@ -224,7 +222,7 @@ export default function InstructorCoursesPage() {
 
                 <Link
                   to={`${ROUTES.INSTRUCTOR.COURSES}/${course.id}/assignments`}
-                  className="flex items-center justify-center gap-2 rounded-lg bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2.5 text-center text-sm font-medium text-white transition hover:from-brand-700 hover:to-brand-600"
+                  className="flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-center text-sm font-medium text-white transition hover:bg-brand-700"
                 >
                   <ClipboardList size={16} />
                   Assignments

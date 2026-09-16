@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { useEffect } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 
-import Navbar from '../components/layout/Navbar';
-import Sidebar from '../components/layout/Sidebar';
-import { ROUTES } from '../constants/routes';
-import { useAnnouncementStore } from '../store/useAnnouncementStore';
+import Navbar from "../components/layout/Navbar";
+import Sidebar from "../components/layout/Sidebar";
+import { ROUTES } from "../constants/routes";
+import { useAnnouncementStore } from "../store/useAnnouncementStore";
 import {
   AnnouncementsIcon,
   AssignmentsIcon,
@@ -13,42 +13,42 @@ import {
   MyCoursesIcon,
   ProfileIcon,
   SchedulesIcon,
-} from '../components/common/NavIcons';
+} from "../components/common/NavIcons";
 
 const studentNavigation = [
   {
-    label: 'Dashboard',
+    label: "Dashboard",
     path: ROUTES.STUDENT.DASHBOARD,
     icon: <DashboardIcon />,
     end: true,
   },
   {
-    label: 'Profile',
+    label: "Profile",
     path: ROUTES.STUDENT.PROFILE,
     icon: <ProfileIcon />,
   },
   {
-    label: 'Browse Courses',
+    label: "Browse Courses",
     path: ROUTES.STUDENT.COURSES,
     icon: <BrowseCoursesIcon />,
   },
   {
-    label: 'My Courses',
+    label: "My Courses",
     path: ROUTES.STUDENT.MY_COURSES,
     icon: <MyCoursesIcon />,
   },
   {
-    label: 'Tasks',
+    label: "Tasks",
     path: ROUTES.STUDENT.TASKS,
     icon: <AssignmentsIcon />,
   },
   {
-    label: 'Timetable',
+    label: "Timetable",
     path: ROUTES.STUDENT.TIMETABLE,
     icon: <SchedulesIcon />,
   },
   {
-    label: 'Announcements',
+    label: "Announcements",
     path: ROUTES.STUDENT.ANNOUNCEMENTS,
     icon: <AnnouncementsIcon />,
   },
@@ -56,7 +56,9 @@ const studentNavigation = [
 
 function StudentLayout() {
   const location = useLocation();
-  const unreadAnnouncements = useAnnouncementStore((state) => state.unreadCount);
+  const unreadAnnouncements = useAnnouncementStore(
+    (state) => state.unreadCount,
+  );
   const refreshUnread = useAnnouncementStore((state) => state.refreshUnread);
 
   useEffect(() => {
@@ -64,17 +66,19 @@ function StudentLayout() {
   }, [refreshUnread, location.pathname]);
 
   const navigation = studentNavigation.map((item) =>
-    item.path === ROUTES.STUDENT.ANNOUNCEMENTS ? { ...item, badge: unreadAnnouncements } : item,
+    item.path === ROUTES.STUDENT.ANNOUNCEMENTS
+      ? { ...item, badge: unreadAnnouncements }
+      : item,
   );
 
   return (
-    <div className="bg-line-grid min-h-screen bg-gray-100 dark:bg-gray-950">
+    <div className="app-shell student-shell">
       <Navbar portalName="Student Portal" />
 
-      <div className="flex flex-col md:flex-row">
+      <div className="shell-body">
         <Sidebar items={navigation} />
 
-        <main className="min-w-0 flex-1 p-4 sm:p-6">
+        <main className="app-content">
           <Outlet />
         </main>
       </div>

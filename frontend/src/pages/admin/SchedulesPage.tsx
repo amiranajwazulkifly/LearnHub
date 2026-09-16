@@ -257,7 +257,9 @@ function SchedulesPage() {
       </div>
 
       {error && (
-        <div className="mb-4 rounded bg-red-100 p-4 text-red-700 dark:bg-red-900/40 dark:text-red-400">{error}</div>
+        <div className="mb-4 rounded bg-red-100 p-4 text-red-700 dark:bg-red-900/40 dark:text-red-400">
+          {error}
+        </div>
       )}
 
       <form
@@ -390,7 +392,7 @@ function SchedulesPage() {
                 type="button"
                 onClick={() => void handleUpdateSchedule()}
                 disabled={saving}
-                className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-white disabled:opacity-50"
+                className="rounded bg-brand-600 px-4 py-2 text-white disabled:opacity-50"
               >
                 {saving ? "Updating..." : "Update Schedule"}
               </button>
@@ -408,7 +410,7 @@ function SchedulesPage() {
             <button
               type="submit"
               disabled={saving}
-              className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-white disabled:opacity-50"
+              className="rounded bg-brand-600 px-4 py-2 text-white disabled:opacity-50"
             >
               {saving ? "Creating..." : "Create Schedule"}
             </button>
@@ -431,7 +433,10 @@ function SchedulesPage() {
 
           <tbody>
             {schedules.map((schedule) => (
-              <tr key={schedule.id} className="border-b border-gray-200 dark:border-gray-800">
+              <tr
+                key={schedule.id}
+                className="border-b border-gray-200 dark:border-gray-800"
+              >
                 <td className="px-6 py-4">
                   <div className="font-medium">
                     {schedule.course_title ?? "Unknown Course"}
@@ -467,7 +472,7 @@ function SchedulesPage() {
                     <button
                       type="button"
                       onClick={() => handleEdit(schedule)}
-                      className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-3 py-2 text-sm text-white"
+                      className="rounded bg-brand-600 px-3 py-2 text-sm text-white"
                     >
                       Edit
                     </button>
@@ -486,8 +491,15 @@ function SchedulesPage() {
 
             {schedules.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                  <EmptyState variant="plain" title="No schedules found" description="Add a weekly session above to build the timetable." />
+                <td
+                  colSpan={6}
+                  className="px-6 py-8 text-center text-gray-500 dark:text-gray-400"
+                >
+                  <EmptyState
+                    variant="plain"
+                    title="No schedules found"
+                    description="Add a weekly session above to build the timetable."
+                  />
                 </td>
               </tr>
             )}

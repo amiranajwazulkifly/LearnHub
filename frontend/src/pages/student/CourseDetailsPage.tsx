@@ -76,11 +76,12 @@ export default function CourseDetailsPage() {
       }
 
       try {
-        const [courseResponse, schedulesResponse, myCoursesResponse] = await Promise.all([
-          getCourseById(id),
-          getSchedules(),
-          getMyCourses(),
-        ]);
+        const [courseResponse, schedulesResponse, myCoursesResponse] =
+          await Promise.all([
+            getCourseById(id),
+            getSchedules(),
+            getMyCourses(),
+          ]);
 
         setCourse(courseResponse);
 
@@ -92,7 +93,8 @@ export default function CourseDetailsPage() {
 
         const existingEnrollment = myCoursesResponse.data.find(
           (enrollment) =>
-            enrollment.course_id === id && enrollment.enrollment_status === "enrolled",
+            enrollment.course_id === id &&
+            enrollment.enrollment_status === "enrolled",
         );
 
         if (existingEnrollment) {
@@ -164,14 +166,19 @@ export default function CourseDetailsPage() {
       setEnrollmentId(null);
       setCourse((previous) =>
         previous
-          ? { ...previous, enrolled_count: Math.max((previous.enrolled_count ?? 1) - 1, 0) }
+          ? {
+              ...previous,
+              enrolled_count: Math.max((previous.enrolled_count ?? 1) - 1, 0),
+            }
           : previous,
       );
     } catch (error) {
       console.error(error);
 
       if (axios.isAxiosError(error)) {
-        setError(error.response?.data?.message ?? "Failed to cancel enrollment");
+        setError(
+          error.response?.data?.message ?? "Failed to cancel enrollment",
+        );
       } else {
         setError("Failed to cancel enrollment");
       }
@@ -181,9 +188,7 @@ export default function CourseDetailsPage() {
   }
 
   if (loading) {
-    return (
-      <SkeletonForm />
-    );
+    return <SkeletonForm />;
   }
 
   if (error && !course) {
@@ -198,7 +203,9 @@ export default function CourseDetailsPage() {
   const enrolledCount = course.enrolled_count ?? 0;
   const seatsRemaining = Math.max(capacity - enrolledCount, 0);
   const fillPercent =
-    capacity > 0 ? Math.min(100, Math.round((enrolledCount / capacity) * 100)) : 0;
+    capacity > 0
+      ? Math.min(100, Math.round((enrolledCount / capacity) * 100))
+      : 0;
 
   const isPublished = course.status === "published";
   const isFull = seatsRemaining <= 0;
@@ -276,19 +283,20 @@ export default function CourseDetailsPage() {
             </h1>
 
             <p className="mt-4 text-gray-600 dark:text-gray-400">
-              {course.description || "No description provided for this course yet."}
+              {course.description ||
+                "No description provided for this course yet."}
             </p>
           </div>
 
-          <div className="relative flex h-56 items-center justify-center overflow-hidden rounded-xl bg-linear-to-br from-brand-900 via-brand-700 to-brand-500 sm:h-72">
-            <div
-              aria-hidden="true"
-              className="bg-dot-grid pointer-events-none absolute inset-0 opacity-40 mix-blend-overlay"
-            />
-
-            <span className="relative font-mono text-6xl font-bold tracking-widest text-white/20 sm:text-8xl">
-              {course.code}
-            </span>
+          <div className="academic-art course-identity">
+            <span>{course.code}</span>
+            <p>
+              BUILD
+              <br />
+              SKILLS
+              <br />
+              THAT MATTER.
+            </p>
           </div>
 
           <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
@@ -297,7 +305,8 @@ export default function CourseDetailsPage() {
             </h2>
 
             <p className="mt-3 whitespace-pre-line text-gray-600 dark:text-gray-400">
-              {course.description || "No further details have been added for this course."}
+              {course.description ||
+                "No further details have been added for this course."}
             </p>
           </div>
         </div>
@@ -325,7 +334,7 @@ export default function CourseDetailsPage() {
 
               <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
                 <div
-                  className="h-full rounded-full bg-linear-to-r from-brand-600 to-brand-400"
+                  className="h-full rounded-full bg-brand-600"
                   style={{ width: `${fillPercent}%` }}
                 />
               </div>
@@ -342,7 +351,9 @@ export default function CourseDetailsPage() {
                 <ClockIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
 
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Schedule</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Schedule
+                  </p>
                   <p className="font-medium text-gray-900 dark:text-gray-100">
                     {schedule
                       ? `${dayNames[schedule.day_of_week]}, ${schedule.start_time.slice(0, 5)} - ${schedule.end_time.slice(0, 5)}`
@@ -355,7 +366,9 @@ export default function CourseDetailsPage() {
                 <PinIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
 
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Location</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Location
+                  </p>
                   <p className="font-medium text-gray-900 dark:text-gray-100">
                     {schedule?.location || "TBA"}
                   </p>
@@ -381,7 +394,7 @@ export default function CourseDetailsPage() {
             <button
               onClick={handleEnroll}
               disabled={enrollDisabled}
-              className="mt-5 w-full rounded-lg bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:from-brand-700 hover:to-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-5 w-full rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {enrollLabel}
             </button>
@@ -403,7 +416,9 @@ export default function CourseDetailsPage() {
             )}
 
             {error && (
-              <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p>
+              <p className="mt-3 text-sm text-red-600 dark:text-red-400">
+                {error}
+              </p>
             )}
           </div>
 
@@ -414,7 +429,7 @@ export default function CourseDetailsPage() {
               </h3>
 
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-brand-600 to-brand-400 text-sm font-bold text-white">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-600 text-sm font-bold text-white">
                   {getInitials(course.instructor_name)}
                 </div>
 

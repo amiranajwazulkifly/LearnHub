@@ -6,11 +6,17 @@ import {
   getAssignmentAttachmentUrl,
   getSubmissionAttachmentUrl,
 } from "../../services/assignmentService";
-import { getMySubmission, submitAssignment } from "../../services/submissionService";
+import {
+  getMySubmission,
+  submitAssignment,
+} from "../../services/submissionService";
 import type { Assignment, Submission } from "../../types/assignment";
 import { fieldBorderClasses } from "../../utils/formStyles";
 import { ROUTES } from "../../constants/routes";
-import { describeLoadError, type LoadErrorCopy } from "../../utils/errorHandler";
+import {
+  describeLoadError,
+  type LoadErrorCopy,
+} from "../../utils/errorHandler";
 import { formatDateTime, formatGrade } from "../../utils/formatters";
 import ErrorState from "../../components/common/ErrorState";
 import { toast } from "../../store/useToastStore";
@@ -53,7 +59,10 @@ export default function StudentAssignmentDetailPage() {
     if (!assignmentId) return;
     setLoading(true);
     setLoadError(null);
-    Promise.all([getAssignmentById(assignmentId), getMySubmission(assignmentId)])
+    Promise.all([
+      getAssignmentById(assignmentId),
+      getMySubmission(assignmentId),
+    ])
       .then(([a, s]) => {
         setAssignment(a);
         setSubmission(s);
@@ -89,11 +98,15 @@ export default function StudentAssignmentDetailPage() {
       setFile(null);
       load();
       toast.success(
-        submission ? "Submission replaced." : "Assignment submitted successfully.",
+        submission
+          ? "Submission replaced."
+          : "Assignment submitted successfully.",
       );
     } catch {
       toast.error("Unable to submit. Please try again.");
-      setSubmitError("Failed to submit. Please check your link is a valid URL and try again.");
+      setSubmitError(
+        "Failed to submit. Please check your link is a valid URL and try again.",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -105,7 +118,8 @@ export default function StudentAssignmentDetailPage() {
 
   if (loadError || !assignment) {
     const copy =
-      loadError ?? describeLoadError(new Error("missing assignment"), "assignment");
+      loadError ??
+      describeLoadError(new Error("missing assignment"), "assignment");
 
     return (
       <ErrorState
@@ -118,7 +132,8 @@ export default function StudentAssignmentDetailPage() {
     );
   }
 
-  const isGraded = submission?.grade !== null && submission?.grade !== undefined;
+  const isGraded =
+    submission?.grade !== null && submission?.grade !== undefined;
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -132,10 +147,14 @@ export default function StudentAssignmentDetailPage() {
       <p className="mt-2 font-mono text-xs font-semibold text-brand-600 dark:text-brand-400">
         {assignment.courseCode} · {assignment.courseTitle}
       </p>
-      <h1 className="mb-2 text-2xl font-bold text-gray-900 dark:text-gray-50">{assignment.title}</h1>
+      <h1 className="mb-2 text-2xl font-bold text-gray-900 dark:text-gray-50">
+        {assignment.title}
+      </h1>
       <p className="mb-6 font-mono text-xs text-gray-500 dark:text-gray-400">
         {assignment.points ? `${assignment.points} points` : "No points set"}
-        {assignment.dueAt ? ` · Due ${formatDateTime(assignment.dueAt)}` : " · No due date"}
+        {assignment.dueAt
+          ? ` · Due ${formatDateTime(assignment.dueAt)}`
+          : " · No due date"}
       </p>
 
       {assignment.description && (
@@ -200,14 +219,20 @@ export default function StudentAssignmentDetailPage() {
           <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950/30">
             {submission.hasAttachment ? (
               <AttachmentLink
-                getDownload={() => getSubmissionAttachmentUrl(submission.assignmentId, submission.id)}
+                getDownload={() =>
+                  getSubmissionAttachmentUrl(
+                    submission.assignmentId,
+                    submission.id,
+                  )
+                }
                 className="text-sm font-medium text-brand-600 hover:underline dark:text-brand-400"
               >
                 {submission.attachmentName}
               </AttachmentLink>
             ) : (
               <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Text {submission.submissionLink ? "and link" : "response"} submitted
+                Text {submission.submissionLink ? "and link" : "response"}{" "}
+                submitted
               </p>
             )}
 
@@ -229,7 +254,9 @@ export default function StudentAssignmentDetailPage() {
         )}
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Text</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Text
+          </label>
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -240,7 +267,9 @@ export default function StudentAssignmentDetailPage() {
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Link</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Link
+          </label>
           <input
             type="url"
             value={link}
@@ -258,7 +287,12 @@ export default function StudentAssignmentDetailPage() {
             <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">
               Current file:{" "}
               <AttachmentLink
-                getDownload={() => getSubmissionAttachmentUrl(submission.assignmentId, submission.id)}
+                getDownload={() =>
+                  getSubmissionAttachmentUrl(
+                    submission.assignmentId,
+                    submission.id,
+                  )
+                }
                 className="text-brand-600 hover:underline dark:text-brand-400"
               >
                 {submission.attachmentName}
@@ -272,12 +306,16 @@ export default function StudentAssignmentDetailPage() {
           />
         </div>
 
-        {submitError && <p className="text-sm text-red-600 dark:text-red-400">{submitError}</p>}
+        {submitError && (
+          <p className="text-sm text-red-600 dark:text-red-400">
+            {submitError}
+          </p>
+        )}
 
         <button
           type="submit"
           disabled={submitting || !canSubmit}
-          className="rounded-md bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-sm font-medium text-white hover:from-brand-700 hover:to-brand-600 disabled:opacity-50"
+          className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50"
         >
           {submitting
             ? "Submitting..."

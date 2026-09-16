@@ -10,7 +10,10 @@ import PageHeader from "../../components/layout/PageHeader";
 import { SkeletonList } from "../../components/common/Skeleton";
 import EmptyState from "../../components/common/EmptyState";
 import ErrorState from "../../components/common/ErrorState";
-import { describeLoadError, type LoadErrorCopy } from "../../utils/errorHandler";
+import {
+  describeLoadError,
+  type LoadErrorCopy,
+} from "../../utils/errorHandler";
 import { formatDate } from "../../utils/formatters";
 import { useAnnouncementStore } from "../../store/useAnnouncementStore";
 
@@ -45,13 +48,17 @@ export default function StudentAnnouncementsPage() {
         // loads, so any later fetch — a retry, or React StrictMode running
         // the effect twice in development — sees them as read already.
         // Replacing would wipe the NEW markers the reader hasn't seen yet.
-        setNewIds((previous) => new Set([...previous, ...unread.map((a) => a.id)]));
+        setNewIds(
+          (previous) => new Set([...previous, ...unread.map((a) => a.id)]),
+        );
 
         // Viewing the page is opening them. Mark each read, and clear the
         // sidebar badge straight away rather than waiting on the requests.
         if (unread.length > 0) {
           setUnreadCount(0);
-          void Promise.allSettled(unread.map((a) => markAnnouncementRead(a.id)));
+          void Promise.allSettled(
+            unread.map((a) => markAnnouncementRead(a.id)),
+          );
         }
       })
       .catch((err) => setLoadError(describeLoadError(err, "announcements")))
@@ -67,7 +74,7 @@ export default function StudentAnnouncementsPage() {
   const newCount = newIds.size;
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="announcement-feed">
       <PageHeader
         eyebrow="student / announcements"
         title="Announcements"
@@ -90,18 +97,14 @@ export default function StudentAnnouncementsPage() {
           description="Updates from your instructors and the campus will appear here."
         />
       ) : (
-        <div className="space-y-4">
+        <div className="announcement-feed-list">
           {announcements.map((a) => {
             const isNew = newIds.has(a.id);
 
             return (
               <article
                 key={a.id}
-                className={`rounded-xl border bg-white p-4 dark:bg-gray-900 ${
-                  isNew
-                    ? "border-brand-300 dark:border-brand-800"
-                    : "border-gray-200 dark:border-gray-800"
-                }`}
+                className={`feed-item ${isNew ? "unread" : ""}`}
               >
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
@@ -123,7 +126,9 @@ export default function StudentAnnouncementsPage() {
                   )}
                 </div>
 
-                <h3 className="mt-2 font-semibold text-gray-900 dark:text-gray-50">{a.title}</h3>
+                <h3 className="mt-2 font-semibold text-gray-900 dark:text-gray-50">
+                  {a.title}
+                </h3>
                 <p className="mt-1 whitespace-pre-wrap text-sm text-gray-600 dark:text-gray-400">
                   {a.content}
                 </p>

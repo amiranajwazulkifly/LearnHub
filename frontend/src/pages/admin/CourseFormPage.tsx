@@ -131,7 +131,9 @@ function CourseFormPage() {
       }
 
       toast.success(
-        isEditMode ? "Course updated successfully." : "Course created successfully.",
+        isEditMode
+          ? "Course updated successfully."
+          : "Course created successfully.",
       );
       navigate("/admin/courses");
     } catch (error) {
@@ -311,7 +313,7 @@ function CourseFormPage() {
           <button
             type="submit"
             disabled={loading}
-            className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-5 py-2 text-white disabled:opacity-50"
+            className="rounded bg-brand-600 px-5 py-2 text-white disabled:opacity-50"
           >
             {loading
               ? "Saving..."

@@ -1,42 +1,25 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import {
-  Link,
-  useNavigate,
-} from 'react-router-dom';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
 
-import {
-  getDefaultRouteForRole,
-  ROUTES,
-} from '../../constants/routes';
+import { getDefaultRouteForRole, ROUTES } from "../../constants/routes";
 
-import {
-  loginSchema,
-  type LoginFormValues,
-} from '../../schemas/authSchema';
+import { loginSchema, type LoginFormValues } from "../../schemas/authSchema";
 
-import { useAuthStore } from '../../store/useAuthStore';
-import { fieldBorderClasses } from '../../utils/formStyles';
+import { useAuthStore } from "../../store/useAuthStore";
+import { fieldBorderClasses } from "../../utils/formStyles";
 
 function LoginForm() {
   const navigate = useNavigate();
 
-  const login = useAuthStore(
-    (state) => state.login
-  );
+  const login = useAuthStore((state) => state.login);
 
-  const isLoading = useAuthStore(
-    (state) => state.isLoading
-  );
+  const isLoading = useAuthStore((state) => state.isLoading);
 
-  const error = useAuthStore(
-    (state) => state.error
-  );
+  const error = useAuthStore((state) => state.error);
 
-  const clearError = useAuthStore(
-    (state) => state.clearError
-  );
+  const clearError = useAuthStore((state) => state.clearError);
 
   const {
     register: registerField,
@@ -45,8 +28,8 @@ function LoginForm() {
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
   });
 
@@ -54,27 +37,18 @@ function LoginForm() {
     clearError();
   }, [clearError]);
 
-  async function onSubmit(
-    values: LoginFormValues
-  ) {
+  async function onSubmit(values: LoginFormValues) {
     try {
       const user = await login(values);
 
-      navigate(
-        getDefaultRouteForRole(user.role),
-        { replace: true }
-      );
+      navigate(getDefaultRouteForRole(user.role), { replace: true });
     } catch {
       // The Zustand store already saves the error.
     }
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="space-y-5"
-      noValidate
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
       {error && (
         <div
           role="alert"
@@ -85,10 +59,7 @@ function LoginForm() {
       )}
 
       <div>
-        <label
-          htmlFor="email"
-          className="mb-1 block text-sm font-medium"
-        >
+        <label htmlFor="email" className="mb-1 block text-sm font-medium">
           Email address
         </label>
 
@@ -111,7 +82,7 @@ function LoginForm() {
             id="email"
             type="email"
             autoComplete="email"
-            {...registerField('email')}
+            {...registerField("email")}
             className={`w-full rounded-lg border bg-white py-2 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(!!errors.email)}`}
             placeholder="name@example.com"
           />
@@ -126,10 +97,7 @@ function LoginForm() {
 
       <div>
         <div className="mb-1 flex items-center justify-between">
-          <label
-            htmlFor="password"
-            className="block text-sm font-medium"
-          >
+          <label htmlFor="password" className="block text-sm font-medium">
             Password
           </label>
 
@@ -160,7 +128,7 @@ function LoginForm() {
             id="password"
             type="password"
             autoComplete="current-password"
-            {...registerField('password')}
+            {...registerField("password")}
             className={`w-full rounded-lg border bg-white py-2 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(!!errors.password)}`}
             placeholder="Enter your password"
           />
@@ -176,13 +144,13 @@ function LoginForm() {
       <button
         type="submit"
         disabled={isLoading}
-        className="btn-sheen w-full rounded-lg bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 font-medium text-white transition hover:from-brand-700 hover:to-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+        className="btn-sheen w-full rounded-lg bg-brand-600 px-4 py-2 font-medium text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isLoading ? 'Signing in...' : 'Sign in'}
+        {isLoading ? "Signing in..." : "Sign in"}
       </button>
 
       <p className="text-center text-sm">
-        Don&apos;t have an account?{' '}
+        Don&apos;t have an account?{" "}
         <Link
           to={ROUTES.REGISTER}
           className="font-medium text-brand-600 underline dark:text-brand-400"

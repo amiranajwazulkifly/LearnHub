@@ -1,18 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import {
-  BadgeCheck,
-  BookOpen,
-  GraduationCap,
-  KeyRound,
-  LockKeyhole,
-  Mail,
-  Save,
-  ShieldCheck,
-  UserRound,
-  Users,
-} from "lucide-react";
 
 import {
   changePasswordSchema,
@@ -129,7 +117,7 @@ function ProfileForm() {
     .toUpperCase();
 
   return (
-    <div className="space-y-6">
+    <div className="profile-form space-y-6">
       {/* Global error */}
       {error && (
         <div
@@ -145,7 +133,7 @@ function ProfileForm() {
         <div className="border-b border-gray-100 p-6 dark:border-gray-800">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
             {/* Avatar */}
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-brand-600 to-brand-400 text-xl font-bold text-white shadow-lg shadow-brand-500/20">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xl font-semibold text-brand-700 dark:bg-brand-950 dark:text-brand-300">
               {initials}
             </div>
 
@@ -155,56 +143,18 @@ function ProfileForm() {
               </h2>
 
               <p className="mt-1 flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                <Mail size={15} />
                 {user.email}
               </p>
 
               <div className="mt-3 flex flex-wrap gap-2">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-100 px-3 py-1 text-xs font-medium capitalize text-brand-700 dark:bg-brand-950/50 dark:text-brand-400">
-                  <UserRound size={13} />
                   {user.role}
                 </span>
 
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium capitalize text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400">
-                  <BadgeCheck size={13} />
                   {user.status}
                 </span>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Account info cards */}
-        <div className="grid gap-4 p-6 sm:grid-cols-2">
-          <div className="flex items-center gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950/30">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-600 dark:bg-brand-950/50 dark:text-brand-400">
-              <UserRound size={18} />
-            </div>
-
-            <div>
-              <p className="font-mono text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                Role
-              </p>
-
-              <p className="mt-0.5 font-semibold capitalize text-gray-900 dark:text-gray-100">
-                {user.role}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950/30">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400">
-              <ShieldCheck size={18} />
-            </div>
-
-            <div>
-              <p className="font-mono text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                Account Status
-              </p>
-
-              <p className="mt-0.5 font-semibold capitalize text-gray-900 dark:text-gray-100">
-                {user.status}
-              </p>
             </div>
           </div>
         </div>
@@ -216,16 +166,13 @@ function ProfileForm() {
       {user.role === "student" && (
         <section className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
           <div className="mb-5 flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-600 dark:bg-brand-950/50 dark:text-brand-400">
-              <GraduationCap size={18} />
-            </div>
-
             <div>
               <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
                 Academic Record
               </h2>
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                Managed by the registry. Contact your programme office to correct these.
+                Managed by the registry. Contact your programme office to
+                correct these.
               </p>
             </div>
           </div>
@@ -234,7 +181,10 @@ function ProfileForm() {
             {[
               ["Student Number", user.studentNumber],
               ["Programme", user.programme],
-              ["Semester", user.semester != null ? `Semester ${user.semester}` : null],
+              [
+                "Semester",
+                user.semester != null ? `Semester ${user.semester}` : null,
+              ],
               ["Phone", user.phone],
             ].map(([label, value]) => (
               <div
@@ -245,7 +195,11 @@ function ProfileForm() {
                   {label}
                 </dt>
                 <dd className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
-                  {value ?? <span className="font-normal text-gray-400 dark:text-gray-500">Not recorded</span>}
+                  {value ?? (
+                    <span className="font-normal text-gray-400 dark:text-gray-500">
+                      Not recorded
+                    </span>
+                  )}
                 </dd>
               </div>
             ))}
@@ -256,16 +210,13 @@ function ProfileForm() {
       {user.role === "instructor" && (
         <section className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
           <div className="mb-5 flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-600 dark:bg-brand-950/50 dark:text-brand-400">
-              <BookOpen size={18} />
-            </div>
-
             <div>
               <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
                 Teaching Profile
               </h2>
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                Shown to students on your course pages. An administrator maintains these details.
+                Shown to students on your course pages. An administrator
+                maintains these details.
               </p>
             </div>
           </div>
@@ -273,7 +224,7 @@ function ProfileForm() {
           <div className="mb-4 grid gap-4 sm:grid-cols-3">
             <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950/30">
               <p className="flex items-center gap-1.5 font-mono text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                <BookOpen size={13} /> Courses
+                Courses
               </p>
               <p className="mt-1 text-xl font-bold text-gray-900 dark:text-gray-100">
                 {user.courseCount ?? 0}
@@ -282,7 +233,7 @@ function ProfileForm() {
 
             <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950/30">
               <p className="flex items-center gap-1.5 font-mono text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                <Users size={13} /> Current Students
+                Current Students
               </p>
               <p className="mt-1 text-xl font-bold text-gray-900 dark:text-gray-100">
                 {user.studentCount ?? 0}
@@ -305,7 +256,11 @@ function ProfileForm() {
                 Expertise
               </dt>
               <dd className="mt-1 text-sm text-gray-900 dark:text-gray-100">
-                {user.expertise ?? <span className="text-gray-400 dark:text-gray-500">Not recorded</span>}
+                {user.expertise ?? (
+                  <span className="text-gray-400 dark:text-gray-500">
+                    Not recorded
+                  </span>
+                )}
               </dd>
             </div>
 
@@ -314,7 +269,11 @@ function ProfileForm() {
                 Biography
               </dt>
               <dd className="mt-1 whitespace-pre-wrap text-sm leading-6 text-gray-700 dark:text-gray-300">
-                {user.biography ?? <span className="text-gray-400 dark:text-gray-500">Not recorded</span>}
+                {user.biography ?? (
+                  <span className="text-gray-400 dark:text-gray-500">
+                    Not recorded
+                  </span>
+                )}
               </dd>
             </div>
           </dl>
@@ -322,7 +281,7 @@ function ProfileForm() {
       )}
 
       {/* Forms */}
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="profile-edit-sections grid gap-6">
         {/* Edit profile */}
         <form
           onSubmit={handleProfileSubmit(onProfileSubmit)}
@@ -330,13 +289,9 @@ function ProfileForm() {
           noValidate
         >
           <div className="mb-5 flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-600 dark:bg-brand-950/50 dark:text-brand-400">
-              <UserRound size={18} />
-            </div>
-
             <div>
               <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                Edit Profile
+                Personal information
               </h2>
 
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -364,17 +319,12 @@ function ProfileForm() {
               </label>
 
               <div className="relative">
-                <UserRound
-                  size={16}
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                />
-
                 <input
                   id="profile-full-name"
                   type="text"
                   autoComplete="name"
                   {...registerProfileField("fullName")}
-                  className={`w-full rounded-lg border bg-white py-2.5 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(
+                  className={`w-full rounded-lg border bg-white py-2.5 px-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(
                     !!profileErrors.fullName,
                   )}`}
                 />
@@ -396,17 +346,12 @@ function ProfileForm() {
               </label>
 
               <div className="relative">
-                <Mail
-                  size={16}
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                />
-
                 <input
                   id="profile-email"
                   type="email"
                   autoComplete="email"
                   {...registerProfileField("email")}
-                  className={`w-full rounded-lg border bg-white py-2.5 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(
+                  className={`w-full rounded-lg border bg-white py-2.5 px-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(
                     !!profileErrors.email,
                   )}`}
                 />
@@ -422,10 +367,8 @@ function ProfileForm() {
             <button
               type="submit"
               disabled={isLoading}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2.5 text-sm font-medium text-white transition hover:from-brand-700 hover:to-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              <Save size={16} />
-
               {isLoading ? "Saving..." : "Save Profile"}
             </button>
           </div>
@@ -438,10 +381,6 @@ function ProfileForm() {
           noValidate
         >
           <div className="mb-5 flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400">
-              <KeyRound size={18} />
-            </div>
-
             <div>
               <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
                 Change Password
@@ -472,17 +411,12 @@ function ProfileForm() {
               </label>
 
               <div className="relative">
-                <LockKeyhole
-                  size={16}
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                />
-
                 <input
                   id="current-password"
                   type="password"
                   autoComplete="current-password"
                   {...registerPasswordField("currentPassword")}
-                  className={`w-full rounded-lg border bg-white py-2.5 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(
+                  className={`w-full rounded-lg border bg-white py-2.5 px-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(
                     !!passwordErrors.currentPassword,
                   )}`}
                 />
@@ -504,17 +438,12 @@ function ProfileForm() {
               </label>
 
               <div className="relative">
-                <KeyRound
-                  size={16}
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                />
-
                 <input
                   id="new-password"
                   type="password"
                   autoComplete="new-password"
                   {...registerPasswordField("newPassword")}
-                  className={`w-full rounded-lg border bg-white py-2.5 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(
+                  className={`w-full rounded-lg border bg-white py-2.5 px-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(
                     !!passwordErrors.newPassword,
                   )}`}
                 />
@@ -536,17 +465,12 @@ function ProfileForm() {
               </label>
 
               <div className="relative">
-                <ShieldCheck
-                  size={16}
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                />
-
                 <input
                   id="confirm-password"
                   type="password"
                   autoComplete="new-password"
                   {...registerPasswordField("confirmPassword")}
-                  className={`w-full rounded-lg border bg-white py-2.5 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(
+                  className={`w-full rounded-lg border bg-white py-2.5 px-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(
                     !!passwordErrors.confirmPassword,
                   )}`}
                 />
@@ -564,8 +488,6 @@ function ProfileForm() {
               disabled={isLoading}
               className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:border-brand-400 hover:bg-brand-50 hover:text-brand-700 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:text-gray-300 dark:hover:border-brand-600 dark:hover:bg-brand-950/30 dark:hover:text-brand-400"
             >
-              <KeyRound size={16} />
-
               {isLoading ? "Changing password..." : "Change Password"}
             </button>
           </div>

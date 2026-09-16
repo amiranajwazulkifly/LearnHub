@@ -1,39 +1,28 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import {
-  Link,
-  useNavigate,
-} from 'react-router-dom';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
 
-import { ROUTES } from '../../constants/routes';
+import { ROUTES } from "../../constants/routes";
 
 import {
   registerSchema,
   type RegisterFormValues,
-} from '../../schemas/authSchema';
+} from "../../schemas/authSchema";
 
-import { useAuthStore } from '../../store/useAuthStore';
-import { fieldBorderClasses } from '../../utils/formStyles';
+import { useAuthStore } from "../../store/useAuthStore";
+import { fieldBorderClasses } from "../../utils/formStyles";
 
 function RegisterForm() {
   const navigate = useNavigate();
 
-  const registerAccount = useAuthStore(
-    (state) => state.register
-  );
+  const registerAccount = useAuthStore((state) => state.register);
 
-  const isLoading = useAuthStore(
-    (state) => state.isLoading
-  );
+  const isLoading = useAuthStore((state) => state.isLoading);
 
-  const error = useAuthStore(
-    (state) => state.error
-  );
+  const error = useAuthStore((state) => state.error);
 
-  const clearError = useAuthStore(
-    (state) => state.clearError
-  );
+  const clearError = useAuthStore((state) => state.clearError);
 
   const {
     register: registerField,
@@ -42,9 +31,9 @@ function RegisterForm() {
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      fullName: '',
-      email: '',
-      password: '',
+      fullName: "",
+      email: "",
+      password: "",
     },
   });
 
@@ -52,27 +41,18 @@ function RegisterForm() {
     clearError();
   }, [clearError]);
 
-  async function onSubmit(
-    values: RegisterFormValues
-  ) {
+  async function onSubmit(values: RegisterFormValues) {
     try {
       await registerAccount(values);
 
-      navigate(
-        ROUTES.STUDENT.DASHBOARD,
-        { replace: true }
-      );
+      navigate(ROUTES.STUDENT.DASHBOARD, { replace: true });
     } catch {
       // The Zustand store already saves the error.
     }
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="space-y-5"
-      noValidate
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
       {error && (
         <div
           role="alert"
@@ -83,10 +63,7 @@ function RegisterForm() {
       )}
 
       <div>
-        <label
-          htmlFor="fullName"
-          className="mb-1 block text-sm font-medium"
-        >
+        <label htmlFor="fullName" className="mb-1 block text-sm font-medium">
           Full name
         </label>
 
@@ -109,7 +86,7 @@ function RegisterForm() {
             id="fullName"
             type="text"
             autoComplete="name"
-            {...registerField('fullName')}
+            {...registerField("fullName")}
             className={`w-full rounded-lg border bg-white py-2 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(!!errors.fullName)}`}
             placeholder="Your full name"
           />
@@ -123,10 +100,7 @@ function RegisterForm() {
       </div>
 
       <div>
-        <label
-          htmlFor="email"
-          className="mb-1 block text-sm font-medium"
-        >
+        <label htmlFor="email" className="mb-1 block text-sm font-medium">
           Email address
         </label>
 
@@ -149,7 +123,7 @@ function RegisterForm() {
             id="email"
             type="email"
             autoComplete="email"
-            {...registerField('email')}
+            {...registerField("email")}
             className={`w-full rounded-lg border bg-white py-2 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(!!errors.email)}`}
             placeholder="name@example.com"
           />
@@ -163,10 +137,7 @@ function RegisterForm() {
       </div>
 
       <div>
-        <label
-          htmlFor="password"
-          className="mb-1 block text-sm font-medium"
-        >
+        <label htmlFor="password" className="mb-1 block text-sm font-medium">
           Password
         </label>
 
@@ -189,7 +160,7 @@ function RegisterForm() {
             id="password"
             type="password"
             autoComplete="new-password"
-            {...registerField('password')}
+            {...registerField("password")}
             className={`w-full rounded-lg border bg-white py-2 pl-10 pr-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(!!errors.password)}`}
             placeholder="At least 8 characters"
           />
@@ -205,15 +176,13 @@ function RegisterForm() {
       <button
         type="submit"
         disabled={isLoading}
-        className="btn-sheen w-full rounded-lg bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 font-medium text-white transition hover:from-brand-700 hover:to-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+        className="btn-sheen w-full rounded-lg bg-brand-600 px-4 py-2 font-medium text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isLoading
-          ? 'Creating account...'
-          : 'Create student account'}
+        {isLoading ? "Creating account..." : "Create student account"}
       </button>
 
       <p className="text-center text-sm">
-        Already have an account?{' '}
+        Already have an account?{" "}
         <Link
           to={ROUTES.LOGIN}
           className="font-medium text-brand-600 underline dark:text-brand-400"

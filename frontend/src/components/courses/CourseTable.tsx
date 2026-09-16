@@ -33,7 +33,10 @@ export default function CourseTable({ courses, onEdit, onDelete }: Props) {
 
         <tbody>
           {courses.map((course) => (
-            <tr key={course.id} className="border-b border-gray-200 dark:border-gray-800">
+            <tr
+              key={course.id}
+              className="border-b border-gray-200 dark:border-gray-800"
+            >
               <td className="px-6 py-4 font-mono text-sm text-brand-600 dark:text-brand-400">
                 {course.code}
               </td>
@@ -54,25 +57,31 @@ export default function CourseTable({ courses, onEdit, onDelete }: Props) {
                 />
               </td>
               <td className="px-6 py-4">
-                <StatusBadge label={course.status} tone={STATUS_TONE[course.status] ?? "amber"} />
+                <StatusBadge
+                  label={course.status}
+                  tone={STATUS_TONE[course.status] ?? "amber"}
+                />
               </td>
               <td className="px-6 py-4">
                 <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => onEdit(course)}
-                    className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-3 py-2 text-sm text-white"
+                    className="rounded border border-gray-200 px-3 py-2 text-sm dark:border-gray-700"
                   >
                     Edit
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => onDelete(course.id)}
-                    className="rounded bg-red-600 px-3 py-2 text-sm text-white"
-                  >
-                    Delete
-                  </button>
+                  <details className="row-actions">
+                    <summary aria-label={`More actions for ${course.code}`}>
+                      ···
+                    </summary>
+                    <div>
+                      <button type="button" onClick={() => onDelete(course.id)}>
+                        Delete
+                      </button>
+                    </div>
+                  </details>
                 </div>
               </td>
             </tr>
@@ -80,7 +89,10 @@ export default function CourseTable({ courses, onEdit, onDelete }: Props) {
 
           {courses.length === 0 && (
             <tr>
-              <td colSpan={7} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+              <td
+                colSpan={7}
+                className="px-6 py-8 text-center text-gray-500 dark:text-gray-400"
+              >
                 No courses found.
               </td>
             </tr>

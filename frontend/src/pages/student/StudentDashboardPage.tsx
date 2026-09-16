@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { getMyCourses } from "../../services/enrollmentService";
-import { getMyTimetable, type TimetableSession } from "../../services/timetableService";
+import {
+  getMyTimetable,
+  type TimetableSession,
+} from "../../services/timetableService";
 import { getMyAssignments } from "../../services/assignmentService";
 import { getPublishedAnnouncements } from "../../services/announcementService";
 import type { Assignment } from "../../types/assignment";
@@ -17,32 +20,20 @@ import {
   AnnouncementsIcon,
   ClockIcon,
   MyCoursesIcon,
-  PinIcon,
 } from "../../components/common/NavIcons";
 import {
   DAY_NAMES,
   formatMinutesUntil,
   formatTime,
   getNextSession,
-  sessionsOnDate,
-  getTodayDayOfWeek,
 } from "../../utils/timetable";
-
-function getInitials(name: string) {
-  const words = name.split(" ").filter((word) => word && !word.endsWith("."));
-  return (
-    words
-      .slice(0, 2)
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase() || "?"
-  );
-}
 
 function formatRelativeTime(dateString: string | null) {
   if (!dateString) return "";
 
-  const diffMinutes = Math.floor((Date.now() - new Date(dateString).getTime()) / 60000);
+  const diffMinutes = Math.floor(
+    (Date.now() - new Date(dateString).getTime()) / 60000,
+  );
 
   if (diffMinutes < 1) return "Just now";
   if (diffMinutes < 60) return `${diffMinutes} min ago`;
@@ -53,7 +44,10 @@ function formatRelativeTime(dateString: string | null) {
   const diffDays = Math.floor(diffHours / 24);
   if (diffDays < 7) return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
 
-  return new Date(dateString).toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
+  return new Date(dateString).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+  });
 }
 
 const AUDIENCE_LABEL: Record<string, string> = {
@@ -78,15 +72,23 @@ export default function StudentDashboardPage() {
         setLoading(true);
         setError("");
 
-        const [coursesResponse, timetableResponse, assignmentsResponse, announcementsResponse] =
-          await Promise.all([
-            getMyCourses(),
-            getMyTimetable(),
-            getMyAssignments(),
-            getPublishedAnnouncements(),
-          ]);
+        const [
+          coursesResponse,
+          timetableResponse,
+          assignmentsResponse,
+          announcementsResponse,
+        ] = await Promise.all([
+          getMyCourses(),
+          getMyTimetable(),
+          getMyAssignments(),
+          getPublishedAnnouncements(),
+        ]);
 
-        setCourseCount(coursesResponse.data.length);
+        setCourseCount(
+          coursesResponse.data.filter(
+            (course) => course.enrollment_status === "enrolled",
+          ).length,
+        );
         setSessions(timetableResponse.data);
         setAssignments(assignmentsResponse);
         setAnnouncements(announcementsResponse);
@@ -110,7 +112,9 @@ export default function StudentDashboardPage() {
   }
 
   const firstName = user?.fullName.split(" ")[0] ?? "there";
-  const pendingTasks = assignments.filter((assignment) => !assignment.mySubmission);
+  const pendingTasks = assignments.filter(
+    (assignment) => !assignment.mySubmission,
+  );
 
   const now = new Date();
   const next = getNextSession(sessions, now);
@@ -128,44 +132,40 @@ export default function StudentDashboardPage() {
   if (next) {
     if (next.daysUntil === 0) {
       const [hours, minutes] = next.session.start_time.split(":").map(Number);
-      const minutesUntil = Math.max(hours * 60 + minutes - (now.getHours() * 60 + now.getMinutes()), 0);
-      subtitleParts.push(`Your next lecture starts in ${formatMinutesUntil(minutesUntil)}.`);
+      const minutesUntil = Math.max(
+        hours * 60 + minutes - (now.getHours() * 60 + now.getMinutes()),
+        0,
+      );
+      subtitleParts.push(
+        `Your next lecture starts in ${formatMinutesUntil(minutesUntil)}.`,
+      );
     } else if (next.daysUntil === 1) {
       subtitleParts.push("Your next lecture is tomorrow.");
     } else {
-      subtitleParts.push(`Your next lecture is on ${DAY_NAMES[next.session.day_of_week]}.`);
+      subtitleParts.push(
+        `Your next lecture is on ${DAY_NAMES[next.session.day_of_week]}.`,
+      );
     }
   }
 
-  // Walk forward day by day against real calendar dates, so a session only
-  // counts when that date is inside its schedule's start/end range.
-  let upcomingLabel = "Today";
-  let upcomingSessions = sessionsOnDate(sessions, now);
-
-  if (upcomingSessions.length === 0) {
-    for (let offset = 1; offset < 7; offset++) {
-      const date = new Date(now);
-      date.setDate(date.getDate() + offset);
-
-      const dayMatches = sessionsOnDate(sessions, date);
-
-      if (dayMatches.length > 0) {
-        upcomingLabel = DAY_NAMES[getTodayDayOfWeek(date)];
-        upcomingSessions = dayMatches;
-        break;
-      }
-    }
-  }
-
+  const nextDate = new Date(now);
+  if (next) nextDate.setDate(now.getDate() + next.daysUntil);
+  const submittedCount = assignments.filter((a) => a.mySubmission).length;
+  const progress = assignments.length
+    ? Math.round((submittedCount / assignments.length) * 100)
+    : 0;
   const recentAnnouncements = announcements.slice(0, 3);
 
   return (
     <div>
-      <div className="mb-6">
+      <div className="dashboard-heading">
+        <p className="eyebrow">Dashboard</p>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">
           Welcome back, {firstName}!
         </h1>
-        <p className="mt-1 text-gray-500 dark:text-gray-400">{subtitleParts.join(" ")}</p>
+        <p className="mt-1 text-gray-500 dark:text-gray-400">
+          {subtitleParts.join(" ")}
+        </p>
       </div>
 
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -202,129 +202,153 @@ export default function StudentDashboardPage() {
         />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-50">
-              Upcoming Classes
-            </h2>
-
-            <Link
-              to={ROUTES.STUDENT.TIMETABLE}
-              className="text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
-            >
-              View Timetable &rarr;
-            </Link>
+      <div className="student-dashboard-grid">
+        <section className="panel next-class-panel">
+          <div className="panel-heading">
+            <h2>Next class</h2>
+            <Link to={ROUTES.STUDENT.TIMETABLE}>View timetable →</Link>
           </div>
-
-          {upcomingSessions.length === 0 ? (
-            <div className="rounded-xl border border-gray-200 bg-white p-8 text-center dark:border-gray-800 dark:bg-gray-900">
-              <p className="text-gray-500 dark:text-gray-400">
-                No upcoming classes. Enroll in a course to see it here.
-              </p>
+          {next ? (
+            <div className="next-class-content">
+              <div className="next-date">
+                <span>{DAY_NAMES[next.session.day_of_week].slice(0, 3)}</span>
+                <strong>{nextDate.getDate()}</strong>
+                <small>
+                  {nextDate.toLocaleDateString("en-GB", { month: "short" })}
+                </small>
+              </div>
+              <div className="next-class-info">
+                <h3>
+                  {next.session.code}: {next.session.title}
+                </h3>
+                <p>
+                  {formatTime(next.session.start_time)} –{" "}
+                  {formatTime(next.session.end_time)}
+                </p>
+                <p>{next.session.instructor_name}</p>
+                <p>{next.session.location || "Location to be announced"}</p>
+                <Link
+                  className="primary-button"
+                  to={`${ROUTES.STUDENT.COURSES}/${next.session.course_id}`}
+                >
+                  View Course →
+                </Link>
+              </div>
+              <div className="academic-art next-art">
+                <span>{next.session.code}</span>
+                <p>
+                  BUILD
+                  <br />
+                  SKILLS
+                  <br />
+                  THAT
+                  <br />
+                  MATTER.
+                </p>
+              </div>
             </div>
           ) : (
-            <div className="space-y-3">
-              {upcomingSessions.map((session) => (
-                <div
-                  key={session.schedule_id}
-                  className="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800 dark:bg-gray-900"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="flex flex-col items-center rounded-lg bg-gray-50 px-3 py-1.5 text-center dark:bg-gray-800">
-                      <span className="font-mono text-[10px] font-semibold uppercase tracking-wide text-brand-600 dark:text-brand-400">
-                        {upcomingLabel}
-                      </span>
-                      <span className="flex items-center gap-1 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-gray-50">
-                        <ClockIcon className="h-3.5 w-3.5 text-gray-400" />
-                        {formatTime(session.start_time)}
-                      </span>
-                    </div>
-
-                    <div>
-                      <p className="font-semibold text-gray-900 dark:text-gray-50">
-                        {session.code}: {session.title}
-                      </p>
-                      <p className="mt-0.5 flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-                        <PinIcon className="h-3.5 w-3.5 shrink-0" />
-                        {session.location || "TBA"}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 self-end sm:self-auto">
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-brand-600 to-brand-400 text-xs font-bold text-white">
-                        {getInitials(session.instructor_name)}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-gray-50">
-                          {session.instructor_name}
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Lecturer</p>
-                      </div>
-                    </div>
-
-                    <Link
-                      to={`${ROUTES.STUDENT.COURSES}/${session.course_id}`}
-                      className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-                    >
-                      View Course
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <p className="empty-copy">
+              No upcoming classes. Enroll in a course to see it here.
+            </p>
           )}
-        </div>
-
-        <div>
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-50">
-              Recent Announcements
-            </h2>
-
-            <Link
-              to={ROUTES.STUDENT.ANNOUNCEMENTS}
-              className="text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
-            >
-              All Alerts
-            </Link>
+        </section>
+        <section className="panel">
+          <div className="panel-heading">
+            <h2>Assignment progress</h2>
+            <Link to={ROUTES.STUDENT.TASKS}>View tasks →</Link>
           </div>
-
-          {recentAnnouncements.length === 0 ? (
-            <div className="rounded-xl border border-gray-200 bg-white p-8 text-center dark:border-gray-800 dark:bg-gray-900">
-              <p className="text-gray-500 dark:text-gray-400">No announcements yet.</p>
+          {assignments.length ? (
+            <div className="progress-content">
+              <div
+                className="progress-ring"
+                style={{
+                  background: `conic-gradient(var(--accent) ${progress}%, var(--line) 0)`,
+                }}
+              >
+                <div>
+                  <strong>{progress}%</strong>
+                  <span>Submitted</span>
+                </div>
+              </div>
+              <div>
+                <h3>
+                  {submittedCount} of {assignments.length} assignments
+                </h3>
+                <p>{pendingTasks.length} still to submit</p>
+              </div>
             </div>
           ) : (
-            <div className="space-y-3">
-              {recentAnnouncements.map((announcement) => (
-                <div
-                  key={announcement.id}
-                  className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="rounded-full bg-brand-50 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-brand-700 dark:bg-brand-950 dark:text-brand-300">
-                      {AUDIENCE_LABEL[announcement.audience] ?? announcement.audience}
-                    </span>
-
-                    <span className="text-xs text-gray-400 dark:text-gray-500">
-                      {formatRelativeTime(announcement.publishedAt)}
-                    </span>
-                  </div>
-
-                  <h3 className="mt-2 font-semibold text-gray-900 dark:text-gray-50">
-                    {announcement.title}
-                  </h3>
-
-                  <p className="mt-1 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
-                    {announcement.content}
-                  </p>
+            <p className="empty-copy">
+              No assignments yet. Your progress will appear here when work is
+              assigned.
+            </p>
+          )}
+        </section>
+        <section className="panel">
+          <div className="panel-heading">
+            <h2>Recent Announcements</h2>
+            <Link to={ROUTES.STUDENT.ANNOUNCEMENTS}>View all →</Link>
+          </div>
+          {recentAnnouncements.length ? (
+            recentAnnouncements.map((announcement) => (
+              <article key={announcement.id} className="announcement-row">
+                <div>
+                  <span className="eyebrow">
+                    {AUDIENCE_LABEL[announcement.audience] ??
+                      announcement.audience}
+                  </span>
+                  <h3>{announcement.title}</h3>
+                  <p>{announcement.content}</p>
                 </div>
-              ))}
+                <time>{formatRelativeTime(announcement.publishedAt)}</time>
+              </article>
+            ))
+          ) : (
+            <p className="empty-copy">No announcements yet.</p>
+          )}
+        </section>
+        <section className="panel">
+          <div className="panel-heading">
+            <h2>Upcoming tasks</h2>
+            <Link to={ROUTES.STUDENT.TASKS}>View all →</Link>
+          </div>
+          {pendingTasks.length ? (
+            [...pendingTasks]
+              .sort((a, b) =>
+                (a.dueAt || "9999").localeCompare(b.dueAt || "9999"),
+              )
+              .slice(0, 4)
+              .map((task) => (
+                <Link
+                  className="task-row"
+                  key={task.id}
+                  to={`${ROUTES.STUDENT.TASKS}/${task.id}`}
+                >
+                  <div>
+                    <h3>{task.title}</h3>
+                    <p>
+                      {task.courseCode} · {task.courseTitle}
+                    </p>
+                  </div>
+                  <span>
+                    {task.dueAt
+                      ? new Date(task.dueAt).toLocaleDateString("en-GB", {
+                          day: "numeric",
+                          month: "short",
+                        })
+                      : "No due date"}{" "}
+                    →
+                  </span>
+                </Link>
+              ))
+          ) : (
+            <div className="empty-copy">
+              <strong>No pending tasks</strong>
+              <p>You’re currently up to date.</p>
             </div>
           )}
-        </div>
+        </section>
       </div>
     </div>
   );

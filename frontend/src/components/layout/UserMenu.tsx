@@ -1,68 +1,86 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-
-import { ROUTES } from '../../constants/routes';
-import { useAuthStore } from '../../store/useAuthStore';
-import ConfirmModal from '../common/ConfirmModal';
-
-function UserMenu() {
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ChevronDown } from "lucide-react";
+import { ROUTES } from "../../constants/routes";
+import { useAuthStore } from "../../store/useAuthStore";
+import ConfirmModal from "../common/ConfirmModal";
+export default function UserMenu() {
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
-
-  const user = useAuthStore(
-    (state) => state.user
-  );
-
-  const logout = useAuthStore(
-    (state) => state.logout
-  );
-
+  const [open, setOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
-
-  async function handleConfirmLogout() {
-    setConfirmOpen(false);
-
-    await logout();
-
-    navigate(ROUTES.LOGIN, {
-      replace: true,
-    });
-  }
-
-  if (!user) {
-    return null;
-  }
-
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    function outside(e: MouseEvent) {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+    }
+    function escape(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setOpen(false);
+        ref.current?.querySelector("button")?.focus();
+      }
+    }
+    if (open) {
+      document.addEventListener("mousedown", outside);
+      document.addEventListener("keydown", escape);
+    }
+    return () => {
+      document.removeEventListener("mousedown", outside);
+      document.removeEventListener("keydown", escape);
+    };
+  }, [open]);
+  if (!user) return null;
   return (
-    <div className="flex items-center gap-4">
-      <div className="hidden text-right sm:block">
-        <p className="text-sm font-medium text-gray-900 dark:text-gray-50">
-          {user.fullName}
-        </p>
-
-        <p className="text-xs capitalize text-gray-500 dark:text-gray-400">
-          {user.role}
-        </p>
-      </div>
-
+    <div ref={ref} className="account-menu">
       <button
-        type="button"
-        onClick={() => setConfirmOpen(true)}
-        className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
+        className="account-trigger"
+        aria-expanded={open}
+        aria-controls="account-actions"
+        onClick={() => setOpen(!open)}
       >
-        Logout
+        <span className="avatar">
+          {user.fullName
+            .split(" ")
+            .slice(0, 2)
+            .map((n) => n[0])
+            .join("")}
+        </span>
+        <span className="account-name">
+          <strong>{user.fullName}</strong>
+          <small>{user.role}</small>
+        </span>
+        <ChevronDown size={16} />
       </button>
-
+      {open && (
+        <div id="account-actions" className="account-dropdown">
+          <strong>{user.fullName}</strong>
+          <p>{user.email}</p>
+          <Link onClick={() => setOpen(false)} to={`/${user.role}/profile`}>
+            Profile
+          </Link>
+          <button
+            onClick={() => {
+              setOpen(false);
+              setConfirmOpen(true);
+            }}
+          >
+            Sign out
+          </button>
+        </div>
+      )}
       <ConfirmModal
         open={confirmOpen}
         title="Log out?"
         message="You'll need to sign in again to continue where you left off."
         confirmLabel="Log out"
         cancelLabel="Stay signed in"
-        onConfirm={() => void handleConfirmLogout()}
+        onConfirm={() => {
+          setConfirmOpen(false);
+          void logout().then(() => navigate(ROUTES.LOGIN, { replace: true }));
+        }}
         onCancel={() => setConfirmOpen(false)}
       />
     </div>
   );
 }
-
-export default UserMenu;

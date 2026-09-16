@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode } from "react";
 
 interface PageHeaderProps {
   title: string;
@@ -7,14 +7,9 @@ interface PageHeaderProps {
   actions?: ReactNode;
 }
 
-function PageHeader({
-  title,
-  eyebrow,
-  description,
-  actions,
-}: PageHeaderProps) {
+function PageHeader({ title, eyebrow, description, actions }: PageHeaderProps) {
   return (
-    <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="page-header mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
         {eyebrow && (
           <p className="mb-1 font-mono text-xs uppercase tracking-wide text-brand-600 dark:text-brand-400">
@@ -22,22 +17,18 @@ function PageHeader({
           </p>
         )}
 
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-50">
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-50">
           {title}
         </h1>
 
         {description && (
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-3 text-base text-gray-600 dark:text-gray-400">
             {description}
           </p>
         )}
       </div>
 
-      {actions && (
-        <div className="flex items-center gap-3">
-          {actions}
-        </div>
-      )}
+      {actions && <div className="flex items-center gap-3">{actions}</div>}
     </div>
   );
 }

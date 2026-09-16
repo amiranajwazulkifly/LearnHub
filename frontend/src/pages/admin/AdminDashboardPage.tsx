@@ -17,7 +17,10 @@ import StatCard from "../../components/dashboard/StatCard";
 import { SkeletonDashboard } from "../../components/common/Skeleton";
 import EmptyState from "../../components/common/EmptyState";
 import ErrorState from "../../components/common/ErrorState";
-import { describeLoadError, type LoadErrorCopy } from "../../utils/errorHandler";
+import {
+  describeLoadError,
+  type LoadErrorCopy,
+} from "../../utils/errorHandler";
 import { formatDateTime } from "../../utils/formatters";
 
 // A dot per activity kind, so the feed is scannable without reading every line.
@@ -102,7 +105,8 @@ export default function AdminDashboardPage() {
   if (loading) return <SkeletonDashboard />;
 
   if (loadError || !stats) {
-    const copy = loadError ?? describeLoadError(new Error("no stats"), "dashboard");
+    const copy =
+      loadError ?? describeLoadError(new Error("no stats"), "dashboard");
 
     return (
       <div className="p-6">
@@ -118,17 +122,25 @@ export default function AdminDashboardPage() {
   const fullCourses = capacity.filter((course) => course.isFull).length;
 
   return (
-    <div className="p-4 sm:p-6">
+    <div>
       <p className="mb-1 font-mono text-xs uppercase tracking-wide text-brand-600 dark:text-brand-400">
         admin / dashboard
       </p>
-      <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-gray-50">Admin Dashboard</h1>
+      <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-gray-50">
+        Dashboard
+      </h1>
+      <p className="-mt-3 mb-7 text-gray-500 dark:text-gray-400">
+        Academic overview
+      </p>
 
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Total Students" value={stats.totalStudents} />
         <StatCard label="Total Instructors" value={stats.totalInstructors} />
         <StatCard label="Total Courses" value={stats.totalCourses} />
-        <StatCard label="Active Enrollments" value={stats.totalActiveEnrollments} />
+        <StatCard
+          label="Active Enrollments"
+          value={stats.totalActiveEnrollments}
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -148,7 +160,10 @@ export default function AdminDashboardPage() {
             ) : (
               <ul className="divide-y divide-gray-100 dark:divide-gray-800">
                 {activity.map((item) => (
-                  <li key={`${item.kind}-${item.id}`} className="flex gap-3 px-4 py-3">
+                  <li
+                    key={`${item.kind}-${item.id}`}
+                    className="flex gap-3 px-4 py-3"
+                  >
                     <span
                       className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${KIND_DOTS[item.kind]}`}
                       aria-hidden="true"
@@ -186,8 +201,8 @@ export default function AdminDashboardPage() {
               <>
                 {fullCourses > 0 && (
                   <p className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-xs font-medium text-red-700 dark:bg-red-950/30 dark:text-red-400">
-                    {fullCourses} course{fullCourses === 1 ? " is" : "s are"} at capacity and can no
-                    longer take enrollments.
+                    {fullCourses} course{fullCourses === 1 ? " is" : "s are"} at
+                    capacity and can no longer take enrollments.
                   </p>
                 )}
 

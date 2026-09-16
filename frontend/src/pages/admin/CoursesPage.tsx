@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { deleteCourse, getCourses } from "../../services/courseService";
 
+import StatCard from "../../components/dashboard/StatCard";
 import CourseTable from "../../components/courses/CourseTable";
 
 import type { Course } from "../../types/course";
@@ -32,16 +33,16 @@ function CoursesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  async function loadCourses() {
+  async function loadCourses(reset = false) {
     try {
       setLoading(true);
       setError("");
 
       const result = await getCourses({
-        search: search || undefined,
-        category: category || undefined,
-        instructor: instructor || undefined,
-        status: status || undefined,
+        search: reset ? undefined : search || undefined,
+        category: reset ? undefined : category || undefined,
+        instructor: reset ? undefined : instructor || undefined,
+        status: reset ? undefined : status || undefined,
         page,
       });
 
@@ -73,7 +74,8 @@ function CoursesPage() {
     setCategory("");
     setInstructor("");
     setStatus("");
-    setPage(1);
+    if (page === 1) void loadCourses(true);
+    else setPage(1);
   }
 
   function handleEdit(course: Course) {
@@ -110,14 +112,44 @@ function CoursesPage() {
         <button
           type="button"
           onClick={() => navigate("/admin/courses/create")}
-          className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-5 py-2 text-white hover:from-brand-700 hover:to-brand-600"
+          className="rounded bg-brand-600 px-5 py-2 text-white hover:bg-brand-700"
         >
           + Add Course
         </button>
       </div>
 
       {error && (
-        <div className="mb-4 rounded bg-red-100 p-4 text-red-700 dark:bg-red-900/40 dark:text-red-400">{error}</div>
+        <div className="mb-4 rounded bg-red-100 p-4 text-red-700 dark:bg-red-900/40 dark:text-red-400">
+          {error}
+        </div>
+      )}
+
+      {!loading && (
+        <div className="mb-6 grid grid-cols-2 gap-4 xl:grid-cols-4">
+          <StatCard
+            label="Matching courses"
+            value={pagination?.total ?? courses.length}
+            helperText="Across matching results"
+          />
+          <StatCard
+            label="Published"
+            value={courses.filter((c) => c.status === "published").length}
+            helperText="On this page"
+          />
+          <StatCard
+            label="Instructors"
+            value={
+              new Set(courses.map((c) => c.instructor_name).filter(Boolean))
+                .size
+            }
+            helperText="On this page"
+          />
+          <StatCard
+            label="Total capacity"
+            value={courses.reduce((sum, c) => sum + c.capacity, 0)}
+            helperText="On this page"
+          />
+        </div>
       )}
 
       <form
@@ -128,6 +160,7 @@ function CoursesPage() {
           type="text"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
+          aria-label="Search courses"
           placeholder="Search title or code"
           className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
         />
@@ -136,6 +169,7 @@ function CoursesPage() {
           type="text"
           value={category}
           onChange={(event) => setCategory(event.target.value)}
+          aria-label="Category"
           placeholder="Category"
           className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
         />
@@ -144,11 +178,13 @@ function CoursesPage() {
           type="text"
           value={instructor}
           onChange={(event) => setInstructor(event.target.value)}
+          aria-label="Instructor"
           placeholder="Instructor"
           className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
         />
 
         <select
+          aria-label="Status"
           value={status}
           onChange={(event) => setStatus(event.target.value)}
           className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
@@ -162,7 +198,7 @@ function CoursesPage() {
         <div className="flex gap-2">
           <button
             type="submit"
-            className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-white"
+            className="rounded bg-brand-600 px-4 py-2 text-white"
           >
             Search
           </button>
@@ -186,7 +222,9 @@ function CoursesPage() {
             onEdit={handleEdit}
             onDelete={setDeleteTarget}
           />
-          {pagination && <Pagination pagination={pagination} onPageChange={setPage} />}
+          {pagination && (
+            <Pagination pagination={pagination} onPageChange={setPage} />
+          )}
         </>
       )}
 

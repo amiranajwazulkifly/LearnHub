@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useAuthStore } from "../../store/useAuthStore";
 import { BookOpen, Users, ClipboardCheck, Clock3 } from "lucide-react";
 
 import {
@@ -17,6 +19,7 @@ import StatCard from "../../components/dashboard/StatCard";
 import { SkeletonDashboard } from "../../components/common/Skeleton";
 
 export default function InstructorDashboardPage() {
+  const user = useAuthStore((s) => s.user);
   const [stats, setStats] = useState<InstructorStats | null>(null);
   const [courses, setCourses] = useState<InstructorCourse[]>([]);
   const [recentSubmissions, setRecentSubmissions] = useState<
@@ -43,9 +46,7 @@ export default function InstructorDashboardPage() {
   }, []);
 
   if (loading) {
-    return (
-      <SkeletonDashboard />
-    );
+    return <SkeletonDashboard />;
   }
 
   if (error || !stats) {
@@ -58,14 +59,16 @@ export default function InstructorDashboardPage() {
 
   return (
     <div>
-      <p className="mb-1 font-mono text-xs uppercase tracking-wide text-brand-600 dark:text-brand-400">
-        instructor / dashboard
-      </p>
-
-      <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-gray-50">
-        Instructor Dashboard
-      </h1>
-
+      <div className="dashboard-heading">
+        <p className="eyebrow">Instructor dashboard</p>
+        <h1>
+          Welcome back,{" "}
+          <span className="text-brand-600 dark:text-brand-400">
+            {user?.fullName || "Instructor"}!
+          </span>
+        </h1>
+        <p>Here’s what needs your attention today.</p>
+      </div>
       {/* Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
@@ -104,10 +107,10 @@ export default function InstructorDashboardPage() {
       {/* Lower dashboard */}
       <div className="mt-8 grid gap-6 xl:grid-cols-2">
         {/* Assigned Courses */}
-        <section>
+        <section className="panel">
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-              Assigned Courses
+              Your courses
             </h2>
 
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -138,11 +141,14 @@ export default function InstructorDashboardPage() {
                     </div>
 
                     <h3 className="font-semibold text-gray-900 dark:text-gray-50">
-                      {course.title}
+                      <Link to={`/instructor/courses/${course.id}/assignments`}>
+                        {course.title}
+                      </Link>
                     </h3>
 
                     <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                      {course.categoryName ?? "No category"}
+                      {course.categoryName ?? "No category"} ·{" "}
+                      {course.assignmentCount} assignments
                     </p>
                   </div>
 
@@ -156,7 +162,7 @@ export default function InstructorDashboardPage() {
         </section>
 
         {/* Recent Submissions */}
-        <section>
+        <section className="panel">
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
               Recent Submissions
@@ -167,47 +173,57 @@ export default function InstructorDashboardPage() {
             </p>
           </div>
 
-          <div className="space-y-3">
-            {recentSubmissions.length === 0 ? (
-              <div className="rounded-xl border border-gray-200 bg-white p-5 text-sm text-gray-500 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400">
-                No submissions yet.
-              </div>
-            ) : (
-              recentSubmissions.map((submission) => (
-                <div
-                  key={submission.id}
-                  className="rounded-xl border border-gray-200 bg-white p-4 transition hover:border-brand-400 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-brand-600"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0">
-                      <p className="font-semibold text-gray-900 dark:text-gray-50">
-                        {submission.studentName}
-                      </p>
-
-                      <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                        {submission.assignmentTitle}
-                      </p>
-
-                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
-                        {submission.courseCode} ·{" "}
-                        {new Date(submission.submittedAt).toLocaleString()}
-                      </p>
-                    </div>
-
-                    {submission.grade === null ? (
-                      <span className="shrink-0 rounded-full bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-600 dark:text-amber-400">
-                        Needs grading
-                      </span>
-                    ) : (
-                      <span className="shrink-0 rounded-full bg-green-500/10 px-3 py-1 text-xs font-medium text-green-600 dark:text-green-400">
-                        Graded
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+          {recentSubmissions.length === 0 ? (
+            <p className="empty-copy">No submissions yet.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="submission-table">
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Assignment</th>
+                    <th>Course</th>
+                    <th>Submitted</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentSubmissions.map((submission) => (
+                    <tr key={submission.id}>
+                      <td>{submission.studentName}</td>
+                      <td>
+                        <Link
+                          to={`/instructor/assignments/${submission.assignmentId}/submissions`}
+                        >
+                          {submission.assignmentTitle}
+                        </Link>
+                      </td>
+                      <td>{submission.courseCode}</td>
+                      <td>
+                        {new Date(submission.submittedAt).toLocaleDateString(
+                          "en-GB",
+                          { day: "numeric", month: "short" },
+                        )}
+                      </td>
+                      <td>
+                        <span
+                          className={
+                            submission.grade === null
+                              ? "text-amber-600 dark:text-amber-400"
+                              : "text-emerald-600 dark:text-emerald-400"
+                          }
+                        >
+                          {submission.grade === null
+                            ? "Needs grading"
+                            : "Graded"}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </section>
       </div>
     </div>

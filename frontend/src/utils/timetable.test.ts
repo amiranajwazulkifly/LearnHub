@@ -1,9 +1,15 @@
 import { describe, expect, test } from "vitest";
 
-import { getNextSession, isSessionActiveOn, sessionsOnDate } from "./timetable";
+import {
+  getNextSession,
+  isSessionActiveOn,
+  sessionsOnDate,
+  layoutDaySessions,
+} from "./timetable";
 
 // Local-time constructor, so these don't depend on the machine's timezone.
-const on = (y: number, m: number, d: number, h = 9, min = 0) => new Date(y, m - 1, d, h, min);
+const on = (y: number, m: number, d: number, h = 9, min = 0) =>
+  new Date(y, m - 1, d, h, min);
 
 describe("schedule date ranges", () => {
   // The acceptance case from the spec: a block ending 30 Aug must not recur
@@ -32,7 +38,9 @@ describe("schedule date ranges", () => {
   });
 
   test("open-ended bounds never exclude", () => {
-    expect(isSessionActiveOn({ start_date: null, end_date: null }, on(2031, 1, 1))).toBe(true);
+    expect(
+      isSessionActiveOn({ start_date: null, end_date: null }, on(2031, 1, 1)),
+    ).toBe(true);
   });
 
   test("an ended course never becomes the next lecture", () => {
@@ -41,7 +49,11 @@ describe("schedule date ranges", () => {
   });
 
   test("a running course is still found as the next lecture", () => {
-    const running = { ...augustBlock, start_date: "2026-08-14", end_date: "2026-11-11" };
+    const running = {
+      ...augustBlock,
+      start_date: "2026-08-14",
+      end_date: "2026-11-11",
+    };
     const next = getNextSession([running], on(2026, 9, 16, 8, 0));
 
     expect(next?.daysUntil).toBe(0);
@@ -49,12 +61,60 @@ describe("schedule date ranges", () => {
 
   test("sessionsOnDate filters by weekday and range, earliest first", () => {
     const sessions = [
-      { id: "late", day_of_week: 3, start_time: "14:00", start_date: null, end_date: null },
-      { id: "early", day_of_week: 3, start_time: "09:00", start_date: null, end_date: null },
+      {
+        id: "late",
+        day_of_week: 3,
+        start_time: "14:00",
+        start_date: null,
+        end_date: null,
+      },
+      {
+        id: "early",
+        day_of_week: 3,
+        start_time: "09:00",
+        start_date: null,
+        end_date: null,
+      },
       { id: "ended", ...augustBlock },
-      { id: "thursday", day_of_week: 4, start_time: "09:00", start_date: null, end_date: null },
+      {
+        id: "thursday",
+        day_of_week: 4,
+        start_time: "09:00",
+        start_date: null,
+        end_date: null,
+      },
     ];
 
-    expect(sessionsOnDate(sessions, on(2026, 9, 16)).map((s) => s.id)).toEqual(["early", "late"]);
+    expect(sessionsOnDate(sessions, on(2026, 9, 16)).map((s) => s.id)).toEqual([
+      "early",
+      "late",
+    ]);
+  });
+});
+
+describe("calendar overlap layout", () => {
+  test("keeps chained overlapping sessions in distinct stable lanes", () => {
+    const result = layoutDaySessions([
+      { start_time: "09:00", end_time: "11:00" },
+      { start_time: "10:00", end_time: "12:00" },
+      { start_time: "11:00", end_time: "13:00" },
+    ]);
+    expect(result.map(({ lane, lanes }) => [lane, lanes])).toEqual([
+      [0, 2],
+      [1, 2],
+      [0, 2],
+    ]);
+  });
+  test("uses full width again after an overlapping group ends", () => {
+    const result = layoutDaySessions([
+      { start_time: "09:00", end_time: "11:00" },
+      { start_time: "09:00", end_time: "10:00" },
+      { start_time: "11:00", end_time: "12:00" },
+    ]);
+    expect(result.map(({ lane, lanes }) => [lane, lanes])).toEqual([
+      [0, 2],
+      [1, 2],
+      [0, 1],
+    ]);
   });
 });
