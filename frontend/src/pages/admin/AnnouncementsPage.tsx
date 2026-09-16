@@ -11,6 +11,9 @@ import type { StatusTone } from '../../components/common/StatusBadge';
 import Pagination from '../../components/common/Pagination';
 import { usePagination } from '../../hooks/usePagination';
 import ConfirmModal from '../../components/common/ConfirmModal';
+import { toast } from "../../store/useToastStore";
+import { SkeletonTable } from "../../components/common/Skeleton";
+import EmptyState from "../../components/common/EmptyState";
 
 const STATUS_TONE: Record<string, StatusTone> = {
   published: 'green',
@@ -40,8 +43,18 @@ export default function AnnouncementsPage() {
   }
 
   async function handlePublishToggle(a: Announcement) {
-    const updated = a.status === 'published' ? await archiveAnnouncement(a.id) : await publishAnnouncement(a.id);
-    setAnnouncements((prev) => prev.map((x) => (x.id === a.id ? updated : x)));
+    const archiving = a.status === 'published';
+
+    try {
+      const updated = archiving
+        ? await archiveAnnouncement(a.id)
+        : await publishAnnouncement(a.id);
+
+      setAnnouncements((prev) => prev.map((x) => (x.id === a.id ? updated : x)));
+      toast.success(archiving ? 'Announcement archived.' : 'Announcement published.');
+    } catch {
+      toast.error('Unable to update the announcement. Please try again.');
+    }
   }
 
   async function handleConfirmDelete() {
@@ -49,11 +62,16 @@ export default function AnnouncementsPage() {
     const id = deleteTarget;
     setDeleteTarget(null);
 
-    await deleteAnnouncement(id);
-    setAnnouncements((prev) => prev.filter((x) => x.id !== id));
+    try {
+      await deleteAnnouncement(id);
+      setAnnouncements((prev) => prev.filter((x) => x.id !== id));
+      toast.success('Announcement deleted.');
+    } catch {
+      toast.error('Unable to delete the announcement. Please try again.');
+    }
   }
 
-  if (loading) return <p className="p-6 text-gray-500 dark:text-gray-400">Loading announcements…</p>;
+  if (loading) return <SkeletonTable />;
 
   return (
     <div className="p-6">
@@ -107,7 +125,7 @@ export default function AnnouncementsPage() {
           </div>
         ))}
         {announcements.length === 0 && (
-          <p className="py-8 text-center text-sm text-gray-400 dark:text-gray-500">No announcements yet.</p>
+          <EmptyState title="No announcements yet" description="Compose one to notify students or instructors." />
         )}
       </div>
 
@@ -116,7 +134,7 @@ export default function AnnouncementsPage() {
       <ConfirmModal
         open={deleteTarget !== null}
         title="Delete announcement?"
-        message="Are you sure you want to delete this announcement? This cannot be undone."
+        message="This announcement will no longer be visible to anyone it was published to. This cannot be undone."
         confirmLabel="Delete"
         variant="danger"
         onConfirm={() => void handleConfirmDelete()}

@@ -13,6 +13,7 @@ import type { InstructorCourse } from "../../types/instructorPortal";
 import StatusBadge from "../../components/common/StatusBadge";
 import type { StatusTone } from "../../components/common/StatusBadge";
 import { ROUTES } from "../../constants/routes";
+import { SkeletonCards } from "../../components/common/Skeleton";
 
 const STATUS_TONE: Record<string, StatusTone> = {
   published: "green",
@@ -49,7 +50,7 @@ export default function InstructorCoursesPage() {
 
   if (loading) {
     return (
-      <p className="text-gray-500 dark:text-gray-400">Loading courses...</p>
+      <SkeletonCards cards={3} />
     );
   }
 

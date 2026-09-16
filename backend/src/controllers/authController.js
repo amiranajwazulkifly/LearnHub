@@ -1,18 +1,26 @@
 const {
   registerStudent,
   loginUser,
+  getCurrentUserProfile,
   updateCurrentUser,
   changeCurrentUserPassword,
   revokeUserSessions,
   requestPasswordReset,
   resetPassword,
 } = require('../services/authService');
+const notifications = require('../services/notificationService');
 
 async function register(req, res) {
   const result = await registerStudent({
     fullName: req.body.fullName,
     email: req.body.email,
     password: req.body.password,
+  });
+
+  await notifications.notifyRole('admin', {
+    type: 'student_registered',
+    title: `A new student registered: ${result.user.fullName}`,
+    link: `/admin/students/${result.user.id}`,
   });
 
   res.status(201).json({
@@ -35,12 +43,12 @@ async function login(req, res) {
   });
 }
 
-function getCurrentUser(req, res) {
+async function getCurrentUser(req, res) {
   res.status(200).json({
     success: true,
     message: 'Authenticated user retrieved successfully',
     data: {
-      user: req.user,
+      user: await getCurrentUserProfile(req.user),
     },
   });
 }

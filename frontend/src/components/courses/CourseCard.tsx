@@ -5,6 +5,7 @@ import type { Schedule } from "../../types/schedule";
 import { ROUTES } from "../../constants/routes";
 import StatusBadge from "../common/StatusBadge";
 import type { StatusTone } from "../common/StatusBadge";
+import SeatsIndicator from "./SeatsIndicator";
 
 interface CourseCardProps {
   course: Course;
@@ -71,6 +72,15 @@ export default function CourseCard({ course, schedule, layout = "grid" }: Course
             <span className="font-medium text-gray-800 dark:text-gray-200">Schedule:</span>{" "}
             {scheduleSummary(schedule)}
           </p>
+
+          <p>
+            <span className="font-medium text-gray-800 dark:text-gray-200">Seats:</span>{" "}
+            <SeatsIndicator
+              capacity={course.capacity}
+              enrolled={course.enrolled_count}
+              variant="compact"
+            />
+          </p>
         </div>
 
         <Link
@@ -135,12 +145,10 @@ export default function CourseCard({ course, schedule, layout = "grid" }: Course
           </p>
         )}
 
-        <p>
-          <span className="font-medium text-gray-800 dark:text-gray-200">
-            Capacity:
-          </span>{" "}
-          {course.capacity}
-        </p>
+      </div>
+
+      <div className="mt-4">
+        <SeatsIndicator capacity={course.capacity} enrolled={course.enrolled_count} />
       </div>
 
       <Link

@@ -1,6 +1,10 @@
 // Dzul
 import axiosInstance from '../api/axiosInstance';
-import type { DashboardStats, RecentActivityItem } from '../types/report';
+import type {
+  DashboardStats,
+  RecentActivityItem,
+  CourseCapacityItem,
+} from '../types/report';
 
 // Every real response looks like: { success, message, data: {...} }
 // so we always unwrap response.data.data, not response.data.
@@ -13,4 +17,8 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 export async function getRecentActivity(): Promise<RecentActivityItem[]> {
   const { data } = await axiosInstance.get('/dashboard/recent-activity');
   return data.data.activity;
+}
+export async function getCourseCapacity(): Promise<CourseCapacityItem[]> {
+  const { data } = await axiosInstance.get('/dashboard/course-capacity');
+  return data.data.courses;
 }

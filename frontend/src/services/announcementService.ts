@@ -1,6 +1,11 @@
 // Dzul
 import axiosInstance from '../api/axiosInstance';
-import type { Announcement, CreateAnnouncementInput, AnnouncementListResponse } from '../types/announcement';
+import type {
+  Announcement,
+  CreateAnnouncementInput,
+  AnnouncementListResponse,
+  PublishedAnnouncementFeed,
+} from '../types/announcement';
 
 export async function getAllAnnouncements(page = 1): Promise<AnnouncementListResponse> {
   const { data } = await axiosInstance.get('/announcements', { params: { page } });
@@ -8,8 +13,17 @@ export async function getAllAnnouncements(page = 1): Promise<AnnouncementListRes
 }
 
 export async function getPublishedAnnouncements(): Promise<Announcement[]> {
+  return (await getPublishedAnnouncementFeed()).announcements;
+}
+
+/** The published feed plus the current user's unread count. */
+export async function getPublishedAnnouncementFeed(): Promise<PublishedAnnouncementFeed> {
   const { data } = await axiosInstance.get('/announcements/published');
-  return data.data.announcements;
+  return data.data;
+}
+
+export async function markAnnouncementRead(id: string): Promise<void> {
+  await axiosInstance.post(`/announcements/${id}/read`);
 }
 
 export async function getAnnouncement(id: string): Promise<Announcement> {

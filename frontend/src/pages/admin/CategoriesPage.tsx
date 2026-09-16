@@ -11,6 +11,9 @@ import type { Category } from "../../types/category";
 
 import { getErrorMessage, getValidationErrors } from "../../utils/errorHandler";
 import ConfirmModal from "../../components/common/ConfirmModal";
+import { toast } from "../../store/useToastStore";
+import { SkeletonTable } from "../../components/common/Skeleton";
+import EmptyState from "../../components/common/EmptyState";
 
 function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -66,8 +69,10 @@ function CategoriesPage() {
       setDescription("");
 
       await loadCategories();
+      toast.success("Category created successfully.");
     } catch (error) {
       console.error("Failed to create category:", error);
+      toast.error("Unable to create the category. Please try again.");
 
       const validationErrors = getValidationErrors(error);
 
@@ -112,8 +117,10 @@ function CategoriesPage() {
       setDescription("");
 
       await loadCategories();
+      toast.success("Category updated successfully.");
     } catch (error) {
       console.error("Failed to update category:", error);
+      toast.error("Unable to save changes. Please try again.");
 
       const validationErrors = getValidationErrors(error);
 
@@ -144,8 +151,10 @@ function CategoriesPage() {
       }
 
       await loadCategories();
+      toast.success("Category deleted.");
     } catch (error) {
       console.error("Failed to delete category:", error);
+      toast.error(getErrorMessage(error));
       setError(getErrorMessage(error));
     }
   }
@@ -158,7 +167,7 @@ function CategoriesPage() {
   }
 
   if (loading) {
-    return <div className="p-6">Loading categories...</div>;
+    return <SkeletonTable />;
   }
 
   return (
@@ -289,7 +298,7 @@ function CategoriesPage() {
             {categories.length === 0 && (
               <tr>
                 <td colSpan={3} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                  No categories found.
+                  <EmptyState variant="plain" title="No categories found" description="Create one above, or adjust your search." />
                 </td>
               </tr>
             )}
@@ -300,7 +309,7 @@ function CategoriesPage() {
       <ConfirmModal
         open={deleteTarget !== null}
         title="Delete category?"
-        message="Are you sure you want to delete this category? This cannot be undone."
+        message="Courses in this category will keep their other details but become uncategorised. This cannot be undone."
         confirmLabel="Delete"
         variant="danger"
         onConfirm={() => void handleConfirmDelete()}

@@ -14,6 +14,8 @@ import { getInstructors } from "../../services/instructorService";
 
 import type { Category } from "../../types/category";
 import type { Instructor } from "../../types/instructor";
+import { toast } from "../../store/useToastStore";
+import { SkeletonForm } from "../../components/common/Skeleton";
 
 function CourseFormPage() {
   const navigate = useNavigate();
@@ -128,9 +130,13 @@ function CourseFormPage() {
         await createCourse(payload);
       }
 
+      toast.success(
+        isEditMode ? "Course updated successfully." : "Course created successfully.",
+      );
       navigate("/admin/courses");
     } catch (error) {
       console.error("Failed to save course:", error);
+      toast.error("Unable to save changes. Please try again.");
 
       const validationErrors = getValidationErrors(error);
 
@@ -147,7 +153,7 @@ function CourseFormPage() {
   if (pageLoading) {
     return (
       <div className="flex min-h-48 items-center justify-center rounded-lg border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
-        <p className="text-gray-500 dark:text-gray-400">Loading course form...</p>
+        <SkeletonForm />
       </div>
     );
   }

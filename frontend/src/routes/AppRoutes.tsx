@@ -45,9 +45,11 @@ import InstructorProfilePage from "../pages/instructor/InstructorProfilePage";
 import InstructorCourseAssignmentsPage from "../pages/instructor/InstructorCourseAssignmentsPage";
 import InstructorAssignmentSubmissionsPage from "../pages/instructor/InstructorAssignmentSubmissionsPage";
 
+import NotFoundPage from "../pages/shared/NotFoundPage";
+
 import { useAuthStore } from "../store/useAuthStore";
 
-import ProtectedRoute from "./ProtectedRoute";
+import ProtectedRoute, { SessionCheck } from "./ProtectedRoute";
 import RoleRoute from "./RoleRoute";
 
 function RootRedirect() {
@@ -58,7 +60,7 @@ function RootRedirect() {
   const isInitialized = useAuthStore((state) => state.isInitialized);
 
   if (!isInitialized) {
-    return <div>Loading LearnHub...</div>;
+    return <SessionCheck />;
   }
 
   if (!isAuthenticated || !user) {
@@ -227,7 +229,7 @@ function AppRoutes() {
       </Route>
 
       {/* 404 */}
-      <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }

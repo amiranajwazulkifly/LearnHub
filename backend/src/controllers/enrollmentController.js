@@ -1,160 +1,111 @@
 const enrollmentService = require("../services/enrollmentService");
+const notifications = require("../services/notificationService");
+const ApiError = require("../utils/apiError");
 
+// Student-facing enrollment endpoints.
+//
+// These follow the same pattern as every other controller: throw an ApiError
+// and let asyncHandler and errorMiddleware shape the response. They used to
+// catch everything locally and answer each failure by hand, which meant an
+// unexpected error became a generic 500 here while the same error elsewhere
+// went through the shared handler (and its logging and 400 mapping).
+// Response bodies are unchanged.
+
+// POST /api/enrollments
 async function createEnrollment(req, res) {
-  try {
-    const studentId = req.user.id;
-    const { courseId } = req.body;
+  const studentId = req.user.id;
+  const { courseId } = req.body;
 
-    if (!courseId) {
-      return res.status(400).json({
-        success: false,
-        message: "courseId is required",
-      });
-    }
+  if (!courseId) {
+    throw new ApiError(400, "courseId is required");
+  }
 
-    const course = await enrollmentService.findCourseById(courseId);
+  const course = await enrollmentService.findCourseById(courseId);
 
-    if (!course) {
-      return res.status(404).json({
-        success: false,
-        message: "Course not found",
-      });
-    }
+  if (!course) {
+    throw new ApiError(404, "Course not found");
+  }
 
-    if (course.status !== "published") {
-      return res.status(400).json({
-        success: false,
-        message: "This course is not available for enrollment",
-      });
-    }
+  // Lifecycle: only a published course takes enrollments. A draft isn't ready
+  // and an archived course is a historical record.
+  if (course.status !== "published") {
+    throw new ApiError(400, "This course is not available for enrollment");
+  }
 
-    const existingEnrollment = await enrollmentService.findActiveEnrollment(
-      studentId,
-      courseId,
-    );
+  const existingEnrollment = await enrollmentService.findActiveEnrollment(studentId, courseId);
 
-    if (existingEnrollment) {
-      return res.status(409).json({
-        success: false,
-        message: "You are already enrolled in this course",
-      });
-    }
+  if (existingEnrollment) {
+    throw new ApiError(409, "You are already enrolled in this course");
+  }
 
-    const activeEnrollmentCount =
-      await enrollmentService.countActiveEnrollments(courseId);
+  const activeEnrollmentCount = await enrollmentService.countActiveEnrollments(courseId);
 
-    if (activeEnrollmentCount >= course.capacity) {
-      return res.status(409).json({
-        success: false,
-        message: "This course is already full",
-      });
-    }
+  if (activeEnrollmentCount >= course.capacity) {
+    throw new ApiError(409, "This course is already full");
+  }
 
-    // Check whether the new course clashes with the student's timetable
-    const timetableConflict = await enrollmentService.findTimetableConflict(
-      studentId,
-      courseId,
-    );
+  const timetableConflict = await enrollmentService.findTimetableConflict(studentId, courseId);
 
-    if (timetableConflict) {
-      return res.status(409).json({
-        success: false,
-        message: "This course conflicts with your current timetable",
-        conflict: timetableConflict,
-      });
-    }
-
-    const enrollment = await enrollmentService.createEnrollment(
-      studentId,
-      courseId,
-    );
-
-    res.status(201).json({
-      success: true,
-      message: "Enrollment created successfully",
-      data: enrollment,
-    });
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      success: false,
-      message: "Failed to create enrollment",
+  if (timetableConflict) {
+    throw new ApiError(409, "This course conflicts with your current timetable", null, {
+      conflict: timetableConflict,
     });
   }
+
+  const enrollment = await enrollmentService.createEnrollment(studentId, courseId);
+
+  // This enrollment took the last seat.
+  if (activeEnrollmentCount + 1 >= course.capacity) {
+    await notifications.notifyRole("admin", {
+      type: "course_full",
+      title: `${course.code} reached full capacity`,
+      body: `${course.capacity} / ${course.capacity} seats taken`,
+      link: `/admin/courses/${course.id}/edit`,
+    });
+  }
+
+  res.status(201).json({
+    success: true,
+    message: "Enrollment created successfully",
+    data: enrollment,
+  });
 }
 
+// GET /api/enrollments/my-courses
 async function getMyCourses(req, res) {
-  try {
-    const studentId = req.user.id;
+  const enrollments = await enrollmentService.getEnrollmentsByStudentId(req.user.id);
 
-    const enrollments =
-      await enrollmentService.getEnrollmentsByStudentId(studentId);
-
-    res.status(200).json({
-      success: true,
-      count: enrollments.length,
-      data: enrollments,
-    });
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      success: false,
-      message: "Failed to retrieve enrolled courses",
-    });
-  }
+  res.status(200).json({
+    success: true,
+    count: enrollments.length,
+    data: enrollments,
+  });
 }
 
+// DELETE /api/enrollments/:id
 async function cancelEnrollment(req, res) {
-  try {
-    const studentId = req.user.id;
-    const { id } = req.params;
+  const enrollment = await enrollmentService.cancelEnrollment(req.params.id, req.user.id);
 
-    const enrollment = await enrollmentService.cancelEnrollment(id, studentId);
-
-    if (!enrollment) {
-      return res.status(404).json({
-        success: false,
-        message: "Active enrollment not found",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "Enrollment cancelled successfully",
-      data: enrollment,
-    });
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      success: false,
-      message: "Failed to cancel enrollment",
-    });
+  if (!enrollment) {
+    throw new ApiError(404, "Active enrollment not found");
   }
+
+  res.status(200).json({
+    success: true,
+    message: "Enrollment cancelled successfully",
+    data: enrollment,
+  });
 }
 
+// GET /api/enrollments/timetable
 async function getMyTimetable(req, res) {
-  try {
-    const studentId = req.user.id;
+  const timetable = await enrollmentService.getTimetableByStudentId(req.user.id);
 
-    const timetable =
-      await enrollmentService.getTimetableByStudentId(studentId);
-
-    res.status(200).json({
-      success: true,
-      count: timetable.length,
-      data: timetable,
-    });
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      success: false,
-      message: "Failed to retrieve timetable",
-    });
-  }
+  res.status(200).json({
+    success: true,
+    count: timetable.length,
+    data: timetable,
+  });
 }
 
 module.exports = {

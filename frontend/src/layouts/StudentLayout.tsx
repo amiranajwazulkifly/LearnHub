@@ -1,8 +1,10 @@
-import { Outlet } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 
 import Navbar from '../components/layout/Navbar';
 import Sidebar from '../components/layout/Sidebar';
 import { ROUTES } from '../constants/routes';
+import { useAnnouncementStore } from '../store/useAnnouncementStore';
 import {
   AnnouncementsIcon,
   AssignmentsIcon,
@@ -53,12 +55,24 @@ const studentNavigation = [
 ];
 
 function StudentLayout() {
+  const location = useLocation();
+  const unreadAnnouncements = useAnnouncementStore((state) => state.unreadCount);
+  const refreshUnread = useAnnouncementStore((state) => state.refreshUnread);
+
+  useEffect(() => {
+    void refreshUnread();
+  }, [refreshUnread, location.pathname]);
+
+  const navigation = studentNavigation.map((item) =>
+    item.path === ROUTES.STUDENT.ANNOUNCEMENTS ? { ...item, badge: unreadAnnouncements } : item,
+  );
+
   return (
     <div className="bg-line-grid min-h-screen bg-gray-100 dark:bg-gray-950">
       <Navbar portalName="Student Portal" />
 
       <div className="flex flex-col md:flex-row">
-        <Sidebar items={studentNavigation} />
+        <Sidebar items={navigation} />
 
         <main className="min-w-0 flex-1 p-4 sm:p-6">
           <Outlet />

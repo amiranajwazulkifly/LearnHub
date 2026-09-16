@@ -6,6 +6,7 @@ import type { Student } from '../../types/student';
 import type { PaginationMeta } from '../../types/api';
 import Pagination from '../../components/common/Pagination';
 import { usePagination } from '../../hooks/usePagination';
+import EmptyState from "../../components/common/EmptyState";
 
 export default function StudentsPage() {
   const [students, setStudents] = useState<Student[]>([]);
@@ -73,7 +74,7 @@ export default function StudentsPage() {
             {!loading && students.length === 0 && (
               <tr>
                 <td colSpan={5} className="px-4 py-6 text-center text-sm text-gray-400 dark:text-gray-500">
-                  No students found.
+                  <EmptyState variant="plain" title="No students found" description="Try changing your search or filters." />
                 </td>
               </tr>
             )}

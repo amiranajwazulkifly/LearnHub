@@ -1,6 +1,39 @@
 const { pool } = require("../config/db");
 const ApiError = require("../utils/apiError");
-const { uploadAssignmentFile, deleteAssignmentFileByUrl } = require("../utils/fileStorage");
+const {
+  uploadAssignmentFile,
+  deleteAssignmentFile,
+  createSignedDownloadUrl,
+} = require("../utils/fileStorage");
+const notifications = require("../services/notificationService");
+
+// Per-assignment tallies for instructor-facing lists. These deliberately
+// mirror the roster rule in submissionController.getSubmissionsForAssignment
+// so the assignment list and the submissions page can never disagree:
+//   submitted — every real submission, including from students who have
+//               since cancelled (the work still exists and is gradeable)
+//   graded    — those with a grade recorded
+//   missing   — currently-enrolled students with nothing turned in
+const ASSIGNMENT_COUNT_COLUMNS = `
+  (
+    SELECT COUNT(*) FROM public.assignment_submissions sub
+    WHERE sub.assignment_id = a.id
+  ) AS submitted_count,
+  (
+    SELECT COUNT(*) FROM public.assignment_submissions sub
+    WHERE sub.assignment_id = a.id AND sub.grade IS NOT NULL
+  ) AS graded_count,
+  (
+    SELECT COUNT(DISTINCT en.student_id)
+    FROM public.enrollments en
+    WHERE en.course_id = a.course_id
+      AND en.status <> 'cancelled'
+      AND NOT EXISTS (
+        SELECT 1 FROM public.assignment_submissions sub
+        WHERE sub.assignment_id = a.id AND sub.student_id = en.student_id
+      )
+  ) AS missing_count
+`;
 
 function formatAssignment(row) {
   return {
@@ -12,10 +45,21 @@ function formatAssignment(row) {
     description: row.description,
     points: row.points,
     dueAt: row.due_at,
-    attachmentUrl: row.attachment_url,
+    // Never a URL: files live in a private bucket and are fetched through
+    // GET /api/assignments/:id/attachment, which authorizes and signs.
+    hasAttachment: Boolean(row.attachment_path),
     attachmentName: row.attachment_name,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+    counts:
+      row.submitted_count === undefined
+        ? undefined
+        : {
+            submitted: Number(row.submitted_count),
+            graded: Number(row.graded_count),
+            missing: Number(row.missing_count),
+            ungraded: Number(row.submitted_count) - Number(row.graded_count),
+          },
     mySubmission:
       row.my_submission_id === undefined
         ? undefined
@@ -46,11 +90,21 @@ async function assertInstructorOwnsCourse(userId, courseId) {
   }
 }
 
-async function assertStudentEnrolled(userId, courseId) {
+// Course access for a student, split deliberately into two levels.
+//
+// Cancelling an enrollment removes *active* access (you can no longer turn
+// work in), but it must not erase the academic record: a student who
+// submitted while enrolled keeps read access to that assignment, its grade
+// and its feedback. Returns the enrollment status so callers can surface a
+// read-only banner rather than a dead end.
+async function getStudentCourseAccess(userId, courseId) {
   const result = await pool.query(
     `
-    SELECT id FROM public.enrollments
-    WHERE student_id = $1 AND course_id = $2 AND status != 'cancelled'
+    SELECT status
+    FROM public.enrollments
+    WHERE student_id = $1 AND course_id = $2
+    ORDER BY (status <> 'cancelled') DESC, enrolled_at DESC
+    LIMIT 1
     `,
     [userId, courseId],
   );
@@ -58,6 +112,29 @@ async function assertStudentEnrolled(userId, courseId) {
   if (result.rows.length === 0) {
     throw new ApiError(403, "You are not enrolled in this course");
   }
+
+  const status = result.rows[0].status;
+
+  return { status, isActive: status !== "cancelled" };
+}
+
+// Read access — any enrollment record, current or historical.
+async function assertStudentCanView(userId, courseId) {
+  return getStudentCourseAccess(userId, courseId);
+}
+
+// Write access — submitting requires a live enrollment.
+async function assertStudentCanSubmit(userId, courseId) {
+  const access = await getStudentCourseAccess(userId, courseId);
+
+  if (!access.isActive) {
+    throw new ApiError(
+      403,
+      "Your enrollment in this course is no longer active, so you can't submit new work",
+    );
+  }
+
+  return access;
 }
 
 async function getAssignmentOwnedByInstructor(userId, assignmentId) {
@@ -87,10 +164,11 @@ async function getCourseAssignments(req, res) {
   if (role === "instructor") {
     await assertInstructorOwnsCourse(userId, courseId);
   } else if (role === "student") {
-    await assertStudentEnrolled(userId, courseId);
+    await assertStudentCanView(userId, courseId);
   }
 
   const includeSubmission = role === "student";
+  const includeCounts = role === "instructor" || role === "admin";
 
   const result = await pool.query(
     `
@@ -107,6 +185,7 @@ async function getCourseAssignments(req, res) {
       s.graded_at AS my_submission_graded_at`
           : ""
       }
+      ${includeCounts ? `, ${ASSIGNMENT_COUNT_COLUMNS}` : ""}
     FROM public.assignments a
     JOIN public.courses c ON c.id = a.course_id
     ${
@@ -178,16 +257,26 @@ async function getAssignmentById(req, res) {
 
   const assignment = result.rows[0];
 
+  let access = null;
+
   if (role === "instructor") {
     await assertInstructorOwnsCourse(userId, assignment.course_id);
   } else if (role === "student") {
-    await assertStudentEnrolled(userId, assignment.course_id);
+    access = await assertStudentCanView(userId, assignment.course_id);
   }
 
   res.status(200).json({
     success: true,
     message: "Assignment retrieved successfully",
-    data: { assignment: formatAssignment(assignment) },
+    data: {
+      assignment: {
+        ...formatAssignment(assignment),
+        // Lets the student page render a read-only notice instead of an
+        // enabled submit form for a course they've left.
+        enrollmentStatus: access ? access.status : undefined,
+        canSubmit: access ? access.isActive : undefined,
+      },
+    },
   });
 }
 
@@ -203,7 +292,7 @@ async function createAssignment(req, res) {
   const result = await pool.query(
     `
     INSERT INTO public.assignments
-    (course_id, created_by, title, description, points, due_at, attachment_url, attachment_name)
+    (course_id, created_by, title, description, points, due_at, attachment_path, attachment_name)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING *;
     `,
@@ -214,15 +303,25 @@ async function createAssignment(req, res) {
       description || null,
       points || null,
       due_at || null,
-      uploaded?.url || null,
+      uploaded?.path || null,
       uploaded?.name || null,
     ],
   );
 
+  const created = result.rows[0];
+  const course = await pool.query("SELECT code FROM public.courses WHERE id = $1", [course_id]);
+
+  await notifications.notifyCourseStudents(course_id, {
+    type: "assignment_posted",
+    title: `${created.title} was posted in ${course.rows[0]?.code ?? "your course"}`,
+    body: created.due_at ? `Due ${new Date(created.due_at).toISOString()}` : null,
+    link: `/student/tasks/${created.id}`,
+  });
+
   res.status(201).json({
     success: true,
     message: "Assignment created successfully",
-    data: { assignment: formatAssignment(result.rows[0]) },
+    data: { assignment: formatAssignment(created) },
   });
 }
 
@@ -234,17 +333,17 @@ async function updateAssignment(req, res) {
 
   const existing = await getAssignmentOwnedByInstructor(userId, id);
 
-  let attachmentUrl = existing.attachment_url;
+  let attachmentPath = existing.attachment_path;
   let attachmentName = existing.attachment_name;
 
   if (req.file) {
     const uploaded = await uploadAssignmentFile(req.file, "assignments");
-    await deleteAssignmentFileByUrl(existing.attachment_url);
-    attachmentUrl = uploaded.url;
+    await deleteAssignmentFile(existing.attachment_path);
+    attachmentPath = uploaded.path;
     attachmentName = uploaded.name;
   } else if (remove_attachment === "true" || remove_attachment === true) {
-    await deleteAssignmentFileByUrl(existing.attachment_url);
-    attachmentUrl = null;
+    await deleteAssignmentFile(existing.attachment_path);
+    attachmentPath = null;
     attachmentName = null;
   }
 
@@ -256,13 +355,13 @@ async function updateAssignment(req, res) {
       description = $2,
       points = $3,
       due_at = $4,
-      attachment_url = $5,
+      attachment_path = $5,
       attachment_name = $6,
       updated_at = NOW()
     WHERE id = $7
     RETURNING *;
     `,
-    [title, description || null, points || null, due_at || null, attachmentUrl, attachmentName, id],
+    [title, description || null, points || null, due_at || null, attachmentPath, attachmentName, id],
   );
 
   res.status(200).json({
@@ -280,7 +379,7 @@ async function deleteAssignment(req, res) {
   const existing = await getAssignmentOwnedByInstructor(userId, id);
 
   await pool.query("DELETE FROM public.assignments WHERE id = $1", [id]);
-  await deleteAssignmentFileByUrl(existing.attachment_url);
+  await deleteAssignmentFile(existing.attachment_path);
 
   res.status(200).json({
     success: true,
@@ -289,7 +388,48 @@ async function deleteAssignment(req, res) {
   });
 }
 
+// GET /api/assignments/:id/attachment
+// A short-lived download link for the instructor's attachment, for anyone
+// entitled to see the assignment itself.
+async function getAssignmentAttachment(req, res) {
+  const { id } = req.params;
+  const { role, id: userId } = req.user;
+
+  const result = await pool.query(
+    "SELECT course_id, attachment_path, attachment_name FROM public.assignments WHERE id = $1",
+    [id],
+  );
+
+  if (result.rows.length === 0) {
+    throw new ApiError(404, "Assignment not found");
+  }
+
+  const assignment = result.rows[0];
+
+  if (role === "instructor") {
+    await assertInstructorOwnsCourse(userId, assignment.course_id);
+  } else if (role === "student") {
+    await assertStudentCanView(userId, assignment.course_id);
+  }
+
+  if (!assignment.attachment_path) {
+    throw new ApiError(404, "This assignment has no attachment");
+  }
+
+  const signed = await createSignedDownloadUrl(
+    assignment.attachment_path,
+    assignment.attachment_name,
+  );
+
+  res.status(200).json({
+    success: true,
+    message: "Download link created",
+    data: signed,
+  });
+}
+
 module.exports = {
+  getAssignmentAttachment,
   getCourseAssignments,
   getMyAssignments,
   getAssignmentById,
@@ -297,6 +437,8 @@ module.exports = {
   updateAssignment,
   deleteAssignment,
   assertInstructorOwnsCourse,
-  assertStudentEnrolled,
+  getStudentCourseAccess,
+  assertStudentCanView,
+  assertStudentCanSubmit,
   getAssignmentOwnedByInstructor,
 };

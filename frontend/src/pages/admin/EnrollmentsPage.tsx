@@ -5,6 +5,9 @@ import type { AdminEnrollmentRow, EnrollmentStatus } from '../../types/student';
 import type { PaginationMeta } from '../../types/api';
 import Pagination from '../../components/common/Pagination';
 import { usePagination } from '../../hooks/usePagination';
+import { toast } from "../../store/useToastStore";
+import { SkeletonTable } from "../../components/common/Skeleton";
+import EmptyState from "../../components/common/EmptyState";
 
 export default function EnrollmentsPage() {
   const [rows, setRows] = useState<AdminEnrollmentRow[]>([]);
@@ -27,11 +30,16 @@ export default function EnrollmentsPage() {
   }
 
   async function handleStatusChange(id: string, status: EnrollmentStatus) {
-    await updateEnrollmentStatus(id, status);
-    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
+    try {
+      await updateEnrollmentStatus(id, status);
+      setRows((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
+      toast.success(`Enrollment marked as ${status}.`);
+    } catch {
+      toast.error('Unable to update the enrollment. Please try again.');
+    }
   }
 
-  if (loading) return <p className="p-6 text-gray-500 dark:text-gray-400">Loading enrollments…</p>;
+  if (loading) return <SkeletonTable />;
 
   return (
     <div className="p-6">
@@ -71,7 +79,7 @@ export default function EnrollmentsPage() {
             {rows.length === 0 && (
               <tr>
                 <td colSpan={4} className="px-4 py-6 text-center text-sm text-gray-400 dark:text-gray-500">
-                  No enrollments yet.
+                  <EmptyState variant="plain" title="No enrollments found" description="Try changing your filters." />
                 </td>
               </tr>
             )}

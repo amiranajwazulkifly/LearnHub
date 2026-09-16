@@ -1,0 +1,274 @@
+[
+  {
+    "file": "01-public/01-login.png",
+    "requested": "/login",
+    "landed": "/login",
+    "redirected": false,
+    "chars": 281,
+    "empty": false
+  },
+  {
+    "file": "01-public/02-register.png",
+    "requested": "/register",
+    "landed": "/register",
+    "redirected": false,
+    "chars": 299,
+    "empty": false
+  },
+  {
+    "file": "01-public/03-forgot-password.png",
+    "requested": "/forgot-password",
+    "landed": "/forgot-password",
+    "redirected": false,
+    "chars": 292,
+    "empty": false
+  },
+  {
+    "file": "01-public/04-reset-password.png",
+    "requested": "/reset-password",
+    "landed": "/reset-password",
+    "redirected": false,
+    "chars": 273,
+    "empty": false
+  },
+  {
+    "file": "02-admin/01-dashboard.png",
+    "requested": "/admin",
+    "landed": "/admin",
+    "redirected": false,
+    "chars": 1569,
+    "empty": false
+  },
+  {
+    "file": "02-admin/02-courses.png",
+    "requested": "/admin/courses",
+    "landed": "/admin/courses",
+    "redirected": false,
+    "chars": 1175,
+    "empty": false
+  },
+  {
+    "file": "02-admin/03-course-create.png",
+    "requested": "/admin/courses/create",
+    "landed": "/admin/courses/create",
+    "redirected": false,
+    "chars": 523,
+    "empty": false
+  },
+  {
+    "file": "02-admin/04-course-edit.png",
+    "requested": "/admin/courses/30000000-0000-0000-0000-000000000001/edit",
+    "landed": "/admin/courses/30000000-0000-0000-0000-000000000001/edit",
+    "redirected": false,
+    "chars": 519,
+    "empty": false
+  },
+  {
+    "file": "02-admin/05-categories.png",
+    "requested": "/admin/categories",
+    "landed": "/admin/categories",
+    "redirected": false,
+    "chars": 809,
+    "empty": false
+  },
+  {
+    "file": "02-admin/06-instructors.png",
+    "requested": "/admin/instructors",
+    "landed": "/admin/instructors",
+    "redirected": false,
+    "chars": 1080,
+    "empty": false
+  },
+  {
+    "file": "02-admin/07-schedules.png",
+    "requested": "/admin/schedules",
+    "landed": "/admin/schedules",
+    "redirected": false,
+    "chars": 1857,
+    "empty": false
+  },
+  {
+    "file": "02-admin/08-students.png",
+    "requested": "/admin/students",
+    "landed": "/admin/students",
+    "redirected": false,
+    "chars": 1112,
+    "empty": false
+  },
+  {
+    "file": "02-admin/09-student-details.png",
+    "requested": "/admin/students/00000000-0000-0000-0000-000000000002",
+    "landed": "/admin/students/00000000-0000-0000-0000-000000000002",
+    "redirected": false,
+    "chars": 690,
+    "empty": false
+  },
+  {
+    "file": "02-admin/10-enrollments.png",
+    "requested": "/admin/enrollments",
+    "landed": "/admin/enrollments",
+    "redirected": false,
+    "chars": 1909,
+    "empty": false
+  },
+  {
+    "file": "02-admin/11-reports.png",
+    "requested": "/admin/reports",
+    "landed": "/admin/reports",
+    "redirected": false,
+    "chars": 1049,
+    "empty": false
+  },
+  {
+    "file": "02-admin/12-announcements.png",
+    "requested": "/admin/announcements",
+    "landed": "/admin/announcements",
+    "redirected": false,
+    "chars": 1887,
+    "empty": false
+  },
+  {
+    "file": "02-admin/13-announcement-new.png",
+    "requested": "/admin/announcements/new",
+    "landed": "/admin/announcements/new",
+    "redirected": false,
+    "chars": 252,
+    "empty": false
+  },
+  {
+    "file": "02-admin/14-announcement-edit.png",
+    "requested": "/admin/announcements/50000000-0000-0000-0000-000000000001/edit",
+    "landed": "/admin/announcements/50000000-0000-0000-0000-000000000001/edit",
+    "redirected": false,
+    "chars": 253,
+    "empty": false
+  },
+  {
+    "file": "02-admin/15-profile.png",
+    "requested": "/admin/profile",
+    "landed": "/admin/profile",
+    "redirected": false,
+    "chars": 556,
+    "empty": false
+  },
+  {
+    "file": "03-student/01-dashboard.png",
+    "requested": "/student",
+    "landed": "/student",
+    "redirected": false,
+    "chars": 1318,
+    "empty": false
+  },
+  {
+    "file": "03-student/02-browse-courses.png",
+    "requested": "/student/courses",
+    "landed": "/student/courses",
+    "redirected": false,
+    "chars": 2472,
+    "empty": false
+  },
+  {
+    "file": "03-student/03-course-details.png",
+    "requested": "/student/courses/30000000-0000-0000-0000-000000000001",
+    "landed": "/student/courses/30000000-0000-0000-0000-000000000001",
+    "redirected": false,
+    "chars": 1046,
+    "empty": false
+  },
+  {
+    "file": "03-student/04-my-courses.png",
+    "requested": "/student/my-courses",
+    "landed": "/student/my-courses",
+    "redirected": false,
+    "chars": 1354,
+    "empty": false
+  },
+  {
+    "file": "03-student/05-timetable.png",
+    "requested": "/student/timetable",
+    "landed": "/student/timetable",
+    "redirected": false,
+    "chars": 814,
+    "empty": false
+  },
+  {
+    "file": "03-student/06-tasks.png",
+    "requested": "/student/tasks",
+    "landed": "/student/tasks",
+    "redirected": false,
+    "chars": 786,
+    "empty": false
+  },
+  {
+    "file": "03-student/07-task-detail.png",
+    "requested": "/student/tasks/80000000-0000-0000-0000-000000000001",
+    "landed": "/student/tasks/80000000-0000-0000-0000-000000000001",
+    "redirected": false,
+    "chars": 786,
+    "empty": false
+  },
+  {
+    "file": "03-student/08-announcements.png",
+    "requested": "/student/announcements",
+    "landed": "/student/announcements",
+    "redirected": false,
+    "chars": 1131,
+    "empty": false
+  },
+  {
+    "file": "03-student/09-profile.png",
+    "requested": "/student/profile",
+    "landed": "/student/profile",
+    "redirected": false,
+    "chars": 702,
+    "empty": false
+  },
+  {
+    "file": "04-instructor/01-dashboard.png",
+    "requested": "/instructor",
+    "landed": "/instructor",
+    "redirected": false,
+    "chars": 1038,
+    "empty": false
+  },
+  {
+    "file": "04-instructor/02-courses.png",
+    "requested": "/instructor/courses",
+    "landed": "/instructor/courses",
+    "redirected": false,
+    "chars": 1160,
+    "empty": false
+  },
+  {
+    "file": "04-instructor/03-course-students.png",
+    "requested": "/instructor/courses/30000000-0000-0000-0000-000000000001/students",
+    "landed": "/instructor/courses/30000000-0000-0000-0000-000000000001/students",
+    "redirected": false,
+    "chars": 780,
+    "empty": false
+  },
+  {
+    "file": "04-instructor/04-course-assignments.png",
+    "requested": "/instructor/courses/30000000-0000-0000-0000-000000000001/assignments",
+    "landed": "/instructor/courses/30000000-0000-0000-0000-000000000001/assignments",
+    "redirected": false,
+    "chars": 1121,
+    "empty": true
+  },
+  {
+    "file": "04-instructor/05-assignment-submissions.png",
+    "requested": "/instructor/assignments/80000000-0000-0000-0000-000000000002/submissions",
+    "landed": "/instructor/assignments/80000000-0000-0000-0000-000000000002/submissions",
+    "redirected": false,
+    "chars": 1175,
+    "empty": false
+  },
+  {
+    "file": "04-instructor/06-profile.png",
+    "requested": "/instructor/profile",
+    "landed": "/instructor/profile",
+    "redirected": false,
+    "chars": 895,
+    "empty": false
+  }
+]

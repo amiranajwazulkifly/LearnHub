@@ -1,5 +1,6 @@
 const request = require("supertest");
 const app = require("../src/app");
+const { pool } = require("../src/config/db");
 
 // Seeded local dev accounts (see backend/supabase/seed.sql).
 const SEEDED_ACCOUNTS = {
@@ -39,4 +40,20 @@ function authHeader(token) {
   return { Authorization: `Bearer ${token}` };
 }
 
-module.exports = { app, request, SEEDED_ACCOUNTS, SEEDED_IDS, getToken, authHeader };
+// Tests run against the shared demo database, and creating, submitting or
+// grading an assignment writes real notifications as a side effect. Call this
+// in afterAll with the time the suite started, so a test run leaves nothing
+// behind in anyone's notification bell.
+async function cleanupNotificationsSince(startedAt) {
+  await pool.query("DELETE FROM public.notifications WHERE created_at >= $1", [startedAt]);
+}
+
+module.exports = {
+  app,
+  request,
+  SEEDED_ACCOUNTS,
+  SEEDED_IDS,
+  getToken,
+  authHeader,
+  cleanupNotificationsSince,
+};

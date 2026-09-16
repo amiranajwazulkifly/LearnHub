@@ -7,12 +7,16 @@ import {
 
 import PageHeader from "../../components/layout/PageHeader";
 import { PinIcon, ProfileIcon } from "../../components/common/NavIcons";
+import { SkeletonList } from "../../components/common/Skeleton";
+import EmptyState from "../../components/common/EmptyState";
 import {
   DAY_NAMES,
   DAY_ORDER,
   formatTime,
   getCourseColor,
   getTodayDayOfWeek,
+  isSessionActiveOn,
+  dateForDayThisWeek,
 } from "../../utils/timetable";
 
 export default function TimetablePage() {
@@ -41,7 +45,7 @@ export default function TimetablePage() {
   }, []);
 
   if (loading) {
-    return <p className="text-gray-500 dark:text-gray-400">Loading timetable...</p>;
+    return <SkeletonList rows={3} height="h-40" />;
   }
 
   if (error) {
@@ -63,11 +67,10 @@ export default function TimetablePage() {
       />
 
       {sessions.length === 0 ? (
-        <div className="rounded-xl border border-gray-200 bg-white p-8 text-center dark:border-gray-800 dark:bg-gray-900">
-          <p className="text-gray-500 dark:text-gray-400">
-            No timetable sessions found. Enroll in a course to see your schedule here.
-          </p>
-        </div>
+        <EmptyState
+          title="Nothing scheduled"
+          description="Once you enroll in a course with weekly sessions, they will appear here."
+        />
       ) : (
         <>
           {uniqueCourses.length > 1 && (
@@ -83,10 +86,11 @@ export default function TimetablePage() {
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
             {DAY_ORDER.map((dow) => {
               const daySessions = sessions
                 .filter((session) => session.day_of_week === dow)
+                .filter((session) => isSessionActiveOn(session, dateForDayThisWeek(dow)))
                 .sort((a, b) => a.start_time.localeCompare(b.start_time));
 
               const isToday = dow === todayDow;
@@ -100,7 +104,19 @@ export default function TimetablePage() {
                         : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
                     }`}
                   >
-                    <span className="text-sm font-semibold">{DAY_NAMES[dow]}</span>
+                    <span className="text-sm font-semibold">
+                      {DAY_NAMES[dow]}
+                      <span
+                        className={`ml-1.5 font-mono text-[11px] font-normal ${
+                          isToday ? "text-white/80" : "text-gray-500 dark:text-gray-400"
+                        }`}
+                      >
+                        {dateForDayThisWeek(dow).toLocaleDateString(undefined, {
+                          day: "numeric",
+                          month: "short",
+                        })}
+                      </span>
+                    </span>
                     {isToday && (
                       <span className="font-mono text-[10px] uppercase tracking-wide text-white/90">
                         Today

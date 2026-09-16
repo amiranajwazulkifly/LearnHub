@@ -14,6 +14,7 @@ import type {
 } from "../../types/instructorPortal";
 
 import StatCard from "../../components/dashboard/StatCard";
+import { SkeletonDashboard } from "../../components/common/Skeleton";
 
 export default function InstructorDashboardPage() {
   const [stats, setStats] = useState<InstructorStats | null>(null);
@@ -43,7 +44,7 @@ export default function InstructorDashboardPage() {
 
   if (loading) {
     return (
-      <p className="text-gray-500 dark:text-gray-400">Loading dashboard...</p>
+      <SkeletonDashboard />
     );
   }
 

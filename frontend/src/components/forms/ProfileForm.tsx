@@ -3,12 +3,15 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   BadgeCheck,
+  BookOpen,
+  GraduationCap,
   KeyRound,
   LockKeyhole,
   Mail,
   Save,
   ShieldCheck,
   UserRound,
+  Users,
 } from "lucide-react";
 
 import {
@@ -20,6 +23,7 @@ import {
 
 import { useAuthStore } from "../../store/useAuthStore";
 import { fieldBorderClasses } from "../../utils/formStyles";
+import { toast } from "../../store/useToastStore";
 
 function ProfileForm() {
   const user = useAuthStore((state) => state.user);
@@ -86,8 +90,11 @@ function ProfileForm() {
       await updateProfile(values);
 
       setProfileSuccess("Profile updated successfully");
+      toast.success("Profile updated.");
     } catch {
-      // Error is stored in Zustand.
+      // The message itself is stored in Zustand and rendered inline; the
+      // toast just makes the failure noticeable if the form is scrolled off.
+      toast.error("Unable to save your profile. Please try again.");
     }
   }
 
@@ -104,8 +111,9 @@ function ProfileForm() {
       resetPassword();
 
       setPasswordSuccess("Password changed successfully");
+      toast.success("Password changed.");
     } catch {
-      // Error is stored in Zustand.
+      toast.error("Unable to change your password. Please try again.");
     }
   }
 
@@ -201,6 +209,117 @@ function ProfileForm() {
           </div>
         </div>
       </section>
+
+      {/* Role-specific details. Read-only: these are managed by the
+          institution (student record) or an administrator (instructor
+          directory), not by the account holder. */}
+      {user.role === "student" && (
+        <section className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+          <div className="mb-5 flex items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-600 dark:bg-brand-950/50 dark:text-brand-400">
+              <GraduationCap size={18} />
+            </div>
+
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
+                Academic Record
+              </h2>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Managed by the registry. Contact your programme office to correct these.
+              </p>
+            </div>
+          </div>
+
+          <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              ["Student Number", user.studentNumber],
+              ["Programme", user.programme],
+              ["Semester", user.semester != null ? `Semester ${user.semester}` : null],
+              ["Phone", user.phone],
+            ].map(([label, value]) => (
+              <div
+                key={label}
+                className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950/30"
+              >
+                <dt className="font-mono text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  {label}
+                </dt>
+                <dd className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
+                  {value ?? <span className="font-normal text-gray-400 dark:text-gray-500">Not recorded</span>}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
+
+      {user.role === "instructor" && (
+        <section className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+          <div className="mb-5 flex items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-600 dark:bg-brand-950/50 dark:text-brand-400">
+              <BookOpen size={18} />
+            </div>
+
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
+                Teaching Profile
+              </h2>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Shown to students on your course pages. An administrator maintains these details.
+              </p>
+            </div>
+          </div>
+
+          <div className="mb-4 grid gap-4 sm:grid-cols-3">
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950/30">
+              <p className="flex items-center gap-1.5 font-mono text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                <BookOpen size={13} /> Courses
+              </p>
+              <p className="mt-1 text-xl font-bold text-gray-900 dark:text-gray-100">
+                {user.courseCount ?? 0}
+              </p>
+            </div>
+
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950/30">
+              <p className="flex items-center gap-1.5 font-mono text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                <Users size={13} /> Current Students
+              </p>
+              <p className="mt-1 text-xl font-bold text-gray-900 dark:text-gray-100">
+                {user.studentCount ?? 0}
+              </p>
+            </div>
+
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950/30">
+              <p className="font-mono text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                Directory Status
+              </p>
+              <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
+                {user.isActiveInstructor === false ? "Inactive" : "Active"}
+              </p>
+            </div>
+          </div>
+
+          <dl className="space-y-4">
+            <div>
+              <dt className="font-mono text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                Expertise
+              </dt>
+              <dd className="mt-1 text-sm text-gray-900 dark:text-gray-100">
+                {user.expertise ?? <span className="text-gray-400 dark:text-gray-500">Not recorded</span>}
+              </dd>
+            </div>
+
+            <div>
+              <dt className="font-mono text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                Biography
+              </dt>
+              <dd className="mt-1 whitespace-pre-wrap text-sm leading-6 text-gray-700 dark:text-gray-300">
+                {user.biography ?? <span className="text-gray-400 dark:text-gray-500">Not recorded</span>}
+              </dd>
+            </div>
+          </dl>
+        </section>
+      )}
 
       {/* Forms */}
       <div className="grid gap-6 xl:grid-cols-2">

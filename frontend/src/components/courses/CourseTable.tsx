@@ -1,6 +1,7 @@
 import type { Course } from "../../types/course";
 import StatusBadge from "../common/StatusBadge";
 import type { StatusTone } from "../common/StatusBadge";
+import SeatsIndicator from "./SeatsIndicator";
 
 interface Props {
   courses: Course[];
@@ -24,7 +25,7 @@ export default function CourseTable({ courses, onEdit, onDelete }: Props) {
             <th className="px-6 py-4">Title</th>
             <th className="px-6 py-4">Category</th>
             <th className="px-6 py-4">Instructor</th>
-            <th className="px-6 py-4">Capacity</th>
+            <th className="px-6 py-4">Enrolled</th>
             <th className="px-6 py-4">Status</th>
             <th className="px-6 py-4">Actions</th>
           </tr>
@@ -45,7 +46,13 @@ export default function CourseTable({ courses, onEdit, onDelete }: Props) {
               <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
                 {course.instructor_name ?? "Not assigned"}
               </td>
-              <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{course.capacity}</td>
+              <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
+                <SeatsIndicator
+                  capacity={course.capacity}
+                  enrolled={course.enrolled_count}
+                  variant="compact"
+                />
+              </td>
               <td className="px-6 py-4">
                 <StatusBadge label={course.status} tone={STATUS_TONE[course.status] ?? "amber"} />
               </td>

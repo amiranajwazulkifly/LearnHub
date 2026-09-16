@@ -4,6 +4,7 @@ const express = require('express');
 const {
   listAll,
   listPublished,
+  markRead,
   getOne,
   create,
   update,
@@ -29,6 +30,7 @@ const router = express.Router();
 // scoped to their audience. Declared before '/:id' so it isn't swallowed
 // by the param route.
 router.get('/published', authMiddleware, roleMiddleware('admin', 'student'), asyncHandler(listPublished));
+router.post('/:id/read', authMiddleware, roleMiddleware('admin', 'student'), asyncHandler(markRead));
 
 // Admin management
 router.get('/', authMiddleware, roleMiddleware('admin'), asyncHandler(listAll));

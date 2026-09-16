@@ -12,6 +12,9 @@ import { getCourses } from "../../services/courseService";
 import type { Schedule } from "../../types/schedule";
 import type { Course } from "../../types/course";
 import ConfirmModal from "../../components/common/ConfirmModal";
+import { toast } from "../../store/useToastStore";
+import { SkeletonTable } from "../../components/common/Skeleton";
+import EmptyState from "../../components/common/EmptyState";
 
 // Formats a date-only string (e.g. "2026-08-09") without going through
 // UTC parsing — `new Date("2026-08-09")` interprets it as UTC midnight,
@@ -154,8 +157,10 @@ function SchedulesPage() {
 
       clearForm();
       await loadData();
+      toast.success("Schedule created successfully.");
     } catch (error) {
       console.error("Failed to create schedule:", error);
+      toast.error("Unable to create the schedule. Please try again.");
       setError("Failed to create schedule.");
     } finally {
       setSaving(false);
@@ -200,8 +205,10 @@ function SchedulesPage() {
 
       clearForm();
       await loadData();
+      toast.success("Schedule updated successfully.");
     } catch (error) {
       console.error("Failed to update schedule:", error);
+      toast.error("Unable to save changes. Please try again.");
       setError("Failed to update schedule.");
     } finally {
       setSaving(false);
@@ -223,8 +230,10 @@ function SchedulesPage() {
       }
 
       await loadData();
+      toast.success("Schedule deleted.");
     } catch (error) {
       console.error("Failed to delete schedule:", error);
+      toast.error("Unable to delete the schedule. Please try again.");
       setError("Failed to delete schedule.");
     }
   }
@@ -234,7 +243,7 @@ function SchedulesPage() {
   }
 
   if (loading) {
-    return <div>Loading schedules...</div>;
+    return <SkeletonTable />;
   }
 
   return (
@@ -478,7 +487,7 @@ function SchedulesPage() {
             {schedules.length === 0 && (
               <tr>
                 <td colSpan={6} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                  No schedules found.
+                  <EmptyState variant="plain" title="No schedules found" description="Add a weekly session above to build the timetable." />
                 </td>
               </tr>
             )}
@@ -489,7 +498,7 @@ function SchedulesPage() {
       <ConfirmModal
         open={deleteTarget !== null}
         title="Delete schedule?"
-        message="Are you sure you want to delete this schedule? This cannot be undone."
+        message="This weekly session will be removed from every enrolled student's timetable. This cannot be undone."
         confirmLabel="Delete"
         variant="danger"
         onConfirm={() => void handleConfirmDelete()}

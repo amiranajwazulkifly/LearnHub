@@ -8,6 +8,8 @@ import {
   createAnnouncement, updateAnnouncement, getAnnouncement,
 } from '../../services/announcementService';
 import { fieldBorderClasses } from '../../utils/formStyles';
+import { toast } from "../../store/useToastStore";
+import { SkeletonForm } from "../../components/common/Skeleton";
 
 export default function AnnouncementFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -41,13 +43,17 @@ export default function AnnouncementFormPage() {
       } else {
         await createAnnouncement(values);
       }
+      toast.success(
+        isEdit ? 'Announcement updated successfully.' : 'Announcement created successfully.',
+      );
       navigate('/admin/announcements');
     } catch {
+      toast.error('Unable to save changes. Please try again.');
       setSubmitError('Failed to save announcement. Please try again.');
     }
   }
 
-  if (loading) return <p className="p-6 text-gray-500 dark:text-gray-400">Loading…</p>;
+  if (loading) return <SkeletonForm />;
 
   return (
     <div className="mx-auto max-w-xl p-6">

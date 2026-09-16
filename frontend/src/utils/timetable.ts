@@ -54,6 +54,65 @@ export function getCourseColor(courseId: string) {
 interface SessionLike {
   day_of_week: number;
   start_time: string;
+  start_date?: string | null;
+  end_date?: string | null;
+}
+
+// The calendar date on which `session` would next fall, `offset` days from
+// `from`. Used to check a recurring session against its date range.
+function dateForOffset(from: Date, offset: number): Date {
+  const date = new Date(from);
+  date.setDate(date.getDate() + offset);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+function parseScheduleDate(value: string | null | undefined): Date | null {
+  if (!value) return null;
+  // Schedule bounds are DATE columns ("2026-08-30"); parse as local midnight
+  // so a timezone offset can't shift them onto the wrong day.
+  const [year, month, day] = value.slice(0, 10).split("-").map(Number);
+  if (!year || !month || !day) return null;
+  return new Date(year, month - 1, day);
+}
+
+// A weekly session only actually happens on a given date if that date falls
+// within the schedule's configured range:  start_date <= date <= end_date.
+// A null bound is open-ended. Without this a course that ended in August
+// keeps rendering as an upcoming class forever.
+export function isSessionActiveOn(
+  session: { start_date?: string | null; end_date?: string | null },
+  date: Date,
+): boolean {
+  const target = new Date(date);
+  target.setHours(0, 0, 0, 0);
+
+  const start = parseScheduleDate(session.start_date);
+  if (start && target < start) return false;
+
+  const end = parseScheduleDate(session.end_date);
+  if (end && target > end) return false;
+
+  return true;
+}
+
+// The calendar date of a given weekday within the week containing `from`
+// (weeks run Monday-first, matching DAY_ORDER). Lets the weekly board check
+// each column against the real date it represents.
+export function dateForDayThisWeek(dayOfWeek: number, from: Date = new Date()): Date {
+  const date = new Date(from);
+  date.setHours(0, 0, 0, 0);
+  date.setDate(date.getDate() + (dayOfWeek - getTodayDayOfWeek(from)));
+  return date;
+}
+
+// Sessions that fall on `date`, respecting both the weekday and the range.
+export function sessionsOnDate<T extends SessionLike>(sessions: T[], date: Date): T[] {
+  const dow = getTodayDayOfWeek(date);
+  return sessions
+    .filter((session) => session.day_of_week === dow)
+    .filter((session) => isSessionActiveOn(session, date))
+    .sort((a, b) => a.start_time.localeCompare(b.start_time));
 }
 
 // Nearest upcoming session from now, searching today first (only sessions
@@ -67,9 +126,13 @@ export function getNextSession<T extends SessionLike>(
 
   for (let offset = 0; offset < 7; offset++) {
     const dow = ((todayDow - 1 + offset) % 7) + 1;
+    const candidateDate = dateForOffset(now, offset);
 
     const candidates = sessions
       .filter((session) => session.day_of_week === dow)
+      // Skip occurrences that fall outside the schedule's date range, so a
+      // finished course never becomes "your next lecture".
+      .filter((session) => isSessionActiveOn(session, candidateDate))
       .filter((session) => {
         if (offset > 0) return true;
         const [hours, minutes] = session.start_time.split(":").map(Number);

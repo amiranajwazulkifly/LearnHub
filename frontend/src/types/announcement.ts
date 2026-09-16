@@ -13,6 +13,8 @@ export interface Announcement {
   createdBy: string;
   authorName?: string;
   publishedAt: string | null;
+  /** Whether the current user has read it. Only on the published feed. */
+  isRead?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -26,4 +28,8 @@ export interface CreateAnnouncementInput {
 export interface AnnouncementListResponse {
   announcements: Announcement[];
   pagination: PaginationMeta;
+}
+export interface PublishedAnnouncementFeed {
+  announcements: Announcement[];
+  unreadCount: number;
 }

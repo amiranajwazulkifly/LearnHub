@@ -8,6 +8,8 @@ interface SidebarItem {
   path: string;
   icon: ReactNode;
   end?: boolean;
+  /** Small count shown after the label, e.g. unread announcements. Hidden at 0. */
+  badge?: number;
 }
 
 interface SidebarProps {
@@ -34,8 +36,25 @@ function Sidebar({
               ].join(' ')
             }
           >
-            {item.icon}
-            {item.label}
+            {({ isActive }) => (
+              <>
+                {item.icon}
+                {item.label}
+
+                {item.badge ? (
+                  <span
+                    className={`ml-auto rounded-full px-1.5 font-mono text-[10px] font-semibold leading-4 ${
+                      isActive
+                        ? 'bg-white/25 text-white'
+                        : 'bg-brand-100 text-brand-700 dark:bg-brand-950/60 dark:text-brand-300'
+                    }`}
+                  >
+                    {item.badge > 99 ? '99+' : item.badge}
+                    <span className="sr-only"> unread</span>
+                  </span>
+                ) : null}
+              </>
+            )}
           </NavLink>
         ))}
       </nav>

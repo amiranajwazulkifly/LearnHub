@@ -22,6 +22,8 @@ import {
 
 import type { Course } from "../../types/course";
 import type { Schedule } from "../../types/schedule";
+import { toast } from "../../store/useToastStore";
+import { SkeletonForm } from "../../components/common/Skeleton";
 
 const dayNames: Record<number, string> = {
   1: "Monday",
@@ -121,6 +123,7 @@ export default function CourseDetailsPage() {
       const response = await enrollCourse(id);
 
       setMessage("You're enrolled! We'll see you in class.");
+      toast.success("Enrolled successfully.");
       setEnrolled(true);
       setEnrollmentId(response?.data?.id ?? null);
       setCourse((previous) =>
@@ -156,6 +159,7 @@ export default function CourseDetailsPage() {
       await cancelEnrollment(enrollmentId);
 
       setMessage("Your enrollment has been cancelled.");
+      toast.success("Enrollment cancelled.");
       setEnrolled(false);
       setEnrollmentId(null);
       setCourse((previous) =>
@@ -178,7 +182,7 @@ export default function CourseDetailsPage() {
 
   if (loading) {
     return (
-      <p className="text-gray-500 dark:text-gray-400">Loading course...</p>
+      <SkeletonForm />
     );
   }
 
@@ -440,7 +444,7 @@ export default function CourseDetailsPage() {
       <ConfirmModal
         open={confirmCancelOpen}
         title="Cancel enrollment?"
-        message="Are you sure you want to cancel this enrollment? You may need to re-enroll if space is limited."
+        message="You will lose active access to this course's activities, and you may need to re-enroll if space is limited. Work you have already submitted is kept."
         confirmLabel="Cancel Enrollment"
         cancelLabel="Keep Enrollment"
         variant="danger"

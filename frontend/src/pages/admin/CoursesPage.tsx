@@ -10,6 +10,8 @@ import type { PaginationMeta } from "../../types/api";
 import Pagination from "../../components/common/Pagination";
 import { usePagination } from "../../hooks/usePagination";
 import ConfirmModal from "../../components/common/ConfirmModal";
+import { toast } from "../../store/useToastStore";
+import { SkeletonTable } from "../../components/common/Skeleton";
 
 function CoursesPage() {
   const navigate = useNavigate();
@@ -86,8 +88,10 @@ function CoursesPage() {
     try {
       await deleteCourse(id);
       await loadCourses();
+      toast.success("Course deleted.");
     } catch (error) {
       console.error("Failed to delete course:", error);
+      toast.error("Unable to delete the course. Please try again.");
       setError("Failed to delete course.");
     }
   }
@@ -174,7 +178,7 @@ function CoursesPage() {
       </form>
 
       {loading ? (
-        <div>Loading courses...</div>
+        <SkeletonTable />
       ) : (
         <>
           <CourseTable
@@ -189,7 +193,7 @@ function CoursesPage() {
       <ConfirmModal
         open={deleteTarget !== null}
         title="Delete course?"
-        message="Are you sure you want to delete this course? This cannot be undone."
+        message="Its schedules, assignments and enrollment records will be removed with it. This cannot be undone."
         confirmLabel="Delete"
         variant="danger"
         onConfirm={() => void handleConfirmDelete()}

@@ -5,6 +5,8 @@ import { getStudentDetail } from '../../services/studentService';
 import type { StudentDetail } from '../../types/student';
 import StatusBadge from '../../components/common/StatusBadge';
 import type { StatusTone } from '../../components/common/StatusBadge';
+import { SkeletonTable } from "../../components/common/Skeleton";
+import EmptyState from "../../components/common/EmptyState";
 
 const STATUS_TONE: Record<string, StatusTone> = {
   completed: 'green',
@@ -24,7 +26,7 @@ export default function StudentDetailsPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <p className="p-6 text-gray-500 dark:text-gray-400">Loading…</p>;
+  if (loading) return <SkeletonTable rows={4} />;
   if (!data) return <p className="p-6 text-red-600 dark:text-red-400">Student not found.</p>;
 
   const { student, enrollments } = data;
@@ -75,7 +77,7 @@ export default function StudentDetailsPage() {
             {enrollments.length === 0 && (
               <tr>
                 <td colSpan={4} className="px-4 py-6 text-center text-sm text-gray-400 dark:text-gray-500">
-                  No enrollments yet.
+                  <EmptyState variant="plain" title="No enrollments yet" description="This student has not enrolled in any course." />
                 </td>
               </tr>
             )}

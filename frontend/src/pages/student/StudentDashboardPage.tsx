@@ -11,6 +11,7 @@ import type { Announcement } from "../../types/announcement";
 import { useAuthStore } from "../../store/useAuthStore";
 import { ROUTES } from "../../constants/routes";
 import StatCard from "../../components/dashboard/StatCard";
+import { SkeletonDashboard } from "../../components/common/Skeleton";
 import {
   AlertIcon,
   AnnouncementsIcon,
@@ -23,6 +24,7 @@ import {
   formatMinutesUntil,
   formatTime,
   getNextSession,
+  sessionsOnDate,
   getTodayDayOfWeek,
 } from "../../utils/timetable";
 
@@ -100,7 +102,7 @@ export default function StudentDashboardPage() {
   }, []);
 
   if (loading) {
-    return <p className="text-gray-500 dark:text-gray-400">Loading dashboard...</p>;
+    return <SkeletonDashboard />;
   }
 
   if (error) {
@@ -110,7 +112,6 @@ export default function StudentDashboardPage() {
   const firstName = user?.fullName.split(" ")[0] ?? "there";
   const pendingTasks = assignments.filter((assignment) => !assignment.mySubmission);
 
-  const todayDow = getTodayDayOfWeek();
   const now = new Date();
   const next = getNextSession(sessions, now);
 
@@ -136,20 +137,20 @@ export default function StudentDashboardPage() {
     }
   }
 
+  // Walk forward day by day against real calendar dates, so a session only
+  // counts when that date is inside its schedule's start/end range.
   let upcomingLabel = "Today";
-  let upcomingSessions = sessions
-    .filter((session) => session.day_of_week === todayDow)
-    .sort((a, b) => a.start_time.localeCompare(b.start_time));
+  let upcomingSessions = sessionsOnDate(sessions, now);
 
   if (upcomingSessions.length === 0) {
     for (let offset = 1; offset < 7; offset++) {
-      const dow = ((todayDow - 1 + offset) % 7) + 1;
-      const dayMatches = sessions
-        .filter((session) => session.day_of_week === dow)
-        .sort((a, b) => a.start_time.localeCompare(b.start_time));
+      const date = new Date(now);
+      date.setDate(date.getDate() + offset);
+
+      const dayMatches = sessionsOnDate(sessions, date);
 
       if (dayMatches.length > 0) {
-        upcomingLabel = DAY_NAMES[dow];
+        upcomingLabel = DAY_NAMES[getTodayDayOfWeek(date)];
         upcomingSessions = dayMatches;
         break;
       }

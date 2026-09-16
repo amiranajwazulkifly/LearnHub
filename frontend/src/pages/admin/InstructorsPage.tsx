@@ -15,6 +15,9 @@ import StatusBadge from "../../components/common/StatusBadge";
 import Pagination from "../../components/common/Pagination";
 import { usePagination } from "../../hooks/usePagination";
 import ConfirmModal from "../../components/common/ConfirmModal";
+import { toast } from "../../store/useToastStore";
+import { SkeletonTable } from "../../components/common/Skeleton";
+import EmptyState from "../../components/common/EmptyState";
 
 function InstructorsPage() {
   const [instructors, setInstructors] = useState<Instructor[]>([]);
@@ -102,8 +105,10 @@ function InstructorsPage() {
 
       clearForm();
       await loadInstructors();
+      toast.success("Instructor created successfully.");
     } catch (error) {
       console.error("Instructor operation failed:", error);
+      toast.error("Unable to create the instructor. Please try again.");
 
       const validationErrors = getValidationErrors(error);
 
@@ -158,8 +163,10 @@ function InstructorsPage() {
 
       clearForm();
       await loadInstructors();
+      toast.success("Instructor updated successfully.");
     } catch (error) {
       console.error("Instructor operation failed:", error);
+      toast.error("Unable to save changes. Please try again.");
 
       const validationErrors = getValidationErrors(error);
 
@@ -188,8 +195,10 @@ function InstructorsPage() {
       }
 
       await loadInstructors();
+      toast.success("Instructor deleted.");
     } catch (error) {
       console.error("Failed to delete instructor:", error);
+      toast.error(getErrorMessage(error));
       setError(getErrorMessage(error));
     }
   }
@@ -233,7 +242,7 @@ function InstructorsPage() {
   }
 
   if (loading) {
-    return <div>Loading instructors...</div>;
+    return <SkeletonTable />;
   }
 
   return (
@@ -478,7 +487,7 @@ function InstructorsPage() {
             {instructors.length === 0 && (
               <tr>
                 <td colSpan={6} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                  No instructors found.
+                  <EmptyState variant="plain" title="No instructors found" description="Add an instructor above, or adjust your search." />
                 </td>
               </tr>
             )}
@@ -491,7 +500,7 @@ function InstructorsPage() {
       <ConfirmModal
         open={deleteTargetId !== null}
         title="Delete instructor?"
-        message="Are you sure you want to delete this instructor? This cannot be undone."
+        message="Courses taught by this instructor will be left without one until you reassign them. This cannot be undone."
         confirmLabel="Delete"
         variant="danger"
         onConfirm={() => void handleConfirmDelete()}

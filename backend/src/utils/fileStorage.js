@@ -3,11 +3,19 @@ const supabase = require("../config/supabaseStorage");
 const ApiError = require("./apiError");
 const env = require("../config/env");
 
+// Private bucket: objects are never publicly readable. Downloads go through
+// createSignedDownloadUrl, after the caller has checked the user may see the
+// file.
 const BUCKET = "assignment-files";
 const MAX_FILE_BYTES = 15 * 1024 * 1024; // 15MB
 
-// Uploads a multer in-memory file to the assignment-files bucket under a
-// given folder ("assignments" or "submissions") and returns a public URL.
+// A signed link is minted per click and used straight away, so it only needs
+// to outlive the redirect. Short enough that a copied link is useless.
+const SIGNED_URL_TTL_SECONDS = 60;
+
+// Uploads a multer in-memory file to the bucket under a folder ("assignments"
+// or "submissions"). Returns the object path, which is what gets stored, not
+// a URL.
 async function uploadAssignmentFile(file, folder) {
   if (!file) return null;
 
@@ -28,27 +36,41 @@ async function uploadAssignmentFile(file, folder) {
     throw new ApiError(500, "Failed to upload file");
   }
 
-  const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
+  return { path, name: file.originalname };
+}
+
+/**
+ * A short-lived URL for downloading one object. Callers must authorize the
+ * user first; this function does no access checks of its own.
+ *
+ * `downloadName` makes the browser save the file under its original name
+ * rather than the UUID-prefixed storage path.
+ */
+async function createSignedDownloadUrl(path, downloadName) {
+  const { data, error } = await supabase.storage
+    .from(BUCKET)
+    .createSignedUrl(path, SIGNED_URL_TTL_SECONDS, {
+      download: downloadName || true,
+    });
+
+  if (error || !data?.signedUrl) {
+    console.error("Signed URL error:", error);
+    throw new ApiError(404, "File not found");
+  }
 
   return {
-    url: data.publicUrl.replace(env.supabaseUrl, env.supabasePublicUrl),
-    path,
-    name: file.originalname,
+    // Signed through the internal container address; the browser needs the
+    // host-reachable one. (Identical outside Docker.)
+    url: data.signedUrl.replace(env.supabaseUrl, env.supabasePublicUrl),
+    expiresIn: SIGNED_URL_TTL_SECONDS,
   };
 }
 
-// Best-effort delete — used when an assignment/submission with an
-// attachment is deleted or replaced. Failures are logged, not thrown,
-// since a dangling storage object is harmless and shouldn't block the
-// user-facing request.
-async function deleteAssignmentFileByUrl(url) {
-  if (!url) return;
-
-  const marker = `/object/public/${BUCKET}/`;
-  const index = url.indexOf(marker);
-  if (index === -1) return;
-
-  const path = url.slice(index + marker.length);
+// Best-effort delete, used when an assignment or submission is deleted or its
+// file replaced. Failures are logged, not thrown: an orphaned object is
+// harmless and shouldn't fail the user's request.
+async function deleteAssignmentFile(path) {
+  if (!path) return;
 
   const { error } = await supabase.storage.from(BUCKET).remove([path]);
   if (error) {
@@ -56,4 +78,9 @@ async function deleteAssignmentFileByUrl(url) {
   }
 }
 
-module.exports = { uploadAssignmentFile, deleteAssignmentFileByUrl, MAX_FILE_BYTES };
+module.exports = {
+  uploadAssignmentFile,
+  createSignedDownloadUrl,
+  deleteAssignmentFile,
+  MAX_FILE_BYTES,
+};

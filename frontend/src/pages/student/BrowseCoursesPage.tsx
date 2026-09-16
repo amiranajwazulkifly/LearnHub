@@ -6,6 +6,8 @@ import { getCourses } from "../../services/courseService";
 import { GridViewIcon, ListViewIcon } from "../../components/common/NavIcons";
 
 import type { Course } from "../../types/course";
+import { SkeletonCards } from "../../components/common/Skeleton";
+import EmptyState from "../../components/common/EmptyState";
 
 type ViewLayout = "grid" | "list";
 
@@ -19,7 +21,6 @@ export default function BrowseCoursesPage() {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [category, setCategory] = useState("");
   const [instructor, setInstructor] = useState("");
-  const [status, setStatus] = useState("");
   const [view, setView] = useState<ViewLayout>(
     () => (localStorage.getItem(VIEW_STORAGE_KEY) as ViewLayout) || "grid",
   );
@@ -67,10 +68,8 @@ export default function BrowseCoursesPage() {
     const matchesInstructor =
       !instructor || course.instructor_name === instructor;
 
-    const matchesStatus = !status || course.status === status;
-
     return (
-      matchesSearch && matchesCategory && matchesInstructor && matchesStatus
+      matchesSearch && matchesCategory && matchesInstructor
     );
   });
 
@@ -91,7 +90,7 @@ export default function BrowseCoursesPage() {
   ];
 
   if (loading) {
-    return <p>Loading courses...</p>;
+    return <SkeletonCards />;
   }
 
   if (error) {
@@ -108,7 +107,7 @@ export default function BrowseCoursesPage() {
         </p>
       </div>
 
-      <div className="mb-6 grid gap-4 rounded-lg border border-gray-200 bg-white p-5 md:grid-cols-4 dark:border-gray-800 dark:bg-gray-900">
+      <div className="mb-6 grid gap-4 rounded-lg border border-gray-200 bg-white p-5 md:grid-cols-3 dark:border-gray-800 dark:bg-gray-900">
         <input
           type="text"
           placeholder="Search title, code, category..."
@@ -145,16 +144,6 @@ export default function BrowseCoursesPage() {
           ))}
         </select>
 
-        <select
-          value={status}
-          onChange={(event) => setStatus(event.target.value)}
-          className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
-        >
-          <option value="">All Statuses</option>
-          <option value="published">Published</option>
-          <option value="draft">Draft</option>
-          <option value="archived">Archived</option>
-        </select>
       </div>
 
       <div className="mb-4 flex items-center justify-between">
@@ -196,7 +185,7 @@ export default function BrowseCoursesPage() {
       {filteredCourses.length === 0 ? (
         <div className="rounded-lg border border-gray-200 bg-white p-8 text-center dark:border-gray-800 dark:bg-gray-900">
           <p className="text-gray-500 dark:text-gray-400">
-            No courses match your filters.
+            <EmptyState title="No courses match your filters" description="Try clearing a filter or searching for something broader." />
           </p>
         </div>
       ) : view === "grid" ? (

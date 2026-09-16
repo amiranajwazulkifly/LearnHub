@@ -1,5 +1,5 @@
 import axiosInstance from "../api/axiosInstance";
-import type { Submission, SubmissionRosterEntry } from "../types/assignment";
+import type { Submission, SubmissionRoster } from "../types/assignment";
 
 interface SubmissionApiResponse {
   data: { submission: Submission };
@@ -10,7 +10,7 @@ interface MySubmissionApiResponse {
 }
 
 interface RosterApiResponse {
-  data: { submissions: SubmissionRosterEntry[]; points: number | null };
+  data: SubmissionRoster;
 }
 
 const multipartConfig = { headers: { "Content-Type": undefined } };
@@ -47,7 +47,7 @@ export async function getMySubmission(assignmentId: string): Promise<Submission 
 
 export async function getSubmissionsForAssignment(
   assignmentId: string
-): Promise<{ submissions: SubmissionRosterEntry[]; points: number | null }> {
+): Promise<SubmissionRoster> {
   const { data } = await axiosInstance.get<RosterApiResponse>(
     `/assignments/${assignmentId}/submissions`
   );

@@ -1,6 +1,7 @@
 import Logo from '../common/Logo';
 import ThemeToggle from '../common/ThemeToggle';
 import UserMenu from './UserMenu';
+import NotificationBell from './NotificationBell';
 
 interface NavbarProps {
   portalName: string;
@@ -24,6 +25,7 @@ function Navbar({
 
         <div className="flex items-center gap-3">
           <ThemeToggle />
+          <NotificationBell />
           <UserMenu />
         </div>
       </div>

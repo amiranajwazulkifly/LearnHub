@@ -182,6 +182,13 @@ async function getTimetableByStudentId(studentId) {
       ON instructors.id = courses.instructor_id
     WHERE enrollments.student_id = $1
       AND enrollments.status = 'enrolled'
+      -- A weekly session recurs only inside its configured date range. A
+      -- schedule whose end_date has passed is finished and must stop
+      -- appearing on the board; NULL end_date means it runs indefinitely.
+      AND (
+        course_schedules.end_date IS NULL
+        OR course_schedules.end_date >= CURRENT_DATE
+      )
     ORDER BY
       course_schedules.day_of_week ASC,
       course_schedules.start_time ASC;
