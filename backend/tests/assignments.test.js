@@ -1,4 +1,4 @@
-const { app, request, getToken, authHeader } = require("./helpers");
+const { app, request, getToken, authHeader, cleanupNotificationsSince } = require("./helpers");
 
 // Seeded course IDs (see backend/supabase/seed.sql):
 // WEB101 & API201 are taught by the seeded instructor (Sarah Ahmad, has a
@@ -15,6 +15,8 @@ describe("Assignments", () => {
   let adminToken;
   let assignmentId;
 
+  const startedAt = new Date();
+
   beforeAll(async () => {
     instructorToken = await getToken("instructor");
     studentToken = await getToken("student");
@@ -27,6 +29,8 @@ describe("Assignments", () => {
         .delete(`/api/assignments/${assignmentId}`)
         .set(authHeader(instructorToken));
     }
+
+    await cleanupNotificationsSince(startedAt);
   });
 
   test("anonymous requests are rejected", async () => {

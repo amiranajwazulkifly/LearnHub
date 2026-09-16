@@ -11,6 +11,9 @@ import type { Category } from "../../types/category";
 
 import { getErrorMessage, getValidationErrors } from "../../utils/errorHandler";
 import ConfirmModal from "../../components/common/ConfirmModal";
+import { toast } from "../../store/useToastStore";
+import { SkeletonTable } from "../../components/common/Skeleton";
+import EmptyState from "../../components/common/EmptyState";
 
 function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -66,8 +69,10 @@ function CategoriesPage() {
       setDescription("");
 
       await loadCategories();
+      toast.success("Category created successfully.");
     } catch (error) {
       console.error("Failed to create category:", error);
+      toast.error("Unable to create the category. Please try again.");
 
       const validationErrors = getValidationErrors(error);
 
@@ -112,8 +117,10 @@ function CategoriesPage() {
       setDescription("");
 
       await loadCategories();
+      toast.success("Category updated successfully.");
     } catch (error) {
       console.error("Failed to update category:", error);
+      toast.error("Unable to save changes. Please try again.");
 
       const validationErrors = getValidationErrors(error);
 
@@ -144,8 +151,10 @@ function CategoriesPage() {
       }
 
       await loadCategories();
+      toast.success("Category deleted.");
     } catch (error) {
       console.error("Failed to delete category:", error);
+      toast.error(getErrorMessage(error));
       setError(getErrorMessage(error));
     }
   }
@@ -158,7 +167,7 @@ function CategoriesPage() {
   }
 
   if (loading) {
-    return <div className="p-6">Loading categories...</div>;
+    return <SkeletonTable />;
   }
 
   return (
@@ -166,11 +175,15 @@ function CategoriesPage() {
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Category Management</h1>
 
-        <p className="mt-2 text-gray-500 dark:text-gray-400">Manage LearnHub course categories.</p>
+        <p className="mt-2 text-gray-500 dark:text-gray-400">
+          Manage LearnHub course categories.
+        </p>
       </div>
 
       {error && (
-        <div className="mb-4 rounded bg-red-100 p-4 text-red-700 dark:bg-red-900/40 dark:text-red-400">{error}</div>
+        <div className="mb-4 rounded bg-red-100 p-4 text-red-700 dark:bg-red-900/40 dark:text-red-400">
+          {error}
+        </div>
       )}
 
       <form
@@ -221,7 +234,7 @@ function CategoriesPage() {
                 type="button"
                 onClick={() => void handleUpdateCategory()}
                 disabled={saving}
-                className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-white disabled:opacity-50"
+                className="rounded bg-brand-600 px-4 py-2 text-white disabled:opacity-50"
               >
                 {saving ? "Updating..." : "Update Category"}
               </button>
@@ -239,7 +252,7 @@ function CategoriesPage() {
             <button
               type="submit"
               disabled={saving}
-              className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-white disabled:opacity-50"
+              className="rounded bg-brand-600 px-4 py-2 text-white disabled:opacity-50"
             >
               {saving ? "Creating..." : "Create Category"}
             </button>
@@ -259,7 +272,10 @@ function CategoriesPage() {
 
           <tbody>
             {categories.map((category) => (
-              <tr key={category.id} className="border-b border-gray-200 dark:border-gray-800">
+              <tr
+                key={category.id}
+                className="border-b border-gray-200 dark:border-gray-800"
+              >
                 <td className="px-6 py-4 font-medium">{category.name}</td>
 
                 <td className="px-6 py-4">{category.description}</td>
@@ -269,7 +285,7 @@ function CategoriesPage() {
                     <button
                       type="button"
                       onClick={() => handleEdit(category)}
-                      className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-3 py-2 text-sm text-white"
+                      className="rounded bg-brand-600 px-3 py-2 text-sm text-white"
                     >
                       Edit
                     </button>
@@ -288,8 +304,15 @@ function CategoriesPage() {
 
             {categories.length === 0 && (
               <tr>
-                <td colSpan={3} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                  No categories found.
+                <td
+                  colSpan={3}
+                  className="px-6 py-8 text-center text-gray-500 dark:text-gray-400"
+                >
+                  <EmptyState
+                    variant="plain"
+                    title="No categories found"
+                    description="Create one above, or adjust your search."
+                  />
                 </td>
               </tr>
             )}
@@ -300,7 +323,7 @@ function CategoriesPage() {
       <ConfirmModal
         open={deleteTarget !== null}
         title="Delete category?"
-        message="Are you sure you want to delete this category? This cannot be undone."
+        message="Courses in this category will keep their other details but become uncategorised. This cannot be undone."
         confirmLabel="Delete"
         variant="danger"
         onConfirm={() => void handleConfirmDelete()}

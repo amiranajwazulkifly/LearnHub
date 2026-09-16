@@ -26,6 +26,13 @@ router.get("/course/:courseId", asyncHandler(assignmentController.getCourseAssig
 
 router.get("/:id", asyncHandler(assignmentController.getAssignmentById));
 
+// Signed, short-lived download links. Each handler does its own access check.
+router.get("/:id/attachment", asyncHandler(assignmentController.getAssignmentAttachment));
+router.get(
+  "/:id/submissions/:submissionId/attachment",
+  asyncHandler(submissionController.getSubmissionAttachment),
+);
+
 router.post(
   "/",
   roleMiddleware("instructor"),

@@ -30,13 +30,13 @@ const instructorNavigation = [
 
 function InstructorLayout() {
   return (
-    <div className="bg-line-grid min-h-screen bg-gray-100 dark:bg-gray-950">
+    <div className="app-shell instructor-shell">
       <Navbar portalName="Instructor Portal" />
 
-      <div className="flex flex-col md:flex-row">
+      <div className="shell-body">
         <Sidebar items={instructorNavigation} />
 
-        <main className="min-w-0 flex-1 p-4 sm:p-6">
+        <main className="app-content">
           <Outlet />
         </main>
       </div>

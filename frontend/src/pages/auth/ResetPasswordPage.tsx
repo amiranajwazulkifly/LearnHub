@@ -1,24 +1,24 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import {
   resetPasswordSchema,
   type ResetPasswordFormValues,
-} from '../../schemas/authSchema';
-import { authService } from '../../services/authService';
-import { ROUTES } from '../../constants/routes';
-import { fieldBorderClasses } from '../../utils/formStyles';
-import { getErrorMessage } from '../../utils/errorHandler';
+} from "../../schemas/authSchema";
+import { authService } from "../../services/authService";
+import { ROUTES } from "../../constants/routes";
+import { fieldBorderClasses } from "../../utils/formStyles";
+import { getErrorMessage } from "../../utils/errorHandler";
 
 function ResetPasswordPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const token = searchParams.get('token') ?? '';
-  const email = searchParams.get('email') ?? '';
+  const token = searchParams.get("token") ?? "";
+  const email = searchParams.get("email") ?? "";
 
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
   const {
@@ -27,13 +27,17 @@ function ResetPasswordPage() {
     formState: { errors, isSubmitting },
   } = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(resetPasswordSchema),
-    defaultValues: { newPassword: '', confirmPassword: '' },
+    defaultValues: { newPassword: "", confirmPassword: "" },
   });
 
   async function onSubmit(values: ResetPasswordFormValues) {
-    setError('');
+    setError("");
     try {
-      await authService.resetPassword({ email, token, newPassword: values.newPassword });
+      await authService.resetPassword({
+        email,
+        token,
+        newPassword: values.newPassword,
+      });
       setSuccess(true);
       setTimeout(() => navigate(ROUTES.LOGIN, { replace: true }), 2000);
     } catch (err) {
@@ -46,7 +50,8 @@ function ResetPasswordPage() {
       <div className="text-center">
         <h2 className="text-2xl font-semibold">Invalid reset link</h2>
         <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">
-          This password reset link is missing information. Please request a new one.
+          This password reset link is missing information. Please request a new
+          one.
         </p>
         <Link
           to={ROUTES.FORGOT_PASSWORD}
@@ -87,14 +92,17 @@ function ResetPasswordPage() {
         )}
 
         <div>
-          <label htmlFor="newPassword" className="mb-1 block text-sm font-medium">
+          <label
+            htmlFor="newPassword"
+            className="mb-1 block text-sm font-medium"
+          >
             New password
           </label>
           <input
             id="newPassword"
             type="password"
             autoComplete="new-password"
-            {...register('newPassword')}
+            {...register("newPassword")}
             className={`w-full rounded-lg border bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(!!errors.newPassword)}`}
           />
           {errors.newPassword && (
@@ -105,14 +113,17 @@ function ResetPasswordPage() {
         </div>
 
         <div>
-          <label htmlFor="confirmPassword" className="mb-1 block text-sm font-medium">
+          <label
+            htmlFor="confirmPassword"
+            className="mb-1 block text-sm font-medium"
+          >
             Confirm new password
           </label>
           <input
             id="confirmPassword"
             type="password"
             autoComplete="new-password"
-            {...register('confirmPassword')}
+            {...register("confirmPassword")}
             className={`w-full rounded-lg border bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 ${fieldBorderClasses(!!errors.confirmPassword)}`}
           />
           {errors.confirmPassword && (
@@ -125,9 +136,9 @@ function ResetPasswordPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="btn-sheen w-full rounded-lg bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 font-medium text-white transition hover:from-brand-700 hover:to-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+          className="btn-sheen w-full rounded-lg bg-brand-600 px-4 py-2 font-medium text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isSubmitting ? 'Resetting...' : 'Reset password'}
+          {isSubmitting ? "Resetting..." : "Reset password"}
         </button>
       </form>
     </>

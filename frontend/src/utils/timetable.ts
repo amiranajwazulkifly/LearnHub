@@ -34,13 +34,34 @@ export function formatTime(time: string): string {
 // accent across the weekly board and any legend, without needing a color
 // field in the schema.
 const COURSE_COLORS = [
-  { border: "border-l-emerald-500", chip: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300" },
-  { border: "border-l-amber-500", chip: "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300" },
-  { border: "border-l-rose-500", chip: "bg-rose-100 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300" },
-  { border: "border-l-cyan-500", chip: "bg-cyan-100 text-cyan-700 dark:bg-cyan-950/50 dark:text-cyan-300" },
-  { border: "border-l-orange-500", chip: "bg-orange-100 text-orange-700 dark:bg-orange-950/50 dark:text-orange-300" },
-  { border: "border-l-teal-500", chip: "bg-teal-100 text-teal-700 dark:bg-teal-950/50 dark:text-teal-300" },
-  { border: "border-l-fuchsia-500", chip: "bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-950/50 dark:text-fuchsia-300" },
+  {
+    border: "border-l-emerald-500",
+    chip: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300",
+  },
+  {
+    border: "border-l-amber-500",
+    chip: "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300",
+  },
+  {
+    border: "border-l-rose-500",
+    chip: "bg-rose-100 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300",
+  },
+  {
+    border: "border-l-cyan-500",
+    chip: "bg-cyan-100 text-cyan-700 dark:bg-cyan-950/50 dark:text-cyan-300",
+  },
+  {
+    border: "border-l-orange-500",
+    chip: "bg-orange-100 text-orange-700 dark:bg-orange-950/50 dark:text-orange-300",
+  },
+  {
+    border: "border-l-teal-500",
+    chip: "bg-teal-100 text-teal-700 dark:bg-teal-950/50 dark:text-teal-300",
+  },
+  {
+    border: "border-l-fuchsia-500",
+    chip: "bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-950/50 dark:text-fuchsia-300",
+  },
 ] as const;
 
 export function getCourseColor(courseId: string) {
@@ -54,6 +75,71 @@ export function getCourseColor(courseId: string) {
 interface SessionLike {
   day_of_week: number;
   start_time: string;
+  start_date?: string | null;
+  end_date?: string | null;
+}
+
+// The calendar date on which `session` would next fall, `offset` days from
+// `from`. Used to check a recurring session against its date range.
+function dateForOffset(from: Date, offset: number): Date {
+  const date = new Date(from);
+  date.setDate(date.getDate() + offset);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+function parseScheduleDate(value: string | null | undefined): Date | null {
+  if (!value) return null;
+  // Schedule bounds are DATE columns ("2026-08-30"); parse as local midnight
+  // so a timezone offset can't shift them onto the wrong day.
+  const [year, month, day] = value.slice(0, 10).split("-").map(Number);
+  if (!year || !month || !day) return null;
+  return new Date(year, month - 1, day);
+}
+
+// A weekly session only actually happens on a given date if that date falls
+// within the schedule's configured range:  start_date <= date <= end_date.
+// A null bound is open-ended. Without this a course that ended in August
+// keeps rendering as an upcoming class forever.
+export function isSessionActiveOn(
+  session: { start_date?: string | null; end_date?: string | null },
+  date: Date,
+): boolean {
+  const target = new Date(date);
+  target.setHours(0, 0, 0, 0);
+
+  const start = parseScheduleDate(session.start_date);
+  if (start && target < start) return false;
+
+  const end = parseScheduleDate(session.end_date);
+  if (end && target > end) return false;
+
+  return true;
+}
+
+// The calendar date of a given weekday within the week containing `from`
+// (weeks run Monday-first, matching DAY_ORDER). Lets the weekly board check
+// each column against the real date it represents.
+export function dateForDayThisWeek(
+  dayOfWeek: number,
+  from: Date = new Date(),
+): Date {
+  const date = new Date(from);
+  date.setHours(0, 0, 0, 0);
+  date.setDate(date.getDate() + (dayOfWeek - getTodayDayOfWeek(from)));
+  return date;
+}
+
+// Sessions that fall on `date`, respecting both the weekday and the range.
+export function sessionsOnDate<T extends SessionLike>(
+  sessions: T[],
+  date: Date,
+): T[] {
+  const dow = getTodayDayOfWeek(date);
+  return sessions
+    .filter((session) => session.day_of_week === dow)
+    .filter((session) => isSessionActiveOn(session, date))
+    .sort((a, b) => a.start_time.localeCompare(b.start_time));
 }
 
 // Nearest upcoming session from now, searching today first (only sessions
@@ -67,9 +153,13 @@ export function getNextSession<T extends SessionLike>(
 
   for (let offset = 0; offset < 7; offset++) {
     const dow = ((todayDow - 1 + offset) % 7) + 1;
+    const candidateDate = dateForOffset(now, offset);
 
     const candidates = sessions
       .filter((session) => session.day_of_week === dow)
+      // Skip occurrences that fall outside the schedule's date range, so a
+      // finished course never becomes "your next lecture".
+      .filter((session) => isSessionActiveOn(session, candidateDate))
       .filter((session) => {
         if (offset > 0) return true;
         const [hours, minutes] = session.start_time.split(":").map(Number);
@@ -94,4 +184,37 @@ export function formatMinutesUntil(minutes: number): string {
 
   if (remaining === 0) return `${hours} hr`;
   return `${hours} hr ${remaining} min`;
+}
+
+/** Layout connected overlap groups with stable lanes; adjacent classes can reuse a lane. */
+export function layoutDaySessions<
+  T extends { start_time: string; end_time: string },
+>(sessions: T[]) {
+  const sorted = [...sessions].sort((a, b) =>
+    a.start_time.localeCompare(b.start_time),
+  );
+  const result: { session: T; lane: number; lanes: number }[] = [];
+  let group: { session: T; lane: number; lanes: number }[] = [];
+  let laneEnds: string[] = [];
+  let groupEnd = "";
+  function flush() {
+    for (const item of group) item.lanes = laneEnds.length;
+    result.push(...group);
+    group = [];
+    laneEnds = [];
+  }
+  for (const session of sorted) {
+    if (group.length && session.start_time >= groupEnd) flush();
+    let lane = laneEnds.findIndex((end) => end <= session.start_time);
+    if (lane < 0) lane = laneEnds.length;
+    laneEnds[lane] = session.end_time;
+    groupEnd = group.length
+      ? session.end_time > groupEnd
+        ? session.end_time
+        : groupEnd
+      : session.end_time;
+    group.push({ session, lane, lanes: 1 });
+  }
+  flush();
+  return result;
 }

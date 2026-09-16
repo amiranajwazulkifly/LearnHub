@@ -66,3 +66,26 @@ export async function updateAssignment(
 export async function deleteAssignment(id: string): Promise<void> {
   await axiosInstance.delete(`/assignments/${id}`);
 }
+
+export interface SignedDownload {
+  url: string;
+  /** Seconds until the link stops working. */
+  expiresIn: number;
+}
+
+/** A short-lived download link for an assignment's instructor attachment. */
+export async function getAssignmentAttachmentUrl(assignmentId: string): Promise<SignedDownload> {
+  const { data } = await axiosInstance.get(`/assignments/${assignmentId}/attachment`);
+  return data.data;
+}
+
+/** A short-lived download link for a student's submitted file. */
+export async function getSubmissionAttachmentUrl(
+  assignmentId: string,
+  submissionId: string,
+): Promise<SignedDownload> {
+  const { data } = await axiosInstance.get(
+    `/assignments/${assignmentId}/submissions/${submissionId}/attachment`,
+  );
+  return data.data;
+}

@@ -7,6 +7,7 @@ import type { CourseRoster } from "../../types/instructorPortal";
 import StatusBadge from "../../components/common/StatusBadge";
 import type { StatusTone } from "../../components/common/StatusBadge";
 import { ROUTES } from "../../constants/routes";
+import { SkeletonTable } from "../../components/common/Skeleton";
 
 const STATUS_TONE: Record<string, StatusTone> = {
   completed: "green",
@@ -32,7 +33,7 @@ export default function InstructorCourseStudentsPage() {
 
   if (loading) {
     return (
-      <p className="text-gray-500 dark:text-gray-400">Loading roster...</p>
+      <SkeletonTable />
     );
   }
 

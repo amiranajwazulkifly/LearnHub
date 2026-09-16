@@ -12,6 +12,9 @@ import { getCourses } from "../../services/courseService";
 import type { Schedule } from "../../types/schedule";
 import type { Course } from "../../types/course";
 import ConfirmModal from "../../components/common/ConfirmModal";
+import { toast } from "../../store/useToastStore";
+import { SkeletonTable } from "../../components/common/Skeleton";
+import EmptyState from "../../components/common/EmptyState";
 
 // Formats a date-only string (e.g. "2026-08-09") without going through
 // UTC parsing — `new Date("2026-08-09")` interprets it as UTC midnight,
@@ -154,8 +157,10 @@ function SchedulesPage() {
 
       clearForm();
       await loadData();
+      toast.success("Schedule created successfully.");
     } catch (error) {
       console.error("Failed to create schedule:", error);
+      toast.error("Unable to create the schedule. Please try again.");
       setError("Failed to create schedule.");
     } finally {
       setSaving(false);
@@ -200,8 +205,10 @@ function SchedulesPage() {
 
       clearForm();
       await loadData();
+      toast.success("Schedule updated successfully.");
     } catch (error) {
       console.error("Failed to update schedule:", error);
+      toast.error("Unable to save changes. Please try again.");
       setError("Failed to update schedule.");
     } finally {
       setSaving(false);
@@ -223,8 +230,10 @@ function SchedulesPage() {
       }
 
       await loadData();
+      toast.success("Schedule deleted.");
     } catch (error) {
       console.error("Failed to delete schedule:", error);
+      toast.error("Unable to delete the schedule. Please try again.");
       setError("Failed to delete schedule.");
     }
   }
@@ -234,7 +243,7 @@ function SchedulesPage() {
   }
 
   if (loading) {
-    return <div>Loading schedules...</div>;
+    return <SkeletonTable />;
   }
 
   return (
@@ -248,7 +257,9 @@ function SchedulesPage() {
       </div>
 
       {error && (
-        <div className="mb-4 rounded bg-red-100 p-4 text-red-700 dark:bg-red-900/40 dark:text-red-400">{error}</div>
+        <div className="mb-4 rounded bg-red-100 p-4 text-red-700 dark:bg-red-900/40 dark:text-red-400">
+          {error}
+        </div>
       )}
 
       <form
@@ -381,7 +392,7 @@ function SchedulesPage() {
                 type="button"
                 onClick={() => void handleUpdateSchedule()}
                 disabled={saving}
-                className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-white disabled:opacity-50"
+                className="rounded bg-brand-600 px-4 py-2 text-white disabled:opacity-50"
               >
                 {saving ? "Updating..." : "Update Schedule"}
               </button>
@@ -399,7 +410,7 @@ function SchedulesPage() {
             <button
               type="submit"
               disabled={saving}
-              className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-white disabled:opacity-50"
+              className="rounded bg-brand-600 px-4 py-2 text-white disabled:opacity-50"
             >
               {saving ? "Creating..." : "Create Schedule"}
             </button>
@@ -422,7 +433,10 @@ function SchedulesPage() {
 
           <tbody>
             {schedules.map((schedule) => (
-              <tr key={schedule.id} className="border-b border-gray-200 dark:border-gray-800">
+              <tr
+                key={schedule.id}
+                className="border-b border-gray-200 dark:border-gray-800"
+              >
                 <td className="px-6 py-4">
                   <div className="font-medium">
                     {schedule.course_title ?? "Unknown Course"}
@@ -458,7 +472,7 @@ function SchedulesPage() {
                     <button
                       type="button"
                       onClick={() => handleEdit(schedule)}
-                      className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-3 py-2 text-sm text-white"
+                      className="rounded bg-brand-600 px-3 py-2 text-sm text-white"
                     >
                       Edit
                     </button>
@@ -477,8 +491,15 @@ function SchedulesPage() {
 
             {schedules.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                  No schedules found.
+                <td
+                  colSpan={6}
+                  className="px-6 py-8 text-center text-gray-500 dark:text-gray-400"
+                >
+                  <EmptyState
+                    variant="plain"
+                    title="No schedules found"
+                    description="Add a weekly session above to build the timetable."
+                  />
                 </td>
               </tr>
             )}
@@ -489,7 +510,7 @@ function SchedulesPage() {
       <ConfirmModal
         open={deleteTarget !== null}
         title="Delete schedule?"
-        message="Are you sure you want to delete this schedule? This cannot be undone."
+        message="This weekly session will be removed from every enrolled student's timetable. This cannot be undone."
         confirmLabel="Delete"
         variant="danger"
         onConfirm={() => void handleConfirmDelete()}

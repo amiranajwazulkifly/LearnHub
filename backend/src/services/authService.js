@@ -36,24 +36,67 @@ function formatUser(user) {
 // Student-only fields, merged onto the user object when role === 'student'.
 // A student_profiles row always exists (created by the DB trigger on
 // account creation), so this is a straight lookup, never an insert.
+//
+// studentNumber, programme and semester are institution-managed academic
+// details: exposed so the student can see them, but not editable through
+// the profile endpoint.
 async function getStudentProfileFields(userId) {
   const result = await pool.query(
-    `SELECT address, gender, nationality FROM public.student_profiles WHERE user_id = $1`,
+    `SELECT student_number, phone, programme, semester, address, gender, nationality
+     FROM public.student_profiles WHERE user_id = $1`,
     [userId]
   );
   const row = result.rows[0];
   if (!row) return {};
   return {
+    studentNumber: row.student_number,
+    phone: row.phone,
+    programme: row.programme,
+    semester: row.semester,
     address: row.address,
     gender: row.gender,
     nationality: row.nationality,
   };
 }
 
+// Instructor fields come from the instructors directory row linked to this
+// login, plus live teaching load. An instructor account with no linked
+// directory row simply gets no extra fields.
+async function getInstructorProfileFields(userId) {
+  const result = await pool.query(
+    `SELECT
+       i.expertise, i.biography, i.is_active, i.phone,
+       COUNT(DISTINCT c.id) AS course_count,
+       COUNT(DISTINCT e.student_id) FILTER (WHERE e.status = 'enrolled') AS student_count
+     FROM public.instructors i
+     LEFT JOIN public.courses c ON c.instructor_id = i.id
+     LEFT JOIN public.enrollments e ON e.course_id = c.id
+     WHERE i.user_id = $1
+     GROUP BY i.id`,
+    [userId]
+  );
+  const row = result.rows[0];
+  if (!row) return {};
+  return {
+    expertise: row.expertise,
+    biography: row.biography,
+    isActiveInstructor: row.is_active,
+    phone: row.phone,
+    courseCount: Number(row.course_count),
+    studentCount: Number(row.student_count),
+  };
+}
+
 async function withProfileFields(user) {
-  if (user.role !== 'student') return formatUser(user);
-  const profileFields = await getStudentProfileFields(user.id);
-  return { ...formatUser(user), ...profileFields };
+  if (user.role === 'student') {
+    return { ...formatUser(user), ...(await getStudentProfileFields(user.id)) };
+  }
+
+  if (user.role === 'instructor') {
+    return { ...formatUser(user), ...(await getInstructorProfileFields(user.id)) };
+  }
+
+  return formatUser(user);
 }
 
 async function findUserByEmail(email) {
@@ -85,10 +128,26 @@ async function getAuthContext(userId) {
   const row = result.rows[0];
   if (!row) return null;
 
+  // Only the core account fields: this runs on every authenticated request,
+  // and the middleware needs id, role and status, nothing more. Profile
+  // enrichment (which for an instructor is an aggregate over their courses)
+  // happens once, in getCurrentUserProfile, where it's actually returned.
   return {
-    user: await withProfileFields(row),
+    user: formatUser(row),
     tokenValidAfter: row.token_valid_after,
   };
+}
+
+async function getCurrentUserProfile(user) {
+  return withProfileFields({
+    id: user.id,
+    full_name: user.fullName,
+    email: user.email,
+    role: user.role,
+    status: user.status,
+    created_at: user.createdAt,
+    updated_at: user.updatedAt,
+  });
 }
 
 async function revokeUserSessions(userId) {
@@ -285,6 +344,7 @@ async function resetPassword({ email, token, newPassword }) {
 }
 
 module.exports = {
+  getCurrentUserProfile,
   registerStudent,
   loginUser,
   getAuthContext,

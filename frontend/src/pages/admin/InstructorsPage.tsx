@@ -15,6 +15,9 @@ import StatusBadge from "../../components/common/StatusBadge";
 import Pagination from "../../components/common/Pagination";
 import { usePagination } from "../../hooks/usePagination";
 import ConfirmModal from "../../components/common/ConfirmModal";
+import { toast } from "../../store/useToastStore";
+import { SkeletonTable } from "../../components/common/Skeleton";
+import EmptyState from "../../components/common/EmptyState";
 
 function InstructorsPage() {
   const [instructors, setInstructors] = useState<Instructor[]>([]);
@@ -102,8 +105,10 @@ function InstructorsPage() {
 
       clearForm();
       await loadInstructors();
+      toast.success("Instructor created successfully.");
     } catch (error) {
       console.error("Instructor operation failed:", error);
+      toast.error("Unable to create the instructor. Please try again.");
 
       const validationErrors = getValidationErrors(error);
 
@@ -158,8 +163,10 @@ function InstructorsPage() {
 
       clearForm();
       await loadInstructors();
+      toast.success("Instructor updated successfully.");
     } catch (error) {
       console.error("Instructor operation failed:", error);
+      toast.error("Unable to save changes. Please try again.");
 
       const validationErrors = getValidationErrors(error);
 
@@ -188,8 +195,10 @@ function InstructorsPage() {
       }
 
       await loadInstructors();
+      toast.success("Instructor deleted.");
     } catch (error) {
       console.error("Failed to delete instructor:", error);
+      toast.error(getErrorMessage(error));
       setError(getErrorMessage(error));
     }
   }
@@ -233,7 +242,7 @@ function InstructorsPage() {
   }
 
   if (loading) {
-    return <div>Loading instructors...</div>;
+    return <SkeletonTable />;
   }
 
   return (
@@ -241,11 +250,15 @@ function InstructorsPage() {
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Instructor Management</h1>
 
-        <p className="mt-2 text-gray-500 dark:text-gray-400">Manage LearnHub instructors.</p>
+        <p className="mt-2 text-gray-500 dark:text-gray-400">
+          Manage LearnHub instructors.
+        </p>
       </div>
 
       {error && (
-        <div className="mb-4 rounded bg-red-100 p-4 text-red-700 dark:bg-red-900/40 dark:text-red-400">{error}</div>
+        <div className="mb-4 rounded bg-red-100 p-4 text-red-700 dark:bg-red-900/40 dark:text-red-400">
+          {error}
+        </div>
       )}
 
       <form
@@ -332,7 +345,7 @@ function InstructorsPage() {
                 type="button"
                 onClick={() => void handleUpdateInstructor()}
                 disabled={saving}
-                className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-white disabled:opacity-50"
+                className="rounded bg-brand-600 px-4 py-2 text-white disabled:opacity-50"
               >
                 {saving ? "Updating..." : "Update Instructor"}
               </button>
@@ -350,7 +363,7 @@ function InstructorsPage() {
             <button
               type="submit"
               disabled={saving}
-              className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-white disabled:opacity-50"
+              className="rounded bg-brand-600 px-4 py-2 text-white disabled:opacity-50"
             >
               {saving ? "Creating..." : "Create Instructor"}
             </button>
@@ -402,7 +415,7 @@ function InstructorsPage() {
                       <button
                         type="button"
                         onClick={() => handleEdit(instructor)}
-                        className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-3 py-2 text-sm text-white"
+                        className="rounded bg-brand-600 px-3 py-2 text-sm text-white"
                       >
                         Edit
                       </button>
@@ -412,7 +425,9 @@ function InstructorsPage() {
                         onClick={() => handleOpenLoginForm(instructor)}
                         className="rounded border border-gray-300 px-3 py-2 text-sm font-medium hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
                       >
-                        {instructor.has_login ? "Reset Password" : "Set Up Login"}
+                        {instructor.has_login
+                          ? "Reset Password"
+                          : "Set Up Login"}
                       </button>
 
                       <button
@@ -432,12 +447,16 @@ function InstructorsPage() {
                       <div className="flex flex-wrap items-end gap-3">
                         <div>
                           <label className="mb-1 block text-sm font-medium">
-                            {instructor.has_login ? "New password" : "Set a login password"}
+                            {instructor.has_login
+                              ? "New password"
+                              : "Set a login password"}
                           </label>
                           <input
                             type="password"
                             value={loginPassword}
-                            onChange={(event) => setLoginPassword(event.target.value)}
+                            onChange={(event) =>
+                              setLoginPassword(event.target.value)
+                            }
                             placeholder="At least 8 characters"
                             className="w-64 rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500"
                           />
@@ -447,7 +466,7 @@ function InstructorsPage() {
                           type="button"
                           onClick={() => void handleSaveLogin()}
                           disabled={loginSaving}
-                          className="rounded bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-sm text-white disabled:opacity-50"
+                          className="rounded bg-brand-600 px-4 py-2 text-sm text-white disabled:opacity-50"
                         >
                           {loginSaving ? "Saving..." : "Save"}
                         </button>
@@ -463,11 +482,14 @@ function InstructorsPage() {
                       </div>
 
                       <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                        Login email will be this instructor&apos;s existing email address ({instructor.email}).
+                        Login email will be this instructor&apos;s existing
+                        email address ({instructor.email}).
                       </p>
 
                       {loginError && (
-                        <p className="mt-2 text-sm text-red-600 dark:text-red-400">{loginError}</p>
+                        <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+                          {loginError}
+                        </p>
                       )}
                     </td>
                   </tr>
@@ -477,8 +499,15 @@ function InstructorsPage() {
 
             {instructors.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                  No instructors found.
+                <td
+                  colSpan={6}
+                  className="px-6 py-8 text-center text-gray-500 dark:text-gray-400"
+                >
+                  <EmptyState
+                    variant="plain"
+                    title="No instructors found"
+                    description="Add an instructor above, or adjust your search."
+                  />
                 </td>
               </tr>
             )}
@@ -486,12 +515,14 @@ function InstructorsPage() {
         </table>
       </div>
 
-      {pagination && <Pagination pagination={pagination} onPageChange={setPage} />}
+      {pagination && (
+        <Pagination pagination={pagination} onPageChange={setPage} />
+      )}
 
       <ConfirmModal
         open={deleteTargetId !== null}
         title="Delete instructor?"
-        message="Are you sure you want to delete this instructor? This cannot be undone."
+        message="Courses taught by this instructor will be left without one until you reassign them. This cannot be undone."
         confirmLabel="Delete"
         variant="danger"
         onConfirm={() => void handleConfirmDelete()}

@@ -5,6 +5,7 @@ const {
   enrollmentTrend,
   coursePopularity,
   completionRates,
+  exportReport,
 } = require('../controllers/reportController');
 
 const authMiddleware = require('../middleware/authMiddleware');
@@ -16,5 +17,7 @@ const router = express.Router();
 router.get('/enrollment-trend', authMiddleware, roleMiddleware('admin'), asyncHandler(enrollmentTrend));
 router.get('/course-popularity', authMiddleware, roleMiddleware('admin'), asyncHandler(coursePopularity));
 router.get('/completion-rates', authMiddleware, roleMiddleware('admin'), asyncHandler(completionRates));
+
+router.get('/export/:type', authMiddleware, roleMiddleware('admin'), asyncHandler(exportReport));
 
 module.exports = router;

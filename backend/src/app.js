@@ -16,6 +16,7 @@ const studentRoutes = require("./routes/studentRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const announcementRoutes = require("./routes/announcementRoutes");
 const assignmentRoutes = require("./routes/assignmentRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 
 const { apiRateLimiter } = require("./middleware/rateLimitMiddleware");
 
@@ -29,6 +30,7 @@ const allowedOrigins = [
   "http://127.0.0.1:5175",
 ].filter(Boolean);
 app.disable("x-powered-by");
+app.set("trust proxy", env.trustProxy);
 app.use(helmet());
 app.use(
   cors({
@@ -86,6 +88,12 @@ app.get("/api/health", async (req, res, next) => {
   }
 });
 
+// The general limiter must be mounted before the routers. It used to sit
+// after them, where no request ever reached it, so the API had no general
+// rate limiting at all. The health check above stays unlimited, because
+// container orchestrators poll it constantly.
+app.use("/api", apiRateLimiter);
+
 app.use("/api/auth", authRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/instructors", instructorRoutes);
@@ -98,28 +106,7 @@ app.use("/api", studentRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/announcements", announcementRoutes);
 app.use("/api/assignments", assignmentRoutes);
-app.use("/api", apiRateLimiter);
-app.use(
-  cors({
-    origin(origin, callback) {
-      // Allow Postman, curl and server-to-server requests
-      if (!origin) {
-        return callback(null, true);
-      }
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      console.error("Blocked CORS origin:", origin);
-      return callback(
-        new ApiError(403, `Origin ${origin} is not allowed to access the API`),
-      );
-    },
-    credentials: true,
-  }),
-);
-
+app.use("/api/notifications", notificationRoutes);
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
 module.exports = app;

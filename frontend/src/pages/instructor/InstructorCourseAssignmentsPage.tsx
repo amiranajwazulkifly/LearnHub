@@ -15,6 +15,7 @@ import {
 import {
   createAssignment,
   deleteAssignment,
+  getAssignmentAttachmentUrl,
   getCourseAssignments,
   updateAssignment,
 } from "../../services/assignmentService";
@@ -22,7 +23,11 @@ import {
 import type { Assignment } from "../../types/assignment";
 import { fieldBorderClasses } from "../../utils/formStyles";
 import { ROUTES } from "../../constants/routes";
+import { formatDateTime } from "../../utils/formatters";
 import ConfirmModal from "../../components/common/ConfirmModal";
+import { toast } from "../../store/useToastStore";
+import { SkeletonList } from "../../components/common/Skeleton";
+import AttachmentLink from "../../components/common/AttachmentLink";
 
 interface FormState {
   title: string;
@@ -131,7 +136,13 @@ export default function InstructorCourseAssignmentsPage() {
 
       closeForm();
       loadAssignments();
+      toast.success(
+        editingId
+          ? "Assignment updated successfully."
+          : "Assignment created successfully.",
+      );
     } catch {
+      toast.error("Unable to save the assignment. Please try again.");
       setFormError(
         "Failed to save assignment. Check the fields and try again.",
       );
@@ -147,15 +158,17 @@ export default function InstructorCourseAssignmentsPage() {
 
     setDeleteTarget(null);
 
-    await deleteAssignment(id);
-
-    loadAssignments();
+    try {
+      await deleteAssignment(id);
+      loadAssignments();
+      toast.success("Assignment deleted.");
+    } catch {
+      toast.error("Unable to delete the assignment. Please try again.");
+    }
   }
 
   if (loading) {
-    return (
-      <p className="text-gray-500 dark:text-gray-400">Loading assignments...</p>
-    );
+    return <SkeletonList />;
   }
 
   return (
@@ -187,7 +200,7 @@ export default function InstructorCourseAssignmentsPage() {
 
         <button
           onClick={openCreateForm}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2.5 text-sm font-medium text-white transition hover:from-brand-700 hover:to-brand-600"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-700"
         >
           <Plus size={17} />
           New Assignment
@@ -386,7 +399,7 @@ export default function InstructorCourseAssignmentsPage() {
             <button
               type="submit"
               disabled={saving}
-              className="rounded-md bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-sm font-medium text-white hover:from-brand-700 hover:to-brand-600 disabled:opacity-50"
+              className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50"
             >
               {saving
                 ? "Saving..."
@@ -485,32 +498,55 @@ export default function InstructorCourseAssignmentsPage() {
 
                         <span>
                           {assignment.dueAt
-                            ? `Due ${new Date(
-                                assignment.dueAt,
-                              ).toLocaleString()}`
+                            ? `Due ${formatDateTime(assignment.dueAt)}`
                             : "No due date"}
                         </span>
                       </div>
 
-                      {assignment.attachmentUrl && (
-                        <a
-                          href={assignment.attachmentUrl}
-                          target="_blank"
-                          rel="noreferrer"
+                      {assignment.hasAttachment && (
+                        <AttachmentLink
+                          getDownload={() =>
+                            getAssignmentAttachmentUrl(assignment.id)
+                          }
                           className="flex items-center gap-2 text-brand-600 hover:underline dark:text-brand-400"
                         >
                           <FileText size={16} />
                           {assignment.attachmentName ?? "View attachment"}
-                        </a>
+                        </AttachmentLink>
                       )}
                     </div>
+
+                    {/* Turn-in tallies. These come from the API rather than
+                        being counted here, so this list, the submissions page
+                        and the dashboard always report the same numbers. */}
+                    {assignment.counts && (
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        <span className="inline-flex items-center gap-1.5 rounded-md bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-700 dark:bg-brand-950/40 dark:text-brand-300">
+                          {assignment.counts.submitted} Submitted
+                        </span>
+
+                        <span className="inline-flex items-center gap-1.5 rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
+                          {assignment.counts.graded} Graded
+                        </span>
+
+                        <span className="inline-flex items-center gap-1.5 rounded-md bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                          {assignment.counts.missing} Missing
+                        </span>
+
+                        {assignment.counts.ungraded > 0 && (
+                          <span className="inline-flex items-center gap-1.5 rounded-md bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
+                            {assignment.counts.ungraded} Awaiting grading
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Actions */}
                   <div className="flex flex-wrap gap-2">
                     <Link
                       to={`${ROUTES.INSTRUCTOR.ASSIGNMENTS}/${assignment.id}/submissions`}
-                      className="inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-brand-600 to-brand-500 px-3.5 py-2 text-sm font-medium text-white transition hover:from-brand-700 hover:to-brand-600"
+                      className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-medium text-white transition hover:bg-brand-700"
                     >
                       <Users size={16} />
                       View Submissions
@@ -559,20 +595,18 @@ function AttachmentHint({
   assignment?: Assignment;
   onRemove: () => void;
 }) {
-  if (!assignment?.attachmentUrl) return null;
+  if (!assignment?.hasAttachment) return null;
 
   return (
     <div className="mb-2 flex flex-wrap items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
       <span>Current file:</span>
 
-      <a
-        href={assignment.attachmentUrl}
-        target="_blank"
-        rel="noreferrer"
+      <AttachmentLink
+        getDownload={() => getAssignmentAttachmentUrl(assignment.id)}
         className="font-medium text-brand-600 hover:underline dark:text-brand-400"
       >
         {assignment.attachmentName}
-      </a>
+      </AttachmentLink>
 
       <button
         type="button"

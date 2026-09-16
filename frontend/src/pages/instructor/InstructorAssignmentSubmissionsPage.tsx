@@ -15,39 +15,64 @@ import {
   gradeSubmission,
   getSubmissionsForAssignment,
 } from "../../services/submissionService";
-import { getAssignmentById } from "../../services/assignmentService";
-import type { Assignment, SubmissionRosterEntry } from "../../types/assignment";
+import {
+  getAssignmentById,
+  getSubmissionAttachmentUrl,
+} from "../../services/assignmentService";
+import type {
+  Assignment,
+  AssignmentCounts,
+  SubmissionRosterEntry,
+} from "../../types/assignment";
+import {
+  describeLoadError,
+  type LoadErrorCopy,
+} from "../../utils/errorHandler";
+import ErrorState from "../../components/common/ErrorState";
+import EmptyState from "../../components/common/EmptyState";
 
 import StatusBadge from "../../components/common/StatusBadge";
 import type { StatusTone } from "../../components/common/StatusBadge";
+import { toast } from "../../store/useToastStore";
+import AttachmentLink from "../../components/common/AttachmentLink";
 
 interface GradeDraft {
   grade: string;
   feedback: string;
 }
 
-function submissionTone(entry: SubmissionRosterEntry): {
-  label: string;
-  tone: StatusTone;
-} {
-  if (!entry.submission) {
-    return {
-      label: "missing",
-      tone: "gray",
-    };
-  }
+// The server already derives submitted/graded/missing for each row; this
+// only maps that to a tone, so the page can't drift into its own rule.
+const STATUS_TONES: Record<SubmissionRosterEntry["status"], StatusTone> = {
+  missing: "gray",
+  graded: "green",
+  submitted: "amber",
+};
 
-  if (entry.submission.grade !== null && entry.submission.grade !== undefined) {
-    return {
-      label: "graded",
-      tone: "green",
-    };
-  }
-
-  return {
-    label: "submitted",
-    tone: "amber",
-  };
+function SubmissionsSkeleton() {
+  return (
+    <div className="animate-pulse">
+      <div className="h-4 w-36 rounded bg-gray-200 dark:bg-gray-800" />
+      <div className="mt-4 h-6 w-1/2 rounded bg-gray-200 dark:bg-gray-800" />
+      <div className="mt-3 h-3 w-64 rounded bg-gray-200 dark:bg-gray-800" />
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            className="h-20 rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900"
+          />
+        ))}
+      </div>
+      <div className="mt-6 space-y-4">
+        {[0, 1].map((i) => (
+          <div
+            key={i}
+            className="h-40 rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900"
+          />
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default function InstructorAssignmentSubmissionsPage() {
@@ -56,8 +81,12 @@ export default function InstructorAssignmentSubmissionsPage() {
   const [assignment, setAssignment] = useState<Assignment | null>(null);
   const [entries, setEntries] = useState<SubmissionRosterEntry[]>([]);
   const [points, setPoints] = useState<number | null>(null);
+  // Counts come from the API rather than being recomputed here — this is the
+  // same tally the instructor dashboard and assignment list use.
+  const [counts, setCounts] = useState<AssignmentCounts | null>(null);
 
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<LoadErrorCopy | null>(null);
   const [error, setError] = useState("");
 
   const [drafts, setDrafts] = useState<Record<string, GradeDraft>>({});
@@ -68,6 +97,7 @@ export default function InstructorAssignmentSubmissionsPage() {
 
     setLoading(true);
     setError("");
+    setLoadError(null);
 
     Promise.all([
       getAssignmentById(assignmentId),
@@ -77,6 +107,7 @@ export default function InstructorAssignmentSubmissionsPage() {
         setAssignment(assignmentData);
         setEntries(roster.submissions);
         setPoints(roster.points);
+        setCounts(roster.counts);
 
         const nextDrafts: Record<string, GradeDraft> = {};
 
@@ -95,8 +126,8 @@ export default function InstructorAssignmentSubmissionsPage() {
 
         setDrafts(nextDrafts);
       })
-      .catch(() => {
-        setError("Failed to load submissions");
+      .catch((err) => {
+        setLoadError(describeLoadError(err, "assignment"));
       })
       .finally(() => {
         setLoading(false);
@@ -122,7 +153,9 @@ export default function InstructorAssignmentSubmissionsPage() {
       });
 
       load();
+      toast.success("Grade saved.");
     } catch {
+      toast.error("Unable to save the grade. Check the value and try again.");
       setError("Failed to save grade. Check the value and try again.");
     } finally {
       setSavingId(null);
@@ -130,27 +163,27 @@ export default function InstructorAssignmentSubmissionsPage() {
   }
 
   if (loading) {
+    return <SubmissionsSkeleton />;
+  }
+
+  if (loadError || !assignment) {
+    const copy =
+      loadError ?? describeLoadError(new Error("missing"), "assignment");
+
     return (
-      <p className="text-gray-500 dark:text-gray-400">Loading submissions...</p>
+      <ErrorState
+        title={copy.title}
+        description={copy.description}
+        onRetry={copy.canRetry ? load : undefined}
+        backTo="/instructor/courses"
+        backLabel="Back to My Courses"
+      />
     );
   }
 
-  if (!assignment) {
-    return (
-      <p className="text-red-600 dark:text-red-400">
-        {error || "Assignment not found."}
-      </p>
-    );
-  }
-
-  const submittedCount = entries.filter((entry) => entry.submission).length;
-
-  const gradedCount = entries.filter(
-    (entry) =>
-      entry.submission?.grade !== null && entry.submission?.grade !== undefined,
-  ).length;
-
-  const missingCount = entries.filter((entry) => !entry.submission).length;
+  const submittedCount = counts?.submitted ?? 0;
+  const gradedCount = counts?.graded ?? 0;
+  const missingCount = counts?.missing ?? 0;
 
   return (
     <div>
@@ -250,24 +283,13 @@ export default function InstructorAssignmentSubmissionsPage() {
 
       {/* No students */}
       {entries.length === 0 ? (
-        <div className="rounded-xl border border-gray-200 bg-white p-10 text-center dark:border-gray-800 dark:bg-gray-900">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-            <User size={22} />
-          </div>
-
-          <h2 className="font-semibold text-gray-900 dark:text-gray-50">
-            No enrolled students
-          </h2>
-
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            There are no students enrolled in this course yet.
-          </p>
-        </div>
+        <EmptyState
+          title="No submissions yet"
+          description="Student work will appear here after a submission is made."
+        />
       ) : (
         <div className="space-y-4">
           {entries.map((entry) => {
-            const status = submissionTone(entry);
-
             const submission = entry.submission;
 
             const draft = submission ? drafts[submission.id] : null;
@@ -296,8 +318,26 @@ export default function InstructorAssignmentSubmissionsPage() {
                     </div>
                   </div>
 
-                  <StatusBadge label={status.label} tone={status.tone} />
+                  <div className="flex flex-wrap items-center gap-2">
+                    {entry.isHistorical && (
+                      <StatusBadge label="cancelled enrollment" tone="gray" />
+                    )}
+
+                    {entry.isLate && <StatusBadge label="late" tone="red" />}
+
+                    <StatusBadge
+                      label={entry.status}
+                      tone={STATUS_TONES[entry.status]}
+                    />
+                  </div>
                 </div>
+
+                {entry.isHistorical && (
+                  <div className="border-b border-amber-100 bg-amber-50 px-5 py-3 text-sm text-amber-800 dark:border-amber-950 dark:bg-amber-950/20 dark:text-amber-400">
+                    This student has left the course. Their submission is kept
+                    as part of the academic record and can still be graded.
+                  </div>
+                )}
 
                 {!submission ? (
                   <div className="p-5">
@@ -328,7 +368,7 @@ export default function InstructorAssignmentSubmissionsPage() {
                       </div>
 
                       {(submission.submissionLink ||
-                        submission.attachmentUrl) && (
+                        submission.hasAttachment) && (
                         <div className="flex flex-wrap gap-3">
                           {submission.submissionLink && (
                             <a
@@ -342,16 +382,19 @@ export default function InstructorAssignmentSubmissionsPage() {
                             </a>
                           )}
 
-                          {submission.attachmentUrl && (
-                            <a
-                              href={submission.attachmentUrl}
-                              target="_blank"
-                              rel="noreferrer"
+                          {submission.hasAttachment && (
+                            <AttachmentLink
+                              getDownload={() =>
+                                getSubmissionAttachmentUrl(
+                                  submission.assignmentId,
+                                  submission.id,
+                                )
+                              }
                               className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-brand-600 transition hover:bg-brand-50 dark:border-gray-700 dark:text-brand-400 dark:hover:bg-brand-950/30"
                             >
                               <FileText size={15} />
                               {submission.attachmentName ?? "View Attachment"}
-                            </a>
+                            </AttachmentLink>
                           )}
                         </div>
                       )}
@@ -368,7 +411,7 @@ export default function InstructorAssignmentSubmissionsPage() {
                         Grade Submission
                       </h4>
 
-                      <div className="grid gap-4 lg:grid-cols-[140px_1fr_auto] lg:items-end">
+                      <div className="grid gap-4 lg:grid-cols-[140px_1fr_auto] lg:items-start">
                         <div>
                           <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
                             Grade
@@ -406,8 +449,8 @@ export default function InstructorAssignmentSubmissionsPage() {
                             Feedback
                           </label>
 
-                          <input
-                            type="text"
+                          <textarea
+                            rows={3}
                             value={draft?.feedback ?? ""}
                             onChange={(e) =>
                               setDrafts({
@@ -426,7 +469,7 @@ export default function InstructorAssignmentSubmissionsPage() {
                         <button
                           onClick={() => handleGrade(submission.id)}
                           disabled={savingId === submission.id}
-                          className="inline-flex items-center justify-center gap-2 rounded-lg bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-sm font-medium text-white transition hover:from-brand-700 hover:to-brand-600 disabled:opacity-50"
+                          className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-700 disabled:opacity-50"
                         >
                           <Save size={16} />
 

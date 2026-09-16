@@ -134,12 +134,20 @@ Every route requires a JWT (`Authorization: Bearer <token>`, obtained from
 
 ## Running tests
 
-Backend tests run against a real Postgres connection (`DATABASE_URL`), so
+Backend tests run against the real Postgres database and the demo seed, so
 start the stack first:
 
 ```bash
 docker compose up -d
 docker compose exec backend npm test
+```
+
+Frontend tests mock the API and need no running stack:
+
+```bash
+cd frontend
+npm install
+npm test
 ```
 
 ## Environment variables

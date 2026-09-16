@@ -2,6 +2,7 @@
 const { pool } = require('../config/db');
 const ApiError = require('../utils/apiError');
 const { parsePagination, buildPaginationMeta } = require('../utils/pagination');
+const notifications = require('../services/notificationService');
 
 function formatAnnouncement(row) {
   return {
@@ -13,6 +14,8 @@ function formatAnnouncement(row) {
     createdBy: row.created_by,
     authorName: row.author_name ?? undefined,
     publishedAt: row.published_at,
+    // Only present on the per-user published feed.
+    isRead: row.is_read ?? undefined,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -45,27 +48,66 @@ async function listAll(req, res) {
   });
 }
 
-// GET /api/announcements/published
-// Filters by the logged-in user's role: students see 'all' + 'students',
-// admins (browsing this route) see everything published regardless.
-async function listPublished(req, res) {
-  const audiences =
-    req.user.role === 'student' ? ['all', 'students'] : ['all', 'students', 'instructors'];
+// Which audiences a role can see. Students see 'all' + 'students'; admins
+// browsing this route see everything published.
+function audiencesFor(role) {
+  return role === 'student' ? ['all', 'students'] : ['all', 'students', 'instructors'];
+}
 
+// GET /api/announcements/published
+// Each announcement carries whether *this* user has read it, and the response
+// carries the unread total for the sidebar badge.
+async function listPublished(req, res) {
   const result = await pool.query(
     `
-      SELECT id, title, content, audience, published_at
-      FROM public.announcements
-      WHERE status = 'published' AND audience = ANY($1)
-      ORDER BY published_at DESC
+      SELECT
+        a.id, a.title, a.content, a.audience, a.published_at,
+        (r.user_id IS NOT NULL) AS is_read
+      FROM public.announcements a
+      LEFT JOIN public.announcement_reads r
+        ON r.announcement_id = a.id AND r.user_id = $2
+      WHERE a.status = 'published' AND a.audience = ANY($1)
+      ORDER BY a.published_at DESC
     `,
-    [audiences]
+    [audiencesFor(req.user.role), req.user.id]
   );
+
+  const announcements = result.rows.map(formatAnnouncement);
 
   res.status(200).json({
     success: true,
     message: 'Published announcements retrieved successfully',
-    data: { announcements: result.rows.map(formatAnnouncement) },
+    data: {
+      announcements,
+      unreadCount: announcements.filter((a) => !a.isRead).length,
+    },
+  });
+}
+
+// POST /api/announcements/:id/read
+// Records that the current user has read a published announcement they are
+// allowed to see. Idempotent: reading twice keeps the first read time.
+async function markRead(req, res) {
+  const visible = await pool.query(
+    `SELECT id FROM public.announcements
+     WHERE id = $1 AND status = 'published' AND audience = ANY($2)`,
+    [req.params.id, audiencesFor(req.user.role)]
+  );
+
+  if (visible.rows.length === 0) {
+    throw new ApiError(404, 'Announcement not found');
+  }
+
+  await pool.query(
+    `INSERT INTO public.announcement_reads (announcement_id, user_id)
+     VALUES ($1, $2)
+     ON CONFLICT DO NOTHING`,
+    [req.params.id, req.user.id]
+  );
+
+  res.status(200).json({
+    success: true,
+    message: 'Announcement marked as read',
   });
 }
 
@@ -131,12 +173,30 @@ async function update(req, res) {
 // published_at MUST be set — the schema's CHECK constraint rejects
 // status='published' with a null published_at.
 async function publish(req, res) {
+  const before = await pool.query(`SELECT status FROM public.announcements WHERE id = $1`, [
+    req.params.id,
+  ]);
+
   const result = await pool.query(
     `UPDATE public.announcements SET status = 'published', published_at = now() WHERE id = $1 RETURNING *`,
     [req.params.id]
   );
   if (result.rows.length === 0) {
     throw new ApiError(404, 'Announcement not found');
+  }
+
+  // Notify only on the transition into published, so pressing publish twice
+  // doesn't notify everyone twice. Students are the audience with an
+  // announcements page; 'instructors'-only announcements don't notify them.
+  const announcement = result.rows[0];
+  const wasPublished = before.rows[0]?.status === 'published';
+
+  if (!wasPublished && ['all', 'students'].includes(announcement.audience)) {
+    await notifications.notifyRole('student', {
+      type: 'announcement_published',
+      title: `New announcement: ${announcement.title}`,
+      link: '/student/announcements',
+    });
   }
   res.status(200).json({
     success: true,
@@ -192,4 +252,4 @@ async function remove(req, res) {
   });
 }
 
-module.exports = { listAll, listPublished, getOne, create, update, publish, archive, backToDraft, remove };
+module.exports = { listAll, listPublished, markRead, getOne, create, update, publish, archive, backToDraft, remove };

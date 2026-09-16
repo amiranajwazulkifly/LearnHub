@@ -6,6 +6,8 @@ import { getCourses } from "../../services/courseService";
 import { GridViewIcon, ListViewIcon } from "../../components/common/NavIcons";
 
 import type { Course } from "../../types/course";
+import { SkeletonCards } from "../../components/common/Skeleton";
+import EmptyState from "../../components/common/EmptyState";
 
 type ViewLayout = "grid" | "list";
 
@@ -17,9 +19,9 @@ export default function BrowseCoursesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [status, setStatus] = useState("");
   const [category, setCategory] = useState("");
   const [instructor, setInstructor] = useState("");
-  const [status, setStatus] = useState("");
   const [view, setView] = useState<ViewLayout>(
     () => (localStorage.getItem(VIEW_STORAGE_KEY) as ViewLayout) || "grid",
   );
@@ -67,10 +69,11 @@ export default function BrowseCoursesPage() {
     const matchesInstructor =
       !instructor || course.instructor_name === instructor;
 
-    const matchesStatus = !status || course.status === status;
-
     return (
-      matchesSearch && matchesCategory && matchesInstructor && matchesStatus
+      matchesSearch &&
+      matchesCategory &&
+      matchesInstructor &&
+      (!status || course.status === status)
     );
   });
 
@@ -91,7 +94,7 @@ export default function BrowseCoursesPage() {
   ];
 
   if (loading) {
-    return <p>Loading courses...</p>;
+    return <SkeletonCards />;
   }
 
   if (error) {
@@ -99,18 +102,35 @@ export default function BrowseCoursesPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">Browse Courses</h1>
+    <div className="catalog-page">
+      <div className="dashboard-heading">
+        <p className="eyebrow">Courses</p>
+        <h1 className="text-3xl font-bold">
+          Browse{" "}
+          <span className="text-brand-600 dark:text-brand-400">Courses</span>
+        </h1>
 
         <p className="mt-2 text-gray-500 dark:text-gray-400">
-          Search and filter available LearnHub courses.
+          Find courses that match your study plan.
         </p>
       </div>
 
-      <div className="mb-6 grid gap-4 rounded-lg border border-gray-200 bg-white p-5 md:grid-cols-4 dark:border-gray-800 dark:bg-gray-900">
+      <div className="category-tabs" aria-label="Course categories">
+        {["", ...categories].map((item) => (
+          <button
+            key={item}
+            aria-pressed={category === item}
+            className={category === item ? "selected" : ""}
+            onClick={() => setCategory(item)}
+          >
+            {item || "All"}
+          </button>
+        ))}
+      </div>
+      <div className="mb-6 grid gap-4 rounded-lg border border-gray-200 bg-white p-5 lg:grid-cols-4 dark:border-gray-800 dark:bg-gray-900">
         <input
           type="text"
+          aria-label="Search courses"
           placeholder="Search title, code, category..."
           value={search}
           onChange={(event) => setSearch(event.target.value)}
@@ -118,6 +138,7 @@ export default function BrowseCoursesPage() {
         />
 
         <select
+          aria-label="Category"
           value={category}
           onChange={(event) => setCategory(event.target.value)}
           className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
@@ -132,6 +153,7 @@ export default function BrowseCoursesPage() {
         </select>
 
         <select
+          aria-label="Instructor"
           value={instructor}
           onChange={(event) => setInstructor(event.target.value)}
           className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
@@ -145,16 +167,32 @@ export default function BrowseCoursesPage() {
           ))}
         </select>
 
-        <select
-          value={status}
-          onChange={(event) => setStatus(event.target.value)}
-          className="rounded border border-gray-300 px-3 py-2 bg-white text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:border-gray-700"
-        >
-          <option value="">All Statuses</option>
-          <option value="published">Published</option>
-          <option value="draft">Draft</option>
-          <option value="archived">Archived</option>
-        </select>
+        <div className="flex gap-3">
+          <select
+            aria-label="Course status"
+            className="min-w-0 flex-1 border border-gray-300 bg-white px-3 dark:bg-gray-800 dark:border-gray-700"
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+          >
+            <option value="">All statuses</option>
+            {[...new Set(courses.map((c) => c.status))].map((value) => (
+              <option key={value} value={value}>
+                {value}
+              </option>
+            ))}
+          </select>
+          <button
+            className="text-sm text-brand-600 dark:text-brand-400"
+            onClick={() => {
+              setSearch("");
+              setCategory("");
+              setInstructor("");
+              setStatus("");
+            }}
+          >
+            Clear filters
+          </button>
+        </div>
       </div>
 
       <div className="mb-4 flex items-center justify-between">
@@ -195,9 +233,13 @@ export default function BrowseCoursesPage() {
 
       {filteredCourses.length === 0 ? (
         <div className="rounded-lg border border-gray-200 bg-white p-8 text-center dark:border-gray-800 dark:bg-gray-900">
-          <p className="text-gray-500 dark:text-gray-400">
-            No courses match your filters.
-          </p>
+          <div className="text-gray-500 dark:text-gray-400">
+            <EmptyState
+              title="No courses match your filters"
+              description="Try clearing a filter or searching for something broader."
+              variant="plain"
+            />
+          </div>
         </div>
       ) : view === "grid" ? (
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -219,7 +261,12 @@ export default function BrowseCoursesPage() {
             );
 
             return (
-              <CourseCard key={course.id} course={course} schedule={schedule} layout="list" />
+              <CourseCard
+                key={course.id}
+                course={course}
+                schedule={schedule}
+                layout="list"
+              />
             );
           })}
         </div>

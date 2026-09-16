@@ -18,43 +18,48 @@ async function getInstructorIdForUser(userId) {
 }
 
 // GET /api/instructor-portal/me/stats
+//
+// Each figure is its own scalar subquery. The previous version LEFT JOINed
+// enrollments, assignments and submissions in a single pass, which fans the
+// result set out into a cartesian product — COUNT(DISTINCT ...) papered over
+// it, but any non-distinct aggregate added later would have been silently
+// wrong. Separate subqueries also let each stat use exactly the rule the
+// matching detail page uses, which is what keeps the screens agreeing.
 async function getStats(req, res) {
   const instructor = await getInstructorIdForUser(req.user.id);
 
   const result = await pool.query(
     `
+    WITH my_courses AS (
+      SELECT id FROM public.courses WHERE instructor_id = $1
+    )
     SELECT
-      COUNT(DISTINCT c.id) AS course_count,
+      (SELECT COUNT(*) FROM my_courses) AS course_count,
 
-      COUNT(DISTINCT e.student_id)
-        FILTER (WHERE e.status = 'enrolled')
-        AS student_count,
+      (
+        SELECT COUNT(DISTINCT e.student_id)
+        FROM public.enrollments e
+        WHERE e.course_id IN (SELECT id FROM my_courses)
+          AND e.status = 'enrolled'
+      ) AS student_count,
 
-      COUNT(DISTINCT a.id)
-        FILTER (
-          WHERE a.due_at IS NULL
-          OR a.due_at >= NOW()
-        )
-        AS active_assignment_count,
+      (
+        SELECT COUNT(*)
+        FROM public.assignments a
+        WHERE a.course_id IN (SELECT id FROM my_courses)
+          AND (a.due_at IS NULL OR a.due_at >= NOW())
+      ) AS active_assignment_count,
 
-      COUNT(DISTINCT s.id)
-        FILTER (
-          WHERE s.grade IS NULL
-        )
-        AS pending_submission_count
-
-    FROM public.courses c
-
-    LEFT JOIN public.enrollments e
-      ON e.course_id = c.id
-
-    LEFT JOIN public.assignments a
-      ON a.course_id = c.id
-
-    LEFT JOIN public.assignment_submissions s
-      ON s.assignment_id = a.id
-
-    WHERE c.instructor_id = $1
+      -- Ungraded work waiting on this instructor. Counts every real
+      -- submission, including those from students who have since cancelled,
+      -- because that work is still on the roster and still gradeable.
+      (
+        SELECT COUNT(*)
+        FROM public.assignment_submissions s
+        JOIN public.assignments a ON a.id = s.assignment_id
+        WHERE a.course_id IN (SELECT id FROM my_courses)
+          AND s.grade IS NULL
+      ) AS pending_submission_count
     `,
     [instructor.id],
   );
@@ -87,9 +92,12 @@ async function getMyCourses(req, res) {
 
         cat.name AS category_name,
 
-        COUNT(DISTINCT e.id)
+        COUNT(DISTINCT e.student_id)
           FILTER (WHERE e.status = 'enrolled')
           AS enrolled_count,
+
+        COUNT(DISTINCT e.student_id)
+          AS associated_count,
 
         COUNT(DISTINCT a.id)
           AS assignment_count,
@@ -145,6 +153,7 @@ async function getMyCourses(req, res) {
         categoryName: r.category_name,
 
         enrolledCount: Number(r.enrolled_count),
+        associatedCount: Number(r.associated_count),
         assignmentCount: Number(r.assignment_count),
 
         dayOfWeek: r.day_of_week !== null ? Number(r.day_of_week) : null,

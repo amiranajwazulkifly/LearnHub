@@ -13,6 +13,7 @@ import type { InstructorCourse } from "../../types/instructorPortal";
 import StatusBadge from "../../components/common/StatusBadge";
 import type { StatusTone } from "../../components/common/StatusBadge";
 import { ROUTES } from "../../constants/routes";
+import { SkeletonCards } from "../../components/common/Skeleton";
 
 const STATUS_TONE: Record<string, StatusTone> = {
   published: "green",
@@ -48,9 +49,7 @@ export default function InstructorCoursesPage() {
   }, []);
 
   if (loading) {
-    return (
-      <p className="text-gray-500 dark:text-gray-400">Loading courses...</p>
-    );
+    return <SkeletonCards cards={3} />;
   }
 
   return (
@@ -223,7 +222,7 @@ export default function InstructorCoursesPage() {
 
                 <Link
                   to={`${ROUTES.INSTRUCTOR.COURSES}/${course.id}/assignments`}
-                  className="flex items-center justify-center gap-2 rounded-lg bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2.5 text-center text-sm font-medium text-white transition hover:from-brand-700 hover:to-brand-600"
+                  className="flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-center text-sm font-medium text-white transition hover:bg-brand-700"
                 >
                   <ClipboardList size={16} />
                   Assignments

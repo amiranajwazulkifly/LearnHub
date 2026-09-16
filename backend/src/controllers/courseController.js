@@ -68,6 +68,13 @@ async function getAllCourses(req, res) {
     index++;
   }
 
+  // Course lifecycle: a draft isn't ready to be seen and an archived course
+  // is a historical record, so the student catalog only ever lists published
+  // courses — whatever status filter the query string asks for.
+  if (req.user.role === "student") {
+    whereClause += ` AND courses.status = 'published'`;
+  }
+
   const fromClause = `
     FROM courses
     LEFT JOIN categories
@@ -79,7 +86,15 @@ async function getAllCourses(req, res) {
 
   const result = await pool.query(
     `
-    SELECT courses.*, categories.name AS category_name, instructors.full_name AS instructor_name
+    SELECT
+      courses.*,
+      categories.name AS category_name,
+      instructors.full_name AS instructor_name,
+      (
+        SELECT COUNT(*)::int
+        FROM public.enrollments e
+        WHERE e.course_id = courses.id AND e.status = 'enrolled'
+      ) AS enrolled_count
     ${fromClause}
     ORDER BY courses.created_at DESC
     LIMIT $${index} OFFSET $${index + 1}
@@ -131,6 +146,18 @@ async function getCourseById(req, res) {
 
   if (result.rowCount === 0) {
     throw new ApiError(404, "Course not found");
+  }
+
+  if (req.user.role === "student" && result.rows[0].status !== "published") {
+    const history = await pool.query(
+      "SELECT 1 FROM public.enrollments WHERE course_id = $1 AND student_id = $2 LIMIT 1",
+      [id, req.user.id],
+    );
+
+    // Same 404 as a missing course, so a draft's existence isn't revealed.
+    if (history.rows.length === 0) {
+      throw new ApiError(404, "Course not found");
+    }
   }
 
   const course = {

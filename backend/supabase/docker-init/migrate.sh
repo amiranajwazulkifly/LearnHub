@@ -19,19 +19,59 @@ until psql $CONN -c 'select 1' > /dev/null 2>&1; do
   sleep 1
 done
 
-# Idempotent: if the app schema is already there (a re-run against an
-# existing volume), skip straight to re-applying the seed, which is itself
-# safe to re-run (ON CONFLICT DO NOTHING/UPDATE throughout).
-already_migrated=$(psql $CONN -tAc "select to_regclass('public.users') is not null")
+# Tracks applied migrations by filename in public.schema_migrations, so a
+# migration added after a volume was first created still gets applied on the
+# next `docker compose up`.
+#
+# The previous version skipped every migration as soon as public.users
+# existed, which meant any new migration silently never ran against an
+# existing database.
+psql $CONN -v ON_ERROR_STOP=1 -q -c "
+  CREATE TABLE IF NOT EXISTS public.schema_migrations (
+    filename   TEXT PRIMARY KEY,
+    applied_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )"
 
-if [ "$already_migrated" != "t" ]; then
+# A database created before tracking existed already has the original
+# schema, but no record of it. Mark those baseline migrations as applied
+# rather than re-running them — they aren't idempotent and would fail.
+# Everything after the baseline goes through the normal path below.
+# Timestamp prefix of the last migration that predates tracking.
+BASELINE=20260811180000
+
+has_schema=$(psql $CONN -tAc "select to_regclass('public.users') is not null")
+tracked=$(psql $CONN -tAc "select count(*) from public.schema_migrations")
+
+if [ "$has_schema" = "t" ] && [ "$tracked" = "0" ]; then
+  echo "migrate: existing schema without tracking, recording baseline"
   for f in /migrations/*.sql; do
-    echo "migrate: applying $(basename "$f")"
-    psql $CONN -v ON_ERROR_STOP=1 -f "$f"
+    name=$(basename "$f")
+    # Integer comparison on the numeric prefix — POSIX `[` has no portable
+    # string less-than.
+    if [ "${name%%_*}" -le "$BASELINE" ]; then
+      psql $CONN -v ON_ERROR_STOP=1 -q -c \
+        "INSERT INTO public.schema_migrations (filename) VALUES ('$name') ON CONFLICT DO NOTHING"
+    fi
   done
-else
-  echo "migrate: public.users already exists, skipping migrations"
 fi
+
+for f in /migrations/*.sql; do
+  name=$(basename "$f")
+  applied=$(psql $CONN -tAc "select 1 from public.schema_migrations where filename = '$name'")
+
+  if [ "$applied" = "1" ]; then
+    continue
+  fi
+
+  echo "migrate: applying $name"
+  # ON_ERROR_STOP makes a failing migration abort the script before it is
+  # recorded, so it is retried on the next run. (Not wrapped in one
+  # transaction here: two of the original migrations manage their own
+  # BEGIN/COMMIT.)
+  psql $CONN -v ON_ERROR_STOP=1 -q -f "$f"
+  psql $CONN -v ON_ERROR_STOP=1 -q -c \
+    "INSERT INTO public.schema_migrations (filename) VALUES ('$name')"
+done
 
 echo "migrate: applying seed.sql"
 psql $CONN -v ON_ERROR_STOP=1 -f /seed.sql

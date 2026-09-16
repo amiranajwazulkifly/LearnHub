@@ -1,4 +1,4 @@
-import Modal from './Modal';
+import Modal from "./Modal";
 
 interface ConfirmModalProps {
   open: boolean;
@@ -6,7 +6,7 @@ interface ConfirmModalProps {
   message: string;
   confirmLabel?: string;
   cancelLabel?: string;
-  variant?: 'default' | 'danger';
+  variant?: "default" | "danger";
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -15,15 +15,18 @@ function ConfirmModal({
   open,
   title,
   message,
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
-  variant = 'default',
+  confirmLabel = "Confirm",
+  cancelLabel = "Cancel",
+  variant = "default",
   onConfirm,
   onCancel,
 }: ConfirmModalProps) {
   return (
     <Modal open={open} onClose={onCancel} labelledBy="confirm-modal-title">
-      <h2 id="confirm-modal-title" className="text-lg font-semibold text-gray-900 dark:text-gray-50">
+      <h2
+        id="confirm-modal-title"
+        className="text-lg font-semibold text-gray-900 dark:text-gray-50"
+      >
         {title}
       </h2>
 
@@ -42,9 +45,9 @@ function ConfirmModal({
           type="button"
           onClick={onConfirm}
           className={
-            variant === 'danger'
-              ? 'rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700'
-              : 'rounded-lg bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-sm font-medium text-white hover:from-brand-700 hover:to-brand-600'
+            variant === "danger"
+              ? "rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+              : "rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
           }
         >
           {confirmLabel}

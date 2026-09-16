@@ -2,9 +2,17 @@ const {
   rateLimit,
 } = require('express-rate-limit');
 
+const env = require('../config/env');
+
+const FIFTEEN_MINUTES = 15 * 60 * 1000;
+
+// General API ceiling, per client IP. A single page load in the SPA is several
+// requests (a dashboard is about six), and a campus NAT puts a whole class
+// behind one address, so this is set well above what one busy user needs.
+// It exists to stop scripted abuse, not to shape normal traffic.
 const apiRateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 200,
+  windowMs: FIFTEEN_MINUTES,
+  limit: env.apiRateLimitMax,
   standardHeaders: 'draft-8',
   legacyHeaders: false,
   message: {
@@ -15,8 +23,8 @@ const apiRateLimiter = rateLimit({
 });
 
 const authRateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 20,
+  windowMs: FIFTEEN_MINUTES,
+  limit: env.authRateLimitMax,
   standardHeaders: 'draft-8',
   legacyHeaders: false,
 

@@ -1,21 +1,27 @@
 // Dzul
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import {
-  getAllAnnouncements, publishAnnouncement, archiveAnnouncement, deleteAnnouncement,
-} from '../../services/announcementService';
-import type { Announcement } from '../../types/announcement';
-import type { PaginationMeta } from '../../types/api';
-import StatusBadge from '../../components/common/StatusBadge';
-import type { StatusTone } from '../../components/common/StatusBadge';
-import Pagination from '../../components/common/Pagination';
-import { usePagination } from '../../hooks/usePagination';
-import ConfirmModal from '../../components/common/ConfirmModal';
+  getAllAnnouncements,
+  publishAnnouncement,
+  archiveAnnouncement,
+  deleteAnnouncement,
+} from "../../services/announcementService";
+import type { Announcement } from "../../types/announcement";
+import type { PaginationMeta } from "../../types/api";
+import StatusBadge from "../../components/common/StatusBadge";
+import type { StatusTone } from "../../components/common/StatusBadge";
+import Pagination from "../../components/common/Pagination";
+import { usePagination } from "../../hooks/usePagination";
+import ConfirmModal from "../../components/common/ConfirmModal";
+import { toast } from "../../store/useToastStore";
+import { SkeletonTable } from "../../components/common/Skeleton";
+import EmptyState from "../../components/common/EmptyState";
 
 const STATUS_TONE: Record<string, StatusTone> = {
-  published: 'green',
-  archived: 'gray',
-  draft: 'amber',
+  published: "green",
+  archived: "gray",
+  draft: "amber",
 };
 
 export default function AnnouncementsPage() {
@@ -40,8 +46,22 @@ export default function AnnouncementsPage() {
   }
 
   async function handlePublishToggle(a: Announcement) {
-    const updated = a.status === 'published' ? await archiveAnnouncement(a.id) : await publishAnnouncement(a.id);
-    setAnnouncements((prev) => prev.map((x) => (x.id === a.id ? updated : x)));
+    const archiving = a.status === "published";
+
+    try {
+      const updated = archiving
+        ? await archiveAnnouncement(a.id)
+        : await publishAnnouncement(a.id);
+
+      setAnnouncements((prev) =>
+        prev.map((x) => (x.id === a.id ? updated : x)),
+      );
+      toast.success(
+        archiving ? "Announcement archived." : "Announcement published.",
+      );
+    } catch {
+      toast.error("Unable to update the announcement. Please try again.");
+    }
   }
 
   async function handleConfirmDelete() {
@@ -49,19 +69,26 @@ export default function AnnouncementsPage() {
     const id = deleteTarget;
     setDeleteTarget(null);
 
-    await deleteAnnouncement(id);
-    setAnnouncements((prev) => prev.filter((x) => x.id !== id));
+    try {
+      await deleteAnnouncement(id);
+      setAnnouncements((prev) => prev.filter((x) => x.id !== id));
+      toast.success("Announcement deleted.");
+    } catch {
+      toast.error("Unable to delete the announcement. Please try again.");
+    }
   }
 
-  if (loading) return <p className="p-6 text-gray-500 dark:text-gray-400">Loading announcements…</p>;
+  if (loading) return <SkeletonTable />;
 
   return (
     <div className="p-6">
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Announcements</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">
+          Announcements
+        </h1>
         <Link
           to="/admin/announcements/new"
-          className="rounded-md bg-linear-to-r from-brand-600 to-brand-500 px-4 py-2 text-sm font-medium text-white hover:from-brand-700 hover:to-brand-600"
+          className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
         >
           + New Announcement
         </Link>
@@ -69,16 +96,26 @@ export default function AnnouncementsPage() {
 
       <div className="space-y-3">
         {announcements.map((a) => (
-          <div key={a.id} className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+          <div
+            key={a.id}
+            className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900"
+          >
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-gray-900 dark:text-gray-50">{a.title}</h3>
-                  <StatusBadge label={a.status} tone={STATUS_TONE[a.status] ?? 'amber'} />
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-50">
+                    {a.title}
+                  </h3>
+                  <StatusBadge
+                    label={a.status}
+                    tone={STATUS_TONE[a.status] ?? "amber"}
+                  />
                 </div>
-                <p className="mt-1 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">{a.content}</p>
+                <p className="mt-1 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
+                  {a.content}
+                </p>
                 <p className="mt-1 font-mono text-xs text-gray-400 dark:text-gray-500">
-                  {a.status === 'published' && a.publishedAt
+                  {a.status === "published" && a.publishedAt
                     ? `Published ${new Date(a.publishedAt).toLocaleDateString()}`
                     : `Created ${new Date(a.createdAt).toLocaleDateString()}`}
                 </p>
@@ -94,7 +131,7 @@ export default function AnnouncementsPage() {
                   onClick={() => handlePublishToggle(a)}
                   className="rounded-md border border-gray-300 px-3 py-1 text-xs font-medium hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
                 >
-                  {a.status === 'published' ? 'Unpublish' : 'Publish'}
+                  {a.status === "published" ? "Unpublish" : "Publish"}
                 </button>
                 <button
                   onClick={() => setDeleteTarget(a.id)}
@@ -107,16 +144,21 @@ export default function AnnouncementsPage() {
           </div>
         ))}
         {announcements.length === 0 && (
-          <p className="py-8 text-center text-sm text-gray-400 dark:text-gray-500">No announcements yet.</p>
+          <EmptyState
+            title="No announcements yet"
+            description="Compose one to notify students or instructors."
+          />
         )}
       </div>
 
-      {pagination && <Pagination pagination={pagination} onPageChange={setPage} />}
+      {pagination && (
+        <Pagination pagination={pagination} onPageChange={setPage} />
+      )}
 
       <ConfirmModal
         open={deleteTarget !== null}
         title="Delete announcement?"
-        message="Are you sure you want to delete this announcement? This cannot be undone."
+        message="This announcement will no longer be visible to anyone it was published to. This cannot be undone."
         confirmLabel="Delete"
         variant="danger"
         onConfirm={() => void handleConfirmDelete()}
